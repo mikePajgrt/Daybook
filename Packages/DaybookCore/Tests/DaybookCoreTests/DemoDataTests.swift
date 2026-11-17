@@ -57,4 +57,35 @@ import Testing
         let segments = TimeGridLayout.allDaySegments(days: week, events: events, calendar: cal)
         #expect(Set(segments.map(\.lane)) == [0, 1])
     }
+
+    @Test func theDesignReviewEventCarriesEveryDetail() throws {
+        let event = try #require(DemoData.events(month: november, calendar: cal).first { $0.key.externalID == "demo-api" })
+        #expect(event.url != nil && event.notes != nil && event.location != nil)
+        #expect(event.alert == AlertOffset(minutesBefore: 15))
+        #expect(event.attendees.count == 4)
+        #expect(Set(event.attendees.map(\.status)).isSuperset(of: [.accepted, .declined, .tentative, .pending]))
+        #expect(event.attendees.contains { $0.isOrganizer })
+    }
+
+    @Test func aWeeklySeriesRunsThroughTheMonth() {
+        let store = DemoData.store(month: november, calendar: cal)
+        let interval = DateInterval(start: TestCalendar.date(2026, 11, 1), end: TestCalendar.date(2026, 12, 1))
+        let plan = store.events(in: interval, calendarIDs: Set(DemoData.calendars.map(\.id)))
+            .filter { $0.key.externalID == DemoData.seriesID }
+        #expect(plan.map { cal.component(.day, from: $0.start) } == [2, 9, 16, 23, 30])
+        #expect(plan.allSatisfy { $0.isRecurring && $0.title == "Týdenní plán" && !$0.attendees.isEmpty })
+    }
+
+    @Test func theStoreOffersSourcesAndADefaultCalendar() {
+        let store = DemoData.store(month: november, calendar: cal)
+        #expect(Set(store.sources().map(\.kind)) == [.icloud, .exchange, .google])
+        #expect(store.defaultCalendarID() == "demo-work")
+    }
+
+    @Test func readOnlyDemoCalendarsGiveReadOnlyEvents() {
+        let store = DemoData.store(month: november, calendar: cal)
+        let interval = DateInterval(start: TestCalendar.date(2026, 11, 17), end: TestCalendar.date(2026, 11, 18))
+        let holiday = store.events(in: interval, calendarIDs: ["demo-holidays"])
+        #expect(!holiday.isEmpty && holiday.allSatisfy { !$0.isEditable })
+    }
 }

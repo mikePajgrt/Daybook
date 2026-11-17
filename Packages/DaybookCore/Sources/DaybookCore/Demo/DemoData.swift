@@ -15,6 +15,28 @@ public enum DemoData {
                      sourceTitle: "Google", sourceKind: .google, isReadOnly: true, isShared: true)
     ]
 
+    /// Accounts the demo calendars live in. Google cannot hold a new calendar.
+    public static let sources: [SourceInfo] = [
+        SourceInfo(id: "demo-src-icloud", title: "iCloud", kind: .icloud),
+        SourceInfo(id: "demo-src-exchange", title: "Exchange", kind: .exchange),
+        SourceInfo(id: "demo-src-google", title: "Google", kind: .google, allowsCalendars: false)
+    ]
+
+    /// The calendar the demo system offers for new events.
+    public static let defaultCalendarID = "demo-work"
+
+    /// The detailed event the detail and editor captures show (on the month's 17th).
+    public static let detailedEventID = "demo-api"
+    /// The weekly series: every Monday at 8:30, from the month's first Monday.
+    public static let seriesID = "demo-weekly"
+
+    private static let people: [Attendee] = [
+        Attendee(name: "Tomáš Novák", email: "tomas.novak@example.com", status: .accepted, isOrganizer: true),
+        Attendee(name: "Petra Svobodová", email: "petra.svobodova@example.com", status: .tentative),
+        Attendee(name: "Jan Dvořák", email: "jan.dvorak@example.com", status: .declined),
+        Attendee(name: nil, email: "design@example.com", status: .pending)
+    ]
+
     private static let titles: [String: [String]] = [
         "demo-work": ["Standup platformy", "1:1 s Tomášem", "Review roadmapy Q1", "Pohovor: senior iOS",
                       "Sprint planning", "Demo pro klienta", "Architektura sync", "Retro", "Rozpočet 2027",
@@ -96,10 +118,33 @@ public enum DemoData {
         timed("demo-outage", "Odstávka DB", calendarID: "demo-team", dayOfMonth: 17, hour: 14, minutes: 60)
         timed("demo-night", "Noční nasazení", calendarID: "demo-team", dayOfMonth: 19, hour: 22, minutes: 240)
 
+        // Everything the event detail can show, on one event.
+        if let index = result.firstIndex(where: { $0.key.externalID == detailedEventID }) {
+            result[index].notes = "Projít návrh endpointů pro synchronizaci kategorií a rozhodnout o stránkování."
+            result[index].url = URL(string: "https://example.com/navrh-api")
+            result[index].alert = AlertOffset(minutesBefore: 15)
+            result[index].attendees = people
+            result[index].timeZoneID = calendar.timeZone.identifier
+        }
+
+        // A weekly series, so the recurring edit and delete questions can be shown.
+        let firstMonday = (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: monthStart) }
+            .first { calendar.component(.weekday, from: $0) == 2 }
+        if let firstMonday,
+           let start = calendar.date(bySettingHour: 8, minute: 30, second: 0, of: firstMonday) {
+            result.append(EventInfo(key: EventKey(externalID: seriesID, occurrenceStart: start),
+                                    calendarID: "demo-work", title: "Týdenní plán",
+                                    start: start, end: start.addingTimeInterval(30 * 60), isAllDay: false,
+                                    location: "Zasedačka Vltava", recurrence: RecurrenceRule(frequency: .weekly),
+                                    attendees: Array(people.prefix(3)), alert: AlertOffset(minutesBefore: 5),
+                                    timeZoneID: calendar.timeZone.identifier))
+        }
+
         return result.sorted { ($0.start, $0.title) < ($1.start, $1.title) }
     }
 
-    public static func store(month: Date, calendar: Calendar) -> InMemoryCalendarStore {
-        InMemoryCalendarStore(calendars: calendars, events: events(month: month, calendar: calendar))
+    public static func store(month: Date, calendar: Calendar, access: CalendarAccess = .granted) -> InMemoryCalendarStore {
+        InMemoryCalendarStore(calendars: calendars, events: events(month: month, calendar: calendar),
+                              access: access, sources: sources, defaultCalendarID: defaultCalendarID, calendar: calendar)
     }
 }
