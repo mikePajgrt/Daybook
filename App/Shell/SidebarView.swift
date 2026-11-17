@@ -4,6 +4,8 @@ import SwiftUI
 /// Calendars grouped by account. One click or tap switches a calendar on or off.
 struct SidebarView: View {
     @Environment(AppModel.self) private var model
+    /// Row fill when the list is shown as an inset list (the iPhone sheet); `nil` keeps the sidebar style.
+    var rowBackground: Color? = nil
 
     var body: some View {
         List {
@@ -15,7 +17,7 @@ struct SidebarView: View {
                 .accessibilityAddTraits(.isHeader)
             #endif
             ForEach(model.sections) { section in
-                Section(section.title) {
+                Section {
                     ForEach(section.calendars) { calendar in
                         CalendarToggleRow(calendar: calendar, isOn: model.filter.isVisible(calendar.id)) {
                             model.toggle(calendar)
@@ -24,7 +26,11 @@ struct SidebarView: View {
                             Button("Zobrazit jen tento") { model.showOnly(calendar) }
                             Button("Zobrazit všechny") { model.showAll() }
                         }
+                        .listRowBackground(rowBackground)
                     }
+                } header: {
+                    Text(section.title)
+                        .foregroundStyle(Theme.secondaryInk)
                 }
             }
         }

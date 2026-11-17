@@ -6,6 +6,8 @@ import SwiftUI
 struct MonthAgendaView: View {
     @Environment(AppModel.self) private var model
     let color: (String) -> Color
+    /// Diameter of the interchange circle around today's number.
+    @ScaledMetric(relativeTo: .title3) private var numberSize: CGFloat = 34
 
     private var days: [DayLayout] {
         model.weeks.flatMap(\.days).filter(\.isInMonth)
@@ -31,18 +33,18 @@ struct MonthAgendaView: View {
         let events = model.events(on: day.date)
         let isToday = day.date == model.today
         return HStack(alignment: .firstTextBaseline, spacing: 12) {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .center, spacing: 2) {
+                // Today: only the number sits in the interchange circle, as in the grid.
                 Text(verbatim: String(model.calendar.component(.day, from: day.date)))
                     .font(.title3.weight(.bold))
                     .monospacedDigit()
+                    .foregroundStyle(isToday ? Theme.ground : Theme.ink)
+                    .frame(minWidth: numberSize, minHeight: numberSize)
+                    .background { if isToday { Circle().fill(Theme.ink) } }
                 Text(day.date, format: .dateTime.weekday(.abbreviated))
                     .font(.caption)
-                    .foregroundStyle(isToday ? Theme.ground.opacity(0.8) : Theme.secondaryInk)
+                    .foregroundStyle(Theme.secondaryInk)
             }
-            .foregroundStyle(isToday ? Theme.ground : Theme.ink)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background { if isToday { RoundedRectangle(cornerRadius: 12).fill(Theme.ink) } }
             .frame(minWidth: 64, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 8) {

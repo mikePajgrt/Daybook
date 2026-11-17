@@ -29,7 +29,7 @@ struct MonthView: View {
                 VStack(spacing: 0) {
                     weekdayHeader
                     GeometryReader { proxy in
-                        grid(viewport: proxy.size.height, bottomInset: proxy.safeAreaInsets.bottom, dense: dense)
+                        grid(viewport: proxy.size.height, dense: dense)
                     }
                 }
             }
@@ -39,6 +39,7 @@ struct MonthView: View {
         .sheet(item: $selectedDay) { day in
             NavigationStack { DayListView(day: day.date) }
                 .presentationDetents([.medium, .large])
+                .presentationBackground(Theme.rail)
         }
         .onAppear {
             if model.stagedScreens.contains("day") { selectedDay = SelectedDay(date: model.today) }
@@ -61,14 +62,16 @@ struct MonthView: View {
         return model.weeks.first { $0.days.contains { $0.date == model.today } } ?? model.weeks.first
     }
 
-    private func grid(viewport: CGFloat, bottomInset: CGFloat, dense: Bool) -> some View {
+    private func grid(viewport: CGFloat, dense: Bool) -> some View {
         let metrics = WeekMetrics(rowHeight: rowHeight, numberHeight: numberHeight)
         let rowHeights = heights(viewport: viewport, metrics: metrics)
         let rows = Array(zip(model.weeks, rowHeights))
-        // Room below the last week, so the opening week can reach the top even late in the month.
+        // Today's week goes to the top when the weeks from it onward fill the viewport. When they do not,
+        // the month's last week sits on the viewport's bottom edge instead: the screen stays full and
+        // today's week is as high as it can get, with no bare band under the month.
         let opening = openingWeek.flatMap { week in model.weeks.firstIndex { $0.id == week.id } } ?? 0
         let tail = rowHeights.isEmpty ? 0 : rowHeights[opening...].reduce(0, +)
-        let runout = opening > 0 ? max(0, viewport + bottomInset - tail) : 0
+        let anchorsBottom = opening > 0 && tail < viewport
         return ScrollViewReader { reader in
             ScrollView {
                 VStack(spacing: 0) {
@@ -79,11 +82,14 @@ struct MonthView: View {
                             .frame(height: height)
                             .id(week.id)
                     }
-                    Color.clear.frame(height: runout)
                 }
             }
             .task(id: model.scrollKey) {
-                if let target = openingWeek { reader.scrollTo(target.id, anchor: .top) }
+                if anchorsBottom, let last = model.weeks.last {
+                    reader.scrollTo(last.id, anchor: .bottom)
+                } else if let target = openingWeek {
+                    reader.scrollTo(target.id, anchor: .top)
+                }
             }
         }
     }

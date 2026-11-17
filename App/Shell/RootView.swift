@@ -29,7 +29,7 @@ struct RootView: View {
             }
             .sheet(isPresented: $showsCalendars) {
                 NavigationStack {
-                    SidebarView()
+                    SidebarView(rowBackground: Theme.ground)
                         .navigationTitle("Kalendáře")
                         .toolbar {
                             ToolbarItem(placement: .confirmationAction) {
@@ -38,6 +38,7 @@ struct RootView: View {
                         }
                 }
                 .presentationDetents([.medium, .large])
+                .presentationBackground(Theme.rail)
             }
             .onAppear {
                 if model.stagedScreens.contains("calendars") { showsCalendars = true }

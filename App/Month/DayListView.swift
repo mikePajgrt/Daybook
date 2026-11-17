@@ -12,7 +12,8 @@ struct DayListView: View {
         List {
             if events.isEmpty {
                 Text("Na tento den není nic naplánováno.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.secondaryInk)
+                    .listRowBackground(Theme.ground)
             }
             ForEach(events) { event in
                 let info = model.calendarInfo(event.calendarID)
@@ -23,14 +24,19 @@ struct DayListView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(EventRowView.title(of: event))
                             .font(.body)
+                            .foregroundStyle(Theme.ink)
                         Text([when(event), info?.title].compactMap { $0 }.joined(separator: " · "))
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Theme.secondaryInk)
                     }
                 }
                 .accessibilityElement(children: .combine)
+                .listRowBackground(Theme.ground)
             }
         }
+        // The world's colours instead of system grey: rows on the ground, set in the deeper rail.
+        .scrollContentBackground(.hidden)
+        .background(Theme.rail)
         .navigationTitle(day.formatted(.dateTime.weekday(.wide).day().month(.wide)))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
