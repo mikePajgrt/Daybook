@@ -96,6 +96,16 @@ public enum TimeGridLayout {
         return SpanLanes.segments(days: days, items: items)
     }
 
+    /// The start of the slot at wall-clock `minute` of `day`: floored to `step` minutes and kept inside
+    /// the day. Built with calendar arithmetic, so clock changes do not shift it.
+    public static func slotStart(day: Date, minute: Double, calendar: Calendar, step: Int = 30) -> Date {
+        let lastSlot = 24 * 60 - step
+        let floored = Int((max(0, minute) / Double(step)).rounded(.down)) * step
+        let clamped = min(max(0, floored), lastSlot)
+        let midnight = calendar.startOfDay(for: day)
+        return calendar.date(bySettingHour: clamped / 60, minute: clamped % 60, second: 0, of: midnight) ?? midnight
+    }
+
     /// Wall-clock minutes of `date` within the day, so a clock change does not shift the hour rules.
     static func minutes(of date: Date, dayStart: Date, dayEnd: Date, calendar: Calendar) -> Int {
         if date >= dayEnd { return 24 * 60 }

@@ -8,6 +8,19 @@ public enum Palette {
     /// The light ground.
     public static let porcelain = RGBA(r: 0.957, g: 0.945, b: 0.918)
 
+    /// Calendar colours the colour picker offers first: red, orange, amber, green, teal, blue, violet, pink.
+    /// Each keeps 3:1 against both grounds, so a line drawn in it reads in both appearances.
+    public static let calendarPresets: [RGBA] = [
+        RGBA(r: 0.93, g: 0.27, b: 0.27),
+        RGBA(r: 0.86, g: 0.40, b: 0.05),
+        RGBA(r: 0.72, g: 0.50, b: 0.00),
+        RGBA(r: 0.12, g: 0.60, b: 0.35),
+        RGBA(r: 0.00, g: 0.60, b: 0.62),
+        RGBA(r: 0.23, g: 0.51, b: 1.00),
+        RGBA(r: 0.66, g: 0.36, b: 0.93),
+        RGBA(r: 0.91, g: 0.30, b: 0.60)
+    ]
+
     /// How much of the calendar's colour an event block's fill carries.
     public static let blockFillAmount = 0.22
 

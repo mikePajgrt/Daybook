@@ -135,3 +135,24 @@ private extension EventInfo {
         return copy
     }
 }
+
+@Suite struct TimeGridSlotTests {
+    @Test func slotsSnapDownToTheHalfHourWithinTheDay() {
+        let cal = TestCalendar.prague()
+        let day = TestCalendar.date(2026, 11, 17)
+        func slot(_ minute: Double) -> Date { TimeGridLayout.slotStart(day: day, minute: minute, calendar: cal) }
+        #expect(slot(645.5) == TestCalendar.date(2026, 11, 17, 10, 30))
+        #expect(slot(0) == day)
+        #expect(slot(-5) == day)
+        #expect(slot(1439) == TestCalendar.date(2026, 11, 17, 23, 30))
+        #expect(slot(1500) == TestCalendar.date(2026, 11, 17, 23, 30))
+    }
+
+    @Test func slotsUseWallClockOnTheClockChange() {
+        let cal = TestCalendar.prague()
+        let day = TestCalendar.date(2026, 10, 25)
+        let slot = TimeGridLayout.slotStart(day: day, minute: 180, calendar: cal)
+        #expect(cal.component(.hour, from: slot) == 3 && cal.component(.minute, from: slot) == 0)
+        #expect(cal.isDate(slot, inSameDayAs: day))
+    }
+}

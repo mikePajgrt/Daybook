@@ -32,4 +32,12 @@ import Testing
             #expect(Palette.contrast(Palette.midnight, light) >= 7)
         }
     }
+
+    @Test func presetCalendarColoursReadOnBothGrounds() {
+        #expect(Palette.calendarPresets.count == 8)
+        for color in Palette.calendarPresets {
+            #expect(Palette.contrast(color, Palette.midnight) >= 3)
+            #expect(Palette.contrast(color, Palette.porcelain) >= 3)
+        }
+    }
 }
