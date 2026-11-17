@@ -879,7 +879,8 @@ public enum MonthLayout {
 
         let dayLayouts = days.enumerated().map { index, date in
             DayLayout(date: date,
-                      isInMonth: monthInterval?.contains(date) ?? true,
+                      // DateInterval.contains includes the end instant, which is the next month's first midnight.
+                      isInMonth: monthInterval.map { date >= $0.start && date < $0.end } ?? true,
                       timed: timed[index].sorted { ($0.start, $0.title) < ($1.start, $1.title) })
         }
         return WeekLayout(days: dayLayouts, spans: spans)
