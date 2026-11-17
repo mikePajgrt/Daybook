@@ -35,4 +35,26 @@ import Testing
         let weekdaysInMonth = weeks.flatMap(\.days).filter { $0.isInMonth && !cal.isDateInWeekend($0.date) }
         #expect(weekdaysInMonth.allSatisfy { !$0.timed.isEmpty })
     }
+
+    @Test func todayHasAnOverlapClusterOfThree() {
+        let events = DemoData.events(month: november, calendar: cal)
+        let placements = TimeGridLayout.layout(day: november, events: events, calendar: cal)
+        let cluster = placements.filter { $0.columnCount == 3 }
+        #expect(cluster.count == 3)
+        #expect(Set(cluster.map(\.column)) == [0, 1, 2])
+        #expect(cluster.contains { $0.event.location != nil })
+    }
+
+    @Test func anEventCrossesMidnightInTheWeekOfToday() {
+        let events = DemoData.events(month: november, calendar: cal)
+        let next = TimeGridLayout.layout(day: TestCalendar.date(2026, 11, 20), events: events, calendar: cal)
+        #expect(next.contains { $0.continuesBefore })
+    }
+
+    @Test func theWeekOfTodayNeedsTwoAllDayLanes() {
+        let events = DemoData.events(month: november, calendar: cal)
+        let week = Period.days(in: Period.interval(.week, containing: november, calendar: cal), calendar: cal)
+        let segments = TimeGridLayout.allDaySegments(days: week, events: events, calendar: cal)
+        #expect(Set(segments.map(\.lane)) == [0, 1])
+    }
 }

@@ -76,6 +76,25 @@ public enum DemoData {
         allDay("demo-conference", "WebExpo", calendarID: "demo-work", dayOfMonth: 11, length: 2)
         allDay("demo-holiday", "Státní svátek", calendarID: "demo-holidays", dayOfMonth: 17, length: 1)
         allDay("demo-trip", "Lisabon", calendarID: "demo-home", dayOfMonth: 26, length: 5)
+        allDay("demo-sitting", "Hlídání Emy", calendarID: "demo-family", dayOfMonth: 17, length: 3)
+
+        // Fixed cases the week and day views must handle: three events overlapping on the 17th,
+        // and a night shift crossing midnight from the 19th into the 20th.
+        func timed(_ id: String, _ title: String, calendarID: String, dayOfMonth: Int,
+                   hour: Int, minute: Int = 0, minutes: Int, location: String? = nil) {
+            guard let day = calendar.date(byAdding: .day, value: dayOfMonth - 1, to: monthStart),
+                  let start = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: day) else { return }
+            result.append(EventInfo(key: EventKey(externalID: id, occurrenceStart: start),
+                                    calendarID: calendarID, title: title,
+                                    start: start, end: start.addingTimeInterval(Double(minutes) * 60),
+                                    isAllDay: false, location: location))
+        }
+        timed("demo-api", "Návrh API", calendarID: "demo-work", dayOfMonth: 17, hour: 13, minutes: 90,
+              location: "Zasedačka Vltava")
+        timed("demo-swim", "Ema: plavání", calendarID: "demo-family", dayOfMonth: 17, hour: 13, minute: 30,
+              minutes: 90, location: "Bazén Podolí")
+        timed("demo-outage", "Odstávka DB", calendarID: "demo-team", dayOfMonth: 17, hour: 14, minutes: 60)
+        timed("demo-night", "Noční nasazení", calendarID: "demo-team", dayOfMonth: 19, hour: 22, minutes: 240)
 
         return result.sorted { ($0.start, $0.title) < ($1.start, $1.title) }
     }
