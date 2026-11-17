@@ -44,14 +44,17 @@ private struct CalendarToggleRow: View {
                 Image(systemName: isOn ? "checkmark.square.fill" : "square")
                     .foregroundStyle(Color(calendar.color))
                     .imageScale(.large)
-                Text(calendar.title)
-                    .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
-                Spacer(minLength: 8)
-                if calendar.isShared {
-                    Text("sdílený")
-                        .font(.caption)
-                        .foregroundStyle(Theme.secondaryInk)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(calendar.title)
+                        .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
+                        .lineLimit(1)
+                    if calendar.isShared {
+                        Text("sdílený")
+                            .font(.caption)
+                            .foregroundStyle(Theme.secondaryInk)
+                    }
                 }
+                Spacer(minLength: 8)
                 if calendar.isReadOnly {
                     Image(systemName: "lock.fill")
                         .font(.caption)

@@ -5,6 +5,7 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showsCalendars = false
 
     var body: some View {
@@ -38,6 +39,9 @@ struct RootView: View {
                 }
                 .presentationDetents([.medium, .large])
             }
+            .onAppear {
+                if model.stagedScreens.contains("calendars") { showsCalendars = true }
+            }
         } else {
             NavigationSplitView {
                 SidebarView()
@@ -49,9 +53,17 @@ struct RootView: View {
         }
     }
 
+    /// The year must survive next to the toolbar buttons, so large text gets the short month name.
+    private var monthTitle: String {
+        let style: Date.FormatStyle = dynamicTypeSize.isAccessibilitySize && sizeClass == .compact
+            ? .dateTime.month(.abbreviated).year()
+            : .dateTime.month(.wide).year()
+        return model.month.formatted(style).localizedCapitalized
+    }
+
     private var month: some View {
         MonthView()
-            .navigationTitle(model.month.formatted(.dateTime.month(.wide).year()).localizedCapitalized)
+            .navigationTitle(monthTitle)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif

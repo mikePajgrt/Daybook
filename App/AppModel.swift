@@ -22,6 +22,10 @@ final class AppModel {
 
     let calendar: Calendar
     let today: Date
+    /// Screens a debug demo launch asks to open straight away, for screenshots.
+    let stagedScreens: Set<String>
+    /// Bumped by "Dnes", so the month scrolls back to today even when it is already on screen.
+    private(set) var todayRequests = 0
     private let store: CalendarStore
     private let defaults: UserDefaults
     private var watcher: Task<Void, Never>?
@@ -34,7 +38,8 @@ final class AppModel {
     private(set) var weeks: [WeekLayout] = []
 
     init(store: CalendarStore, defaults: UserDefaults = .standard,
-         calendar: Calendar = .current, now: Date = Date()) {
+         calendar: Calendar = .current, now: Date = Date(), stagedScreens: Set<String> = []) {
+        self.stagedScreens = stagedScreens
         self.store = store
         self.defaults = defaults
         self.calendar = calendar
@@ -117,7 +122,14 @@ final class AppModel {
 
     func goToToday() {
         month = today
+        todayRequests += 1
         reload()
+    }
+
+    /// Changes whenever the month view should bring today's week (or the month's top) into view.
+    var scrollKey: String {
+        let start = calendar.dateInterval(of: .month, for: month)?.start ?? month
+        return "\(start.timeIntervalSinceReferenceDate)-\(todayRequests)"
     }
 
     /// Everything planned on `day`, all-day and multi-day events first.

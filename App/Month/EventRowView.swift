@@ -7,6 +7,10 @@ struct EventRowView: View {
     let color: Color
     /// Narrow columns (iPhone, iPad beside the sidebar): no time, condensed type.
     let compact: Bool
+    /// The event's day belongs to the neighbouring month.
+    var dimmed = false
+
+    @Environment(\.colorSchemeContrast) private var contrast
 
     static func title(of event: EventInfo) -> String {
         event.title.isEmpty ? "Bez názvu" : event.title
@@ -22,22 +26,16 @@ struct EventRowView: View {
 
     var body: some View {
         HStack(spacing: compact ? 4 : 6) {
-            Rectangle()
-                .fill(color)
-                .frame(width: 3)
-                .overlay {
-                    Circle()
-                        .fill(Theme.station)
-                        .frame(width: 7, height: 7)
-                        .overlay { Circle().stroke(color, lineWidth: 1.5) }
-                }
+            StationMark(color: color)
+                .opacity(dimmed ? 0.45 : 1)
             if !compact {
                 Text(event.start, format: .dateTime.hour().minute())
-                    .foregroundStyle(Theme.secondaryInk)
+                    .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.secondaryInk)
                     .monospacedDigit()
                     .fixedSize()
             }
             Text(Self.title(of: event))
+                .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.ink)
                 .lineLimit(1)
             Spacer(minLength: 0)
         }
@@ -46,5 +44,22 @@ struct EventRowView: View {
         .padding(.leading, compact ? 4 : 8)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(event.start.formatted(date: .omitted, time: .shortened)), \(Self.title(of: event))")
+    }
+}
+
+/// A piece of a calendar's line with the station dot that marks one event on it.
+struct StationMark: View {
+    let color: Color
+
+    var body: some View {
+        Rectangle()
+            .fill(color)
+            .frame(width: 3)
+            .overlay {
+                Circle()
+                    .fill(Theme.station)
+                    .frame(width: 7, height: 7)
+                    .overlay { Circle().stroke(color, lineWidth: 1.5) }
+            }
     }
 }

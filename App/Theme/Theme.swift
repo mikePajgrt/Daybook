@@ -20,6 +20,14 @@ enum Theme {
     static let ink = Color.adaptive(light: midnight, dark: porcelain)
     /// Times and other secondary text.
     static let secondaryInk = ink.opacity(0.62)
+    /// Text of days that belong to the neighbouring month. Holds 4.5:1 on the ground in both appearances.
+    private static let outsideInk = Color.adaptive(light: RGBA(r: 0.357, g: 0.384, b: 0.471),
+                                                   dark: RGBA(r: 0.561, g: 0.592, b: 0.678))
+
+    static func outsideInk(_ contrast: ColorSchemeContrast) -> Color {
+        contrast == .increased ? ink.opacity(0.85) : outsideInk
+    }
+
     /// The dot that marks an event on its calendar's line.
     static let station = Color.adaptive(light: RGBA(r: 1, g: 1, b: 1), dark: porcelain)
     /// Hairlines between days and weeks.
