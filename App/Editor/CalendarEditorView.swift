@@ -47,7 +47,7 @@ struct CalendarEditorView: View {
     }
 
     @ViewBuilder private var newCalendarSections: some View {
-        Section {
+        Section("Název") {
             TextField("Název", text: $editor.title, prompt: Text("Například Výlety"))
         }
         .listRowBackground(Theme.ground)

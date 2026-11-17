@@ -10,7 +10,8 @@ struct CalendarColorPicker: View {
     private static let names = ["Červená", "Oranžová", "Jantarová", "Zelená", "Tyrkysová", "Modrá", "Fialová", "Růžová"]
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 40, maximum: 52), spacing: 4)], spacing: 4) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 44, maximum: 60), spacing: 4), count: 4),
+                  alignment: .leading, spacing: 4) {
             ForEach(Array(Palette.calendarPresets.enumerated()), id: \.offset) { index, preset in
                 let selected = isClose(preset, color)
                 Button { color = preset } label: {

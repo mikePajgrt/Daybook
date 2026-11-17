@@ -34,12 +34,36 @@ macshot() {
   fi
   pkill -x Daybook 2> /dev/null
 }
+# macregion FILE [launch arguments...]: the Daybook window's rectangle, so its popover or sheet
+# (separate windows on top of it) is in the picture. The window is frontmost, so nothing else is.
+macregion() {
+  file=$1
+  shift
+  pkill -x Daybook 2> /dev/null
+  sleep 1
+  open -n "$MACAPP" --args -demo "$@" -ApplePersistenceIgnoreState YES
+  sleep 7
+  bounds=$(swift scripts/window-id.swift Daybook --bounds)
+  if [ -n "$bounds" ]; then
+    screencapture -x -R "$bounds" "$OUT/$file" || echo "mac capture refused: $file"
+  else
+    echo "no Daybook window found, skipped $file"
+  fi
+  pkill -x Daybook 2> /dev/null
+}
 rm -f "$OUT/mac-screen.png"
 macshot mac.png -demo-dark
 macshot mac-light.png -demo-light
 macshot mac-week.png -demo-dark -demo-week
 macshot mac-week-light.png -demo-light -demo-week
 macshot mac-day.png -demo-dark -demo-day-view
+macregion mac-detail.png -demo-dark -demo-detail
+macregion mac-detail-readonly.png -demo-light -demo-detail-readonly
+macregion mac-delete.png -demo-dark -demo-delete
+macregion mac-editor-new.png -demo-dark -demo-editor-new
+macregion mac-editor-new-light.png -demo-light -demo-editor-new
+macregion mac-editor-edit.png -demo-dark -demo-editor-edit
+macregion mac-new-calendar.png -demo-dark -demo-new-calendar
 
 # shot DEVICE FILE [launch arguments...]
 shot() {
@@ -69,15 +93,30 @@ shot "$PHONE" phone-denied.png -demo-denied
 xcrun simctl ui "$PHONE" content_size accessibility-large
 shot "$PHONE" phone-large-type.png
 shot "$PHONE" phone-week-large-type.png -demo-week
+shot "$PHONE" phone-editor-large-type.png -demo-editor-edit
+shot "$PHONE" phone-detail-large-type.png -demo-day-view -demo-detail
 xcrun simctl ui "$PHONE" content_size large
 shot "$PHONE" phone-light.png -demo-light
 shot "$PHONE" phone-week.png -demo-week
 shot "$PHONE" phone-week-light.png -demo-week -demo-light
 shot "$PHONE" phone-day-view.png -demo-day-view
+shot "$PHONE" phone-detail.png -demo-day-view -demo-detail
+shot "$PHONE" phone-detail-readonly.png -demo-day-view -demo-detail-readonly
+shot "$PHONE" phone-delete.png -demo-week -demo-delete
+shot "$PHONE" phone-editor-new.png -demo-editor-new
+shot "$PHONE" phone-editor-new-light.png -demo-editor-new -demo-light
+shot "$PHONE" phone-editor-edit.png -demo-editor-edit
+shot "$PHONE" phone-new-calendar.png -demo-calendars -demo-new-calendar
+shot "$PHONE" phone-calendar-color.png -demo-calendars -demo-calendar-color
 
 shot "$TABLET" tablet.png
 shot "$TABLET" tablet-off.png -demo-off
 shot "$TABLET" tablet-week.png -demo-week
 shot "$TABLET" tablet-day-view.png -demo-day-view
+shot "$TABLET" tablet-detail.png -demo-detail
+shot "$TABLET" tablet-delete.png -demo-delete
+shot "$TABLET" tablet-editor-edit.png -demo-editor-edit
+shot "$TABLET" tablet-editor-new-light.png -demo-editor-new -demo-light
+shot "$TABLET" tablet-new-calendar.png -demo-new-calendar
 
 shasum "$OUT"/*.png

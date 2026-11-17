@@ -238,6 +238,9 @@ struct EventDetailView: View {
             Spacer()
             Button("Smazat událost", systemImage: "trash", role: .destructive) { asksDelete = true }
                 .buttonStyle(.bordered)
+                // The view's ink would otherwise override the destructive colour.
+                .foregroundStyle(.red)
+                .tint(.red)
         }
         .controlSize(style == .popover ? .regular : .large)
     }
