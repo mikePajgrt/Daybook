@@ -1,0 +1,16 @@
+.DS_Store
+
+# Xcode / SwiftPM
+*.xcodeproj
+xcuserdata/
+DerivedData/
+.build/
+.swiftpm/
+
+# Tooling runtime state
+.superpowers/
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/review/
+.impeccable/reference/
+.impeccable/config.local.json
