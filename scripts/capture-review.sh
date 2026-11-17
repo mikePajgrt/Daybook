@@ -17,23 +17,29 @@ xcodebuild -project Daybook.xcodeproj -scheme Daybook -destination "platform=iOS
 
 # Mac first: quitting the Mac app by name would also kill a simulator process of the same name.
 # Only the Daybook window is captured, never the whole screen: other windows are private.
-# macshot FILE APPEARANCE-ARGUMENT
+# macshot FILE [launch arguments...]
 macshot() {
+  file=$1
+  shift
   pkill -x Daybook 2> /dev/null
   sleep 1
-  open -n "$MACAPP" --args -demo "$2"
+  # Ignore saved window state: a session that was killed can restore to no window at all.
+  open -n "$MACAPP" --args -demo "$@" -ApplePersistenceIgnoreState YES
   sleep 6
   window=$(swift scripts/window-id.swift Daybook)
   if [ -n "$window" ]; then
-    screencapture -x -o -l "$window" "$OUT/$1" || echo "mac capture refused: $1"
+    screencapture -x -o -l "$window" "$OUT/$file" || echo "mac capture refused: $file"
   else
-    echo "no Daybook window found, skipped $1"
+    echo "no Daybook window found, skipped $file"
   fi
   pkill -x Daybook 2> /dev/null
 }
 rm -f "$OUT/mac-screen.png"
 macshot mac.png -demo-dark
 macshot mac-light.png -demo-light
+macshot mac-week.png -demo-dark -demo-week
+macshot mac-week-light.png -demo-light -demo-week
+macshot mac-day.png -demo-dark -demo-day-view
 
 # shot DEVICE FILE [launch arguments...]
 shot() {
@@ -62,10 +68,16 @@ shot "$PHONE" phone-off.png -demo-off
 shot "$PHONE" phone-denied.png -demo-denied
 xcrun simctl ui "$PHONE" content_size accessibility-large
 shot "$PHONE" phone-large-type.png
+shot "$PHONE" phone-week-large-type.png -demo-week
 xcrun simctl ui "$PHONE" content_size large
 shot "$PHONE" phone-light.png -demo-light
+shot "$PHONE" phone-week.png -demo-week
+shot "$PHONE" phone-week-light.png -demo-week -demo-light
+shot "$PHONE" phone-day-view.png -demo-day-view
 
 shot "$TABLET" tablet.png
 shot "$TABLET" tablet-off.png -demo-off
+shot "$TABLET" tablet-week.png -demo-week
+shot "$TABLET" tablet-day-view.png -demo-day-view
 
 shasum "$OUT"/*.png
