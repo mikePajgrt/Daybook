@@ -24,7 +24,7 @@ struct MonthView: View {
             // Below this column width a time and a readable title no longer fit on one row.
             let dense = outer.size.width / 7 < 130
             if dense && dynamicTypeSize.isAccessibilitySize {
-                MonthAgendaView(color: color(for:))
+                AgendaView(days: model.weeks.flatMap(\.days).filter(\.isInMonth).map(\.date), color: color(for:))
             } else {
                 VStack(spacing: 0) {
                     weekdayHeader
@@ -78,7 +78,9 @@ struct MonthView: View {
                     ForEach(rows, id: \.0.id) { week, height in
                         WeekRowView(week: week, today: model.today, calendar: model.calendar,
                                     metrics: metrics, compact: dense, color: color(for:),
-                                    onSelectDay: dense ? { selectedDay = SelectedDay(date: $0) } : nil)
+                                    // iPhone: a tap on a day opens the day sheet. Mac and iPad: the day number opens the day view.
+                                    onSelectDay: compact ? { selectedDay = SelectedDay(date: $0) } : nil,
+                                    onOpenDay: compact ? nil : { model.show(day: $0) })
                             .frame(height: height)
                             .id(week.id)
                     }

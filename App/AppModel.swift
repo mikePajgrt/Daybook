@@ -19,6 +19,9 @@ struct SelectedDay: Identifiable {
 @Observable
 final class AppModel {
     static let hiddenCalendarsKey = "hiddenCalendarIDs"
+    static let viewModeKey = "viewMode"
+    /// For overlap, a timed event lasts at least this long: blocks are never drawn shorter.
+    static let minimumBlockDuration: TimeInterval = 30 * 60
 
     let calendar: Calendar
     let today: Date
@@ -33,18 +36,35 @@ final class AppModel {
     private(set) var access: CalendarAccess
     private(set) var calendars: [CalendarInfo] = []
     private(set) var filter: VisibilityFilter
-    /// Any instant inside the month on screen.
-    private(set) var month: Date
+    /// Day, week or month. Remembered per device.
+    private(set) var mode: ViewMode
+    /// Any instant inside the period on screen.
+    private(set) var focusedDate: Date
+    /// The interval whose events are loaded: exactly what the current view shows.
+    private(set) var loadedInterval: DateInterval?
+    /// Month view: the weeks of the month.
     private(set) var weeks: [WeekLayout] = []
+    /// Week and day views: the columns, their all-day lanes and each column's timed events.
+    private(set) var gridDays: [Date] = []
+    private(set) var allDaySegments: [SpanSegment] = []
+    private(set) var placements: [[TimedPlacement]] = []
+    /// Demo mode freezes the clock so screenshots compare; otherwise `nil` and the real time is used.
+    private let fixedNow: Date?
+
+    /// Any instant inside the month on screen (the month view's name for the focused date).
+    var month: Date { focusedDate }
 
     init(store: CalendarStore, defaults: UserDefaults = .standard,
-         calendar: Calendar = .current, now: Date = Date(), stagedScreens: Set<String> = []) {
+         calendar: Calendar = .current, now: Date = Date(), clockIsFixed: Bool = false,
+         stagedScreens: Set<String> = []) {
         self.stagedScreens = stagedScreens
         self.store = store
         self.defaults = defaults
         self.calendar = calendar
         self.today = calendar.startOfDay(for: now)
-        self.month = now
+        self.focusedDate = now
+        self.fixedNow = clockIsFixed ? now : nil
+        self.mode = defaults.string(forKey: Self.viewModeKey).flatMap(ViewMode.init(rawValue:)) ?? .month
         self.access = store.access
         self.filter = VisibilityFilter(storedValue: defaults.stringArray(forKey: Self.hiddenCalendarsKey) ?? [])
     }
@@ -67,14 +87,27 @@ final class AppModel {
     func reload() {
         access = store.access
         calendars = access == .granted ? store.calendars() : []
-        let days = MonthLayout.weeks(containing: month, calendar: calendar).flatMap { $0 }
+        let interval = Period.interval(mode, containing: focusedDate, calendar: calendar)
+        loadedInterval = interval
         var events: [EventInfo] = []
-        if access == .granted, let first = days.first, let last = days.last,
-           let end = calendar.date(byAdding: .day, value: 1, to: last) {
+        if access == .granted {
             let visible = filter.visibleIDs(among: Set(calendars.map(\.id)))
-            events = store.events(in: DateInterval(start: first, end: end), calendarIDs: visible)
+            events = store.events(in: interval, calendarIDs: visible)
         }
-        weeks = MonthLayout.layout(month: month, events: events, calendar: calendar)
+        if mode == .month {
+            weeks = MonthLayout.layout(month: focusedDate, events: events, calendar: calendar)
+            gridDays = []
+            allDaySegments = []
+            placements = []
+        } else {
+            weeks = []
+            gridDays = Period.days(in: interval, calendar: calendar)
+            allDaySegments = TimeGridLayout.allDaySegments(days: gridDays, events: events, calendar: calendar)
+            placements = gridDays.map {
+                TimeGridLayout.layout(day: $0, events: events, calendar: calendar,
+                                      minimumDuration: Self.minimumBlockDuration)
+            }
+        }
     }
 
     // MARK: - Calendars
@@ -113,27 +146,55 @@ final class AppModel {
 
     // MARK: - Navigation
 
-    func step(months: Int) {
-        guard let start = calendar.dateInterval(of: .month, for: month)?.start,
-              let moved = calendar.date(byAdding: .month, value: months, to: start) else { return }
-        month = moved
+    func step(by count: Int) {
+        focusedDate = Period.step(mode, from: focusedDate, by: count, calendar: calendar)
         reload()
     }
 
     func goToToday() {
-        month = today
+        focusedDate = today
         todayRequests += 1
         reload()
     }
 
-    /// Changes whenever the month view should bring today's week (or the month's top) into view.
-    var scrollKey: String {
-        let start = calendar.dateInterval(of: .month, for: month)?.start ?? month
-        return "\(start.timeIntervalSinceReferenceDate)-\(todayRequests)"
+    /// Switches the view. When today is in the period on screen, the new view shows today.
+    func setMode(_ newMode: ViewMode) {
+        guard newMode != mode else { return }
+        if let loadedInterval, loadedInterval.start <= today, today < loadedInterval.end {
+            focusedDate = today
+        }
+        mode = newMode
+        defaults.set(newMode.rawValue, forKey: Self.viewModeKey)
+        reload()
     }
 
-    /// Everything planned on `day`, all-day and multi-day events first.
+    /// Opens the day view on `day`.
+    func show(day: Date) {
+        focusedDate = calendar.startOfDay(for: day)
+        mode = .day
+        defaults.set(ViewMode.day.rawValue, forKey: Self.viewModeKey)
+        reload()
+    }
+
+    /// The current instant: frozen in demo mode, `clock` otherwise.
+    func now(_ clock: Date) -> Date { fixedNow ?? clock }
+
+    /// Changes whenever a view should scroll back to its opening position (today's week, the current hour).
+    var scrollKey: String {
+        let start = loadedInterval?.start ?? focusedDate
+        return "\(mode.rawValue)-\(start.timeIntervalSinceReferenceDate)-\(todayRequests)"
+    }
+
+    /// Everything planned on `day`, all-day and multi-day events first. Covers the days on screen.
     func events(on day: Date) -> [EventInfo] {
+        if let column = gridDays.firstIndex(of: day) {
+            let spans = allDaySegments
+                .filter { $0.startColumn <= column && column <= $0.endColumn }
+                .sorted { $0.lane < $1.lane }
+                .map(\.event)
+            let timed = column < placements.count ? placements[column].map(\.event) : []
+            return spans + timed.sorted { ($0.start, $0.title) < ($1.start, $1.title) }
+        }
         for week in weeks {
             guard let column = week.days.firstIndex(where: { $0.date == day }) else { continue }
             let spans = week.spans

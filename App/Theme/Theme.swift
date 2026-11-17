@@ -32,6 +32,11 @@ enum Theme {
     static let station = Color.adaptive(light: RGBA(r: 1, g: 1, b: 1), dark: porcelain)
     /// Hairlines between days and weeks.
     static let rule = ink.opacity(0.16)
+    /// Fill of an event block in the week and day views: the calendar's colour, thinned so ink stays legible.
+    static func blockFill(_ color: Color) -> Color { color.opacity(0.22) }
+    /// Time and place inside an event block. Darker than `secondaryInk`, because the block's tint
+    /// lowers contrast; holds 4.5:1 on a tinted block in both appearances.
+    static let blockSecondaryInk = ink.opacity(0.8)
     /// Tint laid over weekend columns.
     static let weekend = Color.adaptive(light: RGBA(r: 0.055, g: 0.102, b: 0.227, a: 0.05),
                                         dark: RGBA(r: 0, g: 0, b: 0, a: 0.18))

@@ -24,6 +24,8 @@ struct WeekRowView: View {
     let color: (String) -> Color
     /// Called when a day is tapped. `nil` where tapping a day does nothing.
     let onSelectDay: ((Date) -> Void)?
+    /// Called when a day number is clicked (Mac, iPad: opens that day's view). `nil` leaves the number inert.
+    var onOpenDay: ((Date) -> Void)? = nil
 
     @Environment(\.colorSchemeContrast) private var contrast
 
@@ -60,7 +62,20 @@ struct WeekRowView: View {
         .accessibilityLabel(day.date.formatted(date: .complete, time: .omitted))
     }
 
-    private func dayNumber(_ day: DayLayout) -> some View {
+    @ViewBuilder private func dayNumber(_ day: DayLayout) -> some View {
+        if let onOpenDay {
+            Button { onOpenDay(day.date) } label: { numberLabel(day) }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(day.date.formatted(date: .complete, time: .omitted)), otevřít den")
+                #if os(macOS)
+                .pointerStyle(.link)
+                #endif
+        } else {
+            numberLabel(day)
+        }
+    }
+
+    private func numberLabel(_ day: DayLayout) -> some View {
         let isToday = day.date == today
         let ink = day.isInMonth ? Theme.ink : Theme.outsideInk(contrast)
         return Text(verbatim: String(calendar.component(.day, from: day.date)))

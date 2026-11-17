@@ -21,10 +21,14 @@ struct RootView: View {
     @ViewBuilder private var shell: some View {
         if sizeClass == .compact {
             NavigationStack {
-                month.toolbar {
+                current.toolbar {
                     ToolbarItem(placement: .navigation) {
                         Button("Kalendáře", systemImage: "sidebar.leading") { showsCalendars = true }
                     }
+                    #if os(iOS)
+                    // The top bar already holds the calendars, the title and back / Today / forward.
+                    ToolbarItem(placement: .bottomBar) { modePicker }
+                    #endif
                 }
             }
             .sheet(isPresented: $showsCalendars) {
@@ -49,38 +53,79 @@ struct RootView: View {
                     .navigationTitle("Daybook")
                     .navigationSplitViewColumnWidth(min: 220, ideal: 248, max: 320)
             } detail: {
-                month
+                current.toolbar {
+                    ToolbarItem(placement: .primaryAction) { modePicker }
+                }
             }
         }
     }
 
-    /// The year must survive next to the toolbar buttons, so large text gets the short month name.
-    /// Czech formats an abbreviated month with a year as the full name, so the two parts are joined here.
-    private var monthTitle: String {
-        guard dynamicTypeSize.isAccessibilitySize && sizeClass == .compact else {
-            return model.month.formatted(.dateTime.month(.wide).year()).localizedCapitalized
+    /// The view for the current mode, crossfading when the mode changes.
+    private var currentView: some View {
+        ZStack {
+            switch model.mode {
+            case .month: MonthView().transition(.opacity)
+            case .week: WeekView().transition(.opacity)
+            case .day: DayView().transition(.opacity)
+            }
         }
-        let month = model.month.formatted(.dateTime.month(.abbreviated)).localizedCapitalized
-        return "\(month) \(model.month.formatted(.dateTime.year()))"
+        .animation(.easeInOut(duration: 0.2), value: model.mode)
     }
 
-    private var month: some View {
-        MonthView()
-            .navigationTitle(monthTitle)
+    private var modePicker: some View {
+        Picker("Zobrazení", selection: Binding(get: { model.mode }, set: { model.setMode($0) })) {
+            Text("Den").tag(ViewMode.day)
+            Text("Týden").tag(ViewMode.week)
+            Text("Měsíc").tag(ViewMode.month)
+        }
+        .pickerStyle(.segmented)
+        .fixedSize()
+    }
+
+    private func title(short: Bool, numeric: Bool, abbreviatedWeekday: Bool = false) -> PeriodTitle {
+        PeriodTitle(mode: model.mode, date: model.focusedDate, interval: model.loadedInterval,
+                    calendar: model.calendar, short: short, numeric: numeric,
+                    abbreviatedWeekday: abbreviatedWeekday)
+    }
+
+    /// The iPhone gets short titles; at accessibility sizes months become numbers so the title survives
+    /// next to the toolbar buttons. The iPad toolbar also holds the switcher, so its weekday is abbreviated.
+    private var navigationTitleText: String {
+        let compact = sizeClass == .compact
+        return title(short: compact, numeric: compact && dynamicTypeSize.isAccessibilitySize,
+                     abbreviatedWeekday: true).joined
+    }
+
+    private var unitName: String {
+        switch model.mode {
+        case .day: "den"
+        case .week: "týden"
+        case .month: "měsíc"
+        }
+    }
+
+    private var current: some View {
+        currentView
+            .navigationTitle(navigationTitleText)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #else
-            // The window title stays for the Window menu; the toolbar shows the month in the contract's type.
+            // The window title stays for the Window menu; the toolbar shows the period in the contract's type.
             .toolbar(removing: .title)
             .toolbar {
                 ToolbarItem(placement: .navigation) {
-                    let name = model.month.formatted(.dateTime.month(.wide)).localizedCapitalized
-                    let year = model.month.formatted(.dateTime.year())
-                    Text("\(Text(name).fontWeight(.bold)) \(Text(year).fontWeight(.regular).foregroundStyle(Theme.secondaryInk))")
-                        .font(.system(size: 22))
-                        .foregroundStyle(Theme.ink)
-                        .padding(.horizontal, 4)
-                        .accessibilityAddTraits(.isHeader)
+                    let parts = title(short: false, numeric: false)
+                    Group {
+                        if let year = parts.year {
+                            Text("\(Text(parts.name).fontWeight(.bold)) \(Text(year).fontWeight(.regular).foregroundStyle(Theme.secondaryInk))")
+                        } else {
+                            Text(parts.name).fontWeight(.bold)
+                        }
+                    }
+                    .font(.system(size: 22))
+                    .foregroundStyle(Theme.ink)
+                    .padding(.horizontal, 4)
+                    .accessibilityAddTraits(.isHeader)
                 }
                 .sharedBackgroundVisibility(.hidden)
             }
@@ -89,11 +134,11 @@ struct RootView: View {
             #endif
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {
-                    Button("Předchozí měsíc", systemImage: "chevron.left") { model.step(months: -1) }
+                    Button("Předchozí \(unitName)", systemImage: "chevron.left") { model.step(by: -1) }
                         .keyboardShortcut(.leftArrow, modifiers: .command)
                     Button("Dnes") { model.goToToday() }
                         .keyboardShortcut("t", modifiers: .command)
-                    Button("Další měsíc", systemImage: "chevron.right") { model.step(months: 1) }
+                    Button("Další \(unitName)", systemImage: "chevron.right") { model.step(by: 1) }
                         .keyboardShortcut(.rightArrow, modifiers: .command)
                 }
             }
