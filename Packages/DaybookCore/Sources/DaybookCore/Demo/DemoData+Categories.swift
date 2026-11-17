@@ -41,7 +41,7 @@ extension DemoData {
             result.append(CategoryAssignment(categoryID: categories[category].id, externalID: externalID,
                                              occurrenceStart: start))
         }
-        for event in events(month: month, calendar: calendar) {
+        for event in events(month: month, radius: monthRadius, calendar: calendar) {
             for pick in byTitle where pick.title == event.title { add(pick.category, event.key.externalID) }
         }
         add(0, detailedEventID)

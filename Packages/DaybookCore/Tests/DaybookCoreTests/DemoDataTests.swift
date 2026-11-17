@@ -137,4 +137,15 @@ import Testing
         let b = DemoData.categoryStore(month: november, calendar: cal).assignments()
         #expect(a == b)
     }
+
+    @Test func neighbouringMonthsHaveEventsKeyedApart() {
+        let central = DemoData.events(month: november, calendar: cal)
+        let all = DemoData.events(month: november, radius: 3, calendar: cal)
+        #expect(Set(all.map(\.key)).count == all.count)
+        #expect(Set(central.map(\.key)).isSubset(of: Set(all.map(\.key))))
+        let august = all.filter { cal.component(.month, from: $0.start) == 8 }
+        let february = all.filter { cal.component(.month, from: $0.start) == 2 }
+        #expect(!august.isEmpty && !february.isEmpty)
+        #expect(all.filter { $0.key.externalID == DemoData.detailedEventID }.count == 1)
+    }
 }

@@ -143,8 +143,34 @@ public enum DemoData {
         return result.sorted { ($0.start, $0.title) < ($1.start, $1.title) }
     }
 
+    /// The month's events (exactly `events(month:calendar:)`) and generated days of `radius` months
+    /// either side, so the month scrolls into its neighbours and search finds past and future events.
+    /// Neighbouring days are keyed apart from the month's own.
+    public static func events(month: Date, radius: Int, calendar: Calendar) -> [EventInfo] {
+        var result = events(month: month, calendar: calendar)
+        let covered = Period.interval(.month, containing: month, calendar: calendar)
+        for offset in -radius...radius where offset != 0 {
+            guard let other = calendar.date(byAdding: .month, value: offset, to: month),
+                  let otherMonth = calendar.dateInterval(of: .month, for: other) else { continue }
+            for event in events(month: other, calendar: calendar) where event.recurrence == nil {
+                let day = calendar.startOfDay(for: event.start)
+                // Only the other month's own days, and none the central month already fills. The fixed
+                // timed cases (the detailed event, the overlap, the night shift) stay in the central month.
+                let generated = event.key.externalID.contains(where: \.isNumber)
+                guard otherMonth.start <= day, day < otherMonth.end, !(covered.start <= day && day < covered.end),
+                      generated || event.isAllDay else { continue }
+                result.append(event.with(key: EventKey(externalID: "demo-m\(offset)-\(event.key.externalID)",
+                                                       occurrenceStart: event.key.occurrenceStart)))
+            }
+        }
+        return result.sorted { ($0.start, $0.title) < ($1.start, $1.title) }
+    }
+
+    /// How many months either side of the demo month have events.
+    public static let monthRadius = 3
+
     public static func store(month: Date, calendar: Calendar, access: CalendarAccess = .granted) -> InMemoryCalendarStore {
-        InMemoryCalendarStore(calendars: calendars, events: events(month: month, calendar: calendar),
+        InMemoryCalendarStore(calendars: calendars, events: events(month: month, radius: monthRadius, calendar: calendar),
                               access: access, sources: sources, defaultCalendarID: defaultCalendarID, calendar: calendar)
     }
 }
