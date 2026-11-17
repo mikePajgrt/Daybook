@@ -2,8 +2,8 @@ import Foundation
 
 /// A recurring event as the in-memory store keeps it: the first occurrence as a template, its rule,
 /// and the occurrences that were changed or deleted on their own.
-struct EventSeries {
-    enum Exception {
+struct EventSeries: Sendable {
+    enum Exception: Sendable {
         case changed(EventInfo)
         case deleted
     }

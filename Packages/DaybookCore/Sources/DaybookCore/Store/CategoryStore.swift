@@ -48,6 +48,14 @@ public protocol CategoryStore: AnyObject {
 }
 
 extension CategoryStore {
+    /// Gives the series that "this and future events" split off from `oldID` the categories it had.
+    public func carryOver(from oldID: String, to newID: String, splitAt start: Date) throws {
+        for item in assignments().carriedOver(from: oldID, to: newID, splitAt: start) {
+            try assign(item.categoryID, to: EventKey(externalID: newID, occurrenceStart: item.occurrenceStart ?? start),
+                       scope: item.scope)
+        }
+    }
+
     /// The categories of one event, in sidebar order.
     public func categories(for key: EventKey) -> [Category] {
         let ids = assignments().categoryIDs(for: key)

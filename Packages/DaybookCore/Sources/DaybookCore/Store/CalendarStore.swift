@@ -24,6 +24,9 @@ public enum CalendarStoreError: Error, Equatable, Sendable {
     case system(String)
 }
 
+/// Reads events overlapping an interval, in every calendar. Safe to call from any thread.
+public typealias EventReader = @Sendable (DateInterval) -> [EventInfo]
+
 /// Everything the app needs from the system calendar database.
 /// Implementations are used from the main actor only.
 public protocol CalendarStore: AnyObject {
@@ -38,6 +41,10 @@ public protocol CalendarStore: AnyObject {
     /// Events that overlap `interval` and belong to one of `calendarIDs`, sorted by start then title.
     /// Recurring events come as their occurrences.
     func events(in interval: DateInterval, calendarIDs: Set<String>) -> [EventInfo]
+
+    /// A read of the database as it is now that may run on any thread: events overlapping an interval,
+    /// in every calendar, sorted by start then title. Used to load and to search off the main thread.
+    func reader() -> EventReader
 
     /// Emits whenever calendars or events changed, including after the app's own writes.
     var changes: AsyncStream<Void> { get }
@@ -54,7 +61,8 @@ public protocol CalendarStore: AnyObject {
     @discardableResult func createEvent(_ draft: EventDraft) throws -> EventInfo
 
     /// Applies `draft` to `event`. `span` matters only for occurrences of a recurring event.
-    func updateEvent(_ event: EventInfo, with draft: EventDraft, span: EditSpan) throws
+    /// Returns the changed event's key: a new external ID when "this and future events" split a series.
+    @discardableResult func updateEvent(_ event: EventInfo, with draft: EventDraft, span: EditSpan) throws -> EventKey
 
     /// Deletes `event`. `span` matters only for occurrences of a recurring event.
     func deleteEvent(_ event: EventInfo, span: EditSpan) throws

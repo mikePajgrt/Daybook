@@ -44,13 +44,28 @@ public final class InMemoryCalendarStore: CalendarStore {
     public func calendars() -> [CalendarInfo] { storedCalendars }
 
     public func events(in interval: DateInterval, calendarIDs: Set<String>) -> [EventInfo] {
-        let readOnly = Set(storedCalendars.filter(\.isReadOnly).map(\.id))
+        Self.read(interval, singles: singles, series: series, calendars: storedCalendars, calendar: calendar)
+            .filter { calendarIDs.contains($0.calendarID) }
+    }
+
+    /// A copy of what the store holds now, readable from any thread.
+    public func reader() -> EventReader {
+        let singles = singles, series = series, calendars = storedCalendars, calendar = calendar
+        return { interval in
+            Self.read(interval, singles: singles, series: series, calendars: calendars, calendar: calendar)
+        }
+    }
+
+    private static func read(_ interval: DateInterval, singles: [EventInfo], series: [EventSeries],
+                             calendars: [CalendarInfo], calendar: Calendar) -> [EventInfo] {
+        let readOnly = Set(calendars.filter(\.isReadOnly).map(\.id))
+        let known = Set(calendars.map(\.id))
         let fromSingles = singles.filter {
             $0.start < interval.end && $0.end > interval.start
         }
         let fromSeries = series.flatMap { $0.occurrences(in: interval, calendar: calendar) }
         return (fromSingles + fromSeries)
-            .filter { calendarIDs.contains($0.calendarID) }
+            .filter { known.contains($0.calendarID) }
             .map { event in
                 var event = event
                 event.isEditable = !readOnly.contains(event.calendarID)
@@ -85,9 +100,11 @@ public final class InMemoryCalendarStore: CalendarStore {
         return event
     }
 
-    public func updateEvent(_ event: EventInfo, with draft: EventDraft, span: EditSpan) throws {
+    @discardableResult
+    public func updateEvent(_ event: EventInfo, with draft: EventDraft, span: EditSpan) throws -> EventKey {
         try check(draft)
         let id = event.key.externalID
+        var key = EventKey(externalID: id, occurrenceStart: draftStart(draft))
         if let index = singles.firstIndex(where: { $0.key.externalID == id }) {
             try checkWritable(singles[index].calendarID)
             let old = singles.remove(at: index)
@@ -105,6 +122,7 @@ public final class InMemoryCalendarStore: CalendarStore {
                 changed.recurrence = item.template.recurrence
                 item.exceptions[occurrence] = .changed(changed)
                 series[index] = item
+                key = event.key
             case .futureEvents:
                 if occurrence == item.template.start {
                     series.remove(at: index)
@@ -122,13 +140,16 @@ public final class InMemoryCalendarStore: CalendarStore {
                 } else {
                     item.truncate(before: occurrence, calendar: calendar)
                     series[index] = item
-                    insert(made(draft, id: newID("event"), attendees: item.template.attendees))
+                    let split = made(draft, id: newID("event"), attendees: item.template.attendees)
+                    insert(split)
+                    key = split.key
                 }
             }
         } else {
             throw CalendarStoreError.eventNotFound
         }
         continuation.yield()
+        return key
     }
 
     public func deleteEvent(_ event: EventInfo, span: EditSpan) throws {

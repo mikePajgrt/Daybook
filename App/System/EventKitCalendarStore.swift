@@ -3,6 +3,11 @@ import DaybookCore
 import EventKit
 import Foundation
 
+/// The event store, carried into a read off the main thread. EventKit's reads are thread-safe.
+private struct StoreBox: @unchecked Sendable {
+    let store: EKEventStore
+}
+
 /// `CalendarStore` over the system calendar database.
 ///
 /// A thin translation between EventKit and the package's value types. It cannot be unit-tested
@@ -50,7 +55,23 @@ final class EventKitCalendarStore: CalendarStore {
         guard access == .granted else { return [] }
         let wanted = store.calendars(for: .event).filter { calendarIDs.contains($0.calendarIdentifier) }
         guard !wanted.isEmpty else { return [] }
-        let predicate = store.predicateForEvents(withStart: interval.start, end: interval.end, calendars: wanted)
+        return Self.read(interval, calendars: wanted, in: store)
+    }
+
+    /// Reads off the main thread. `EKEventStore` may be read from any thread; the box only tells
+    /// the compiler so. Callers keep each interval within four years (EventKit's predicate limit).
+    func reader() -> EventReader {
+        guard access == .granted else { return { _ in [] } }
+        let box = StoreBox(store: store)
+        return { interval in
+            let calendars = box.store.calendars(for: .event)
+            guard !calendars.isEmpty else { return [] }
+            return Self.read(interval, calendars: calendars, in: box.store)
+        }
+    }
+
+    private static func read(_ interval: DateInterval, calendars: [EKCalendar], in store: EKEventStore) -> [EventInfo] {
+        let predicate = store.predicateForEvents(withStart: interval.start, end: interval.end, calendars: calendars)
         return store.events(matching: predicate)
             .map(Self.info(for:))
             .sorted { ($0.start, $0.title) < ($1.start, $1.title) }
@@ -80,7 +101,8 @@ final class EventKitCalendarStore: CalendarStore {
         return Self.info(for: event)
     }
 
-    func updateEvent(_ event: EventInfo, with draft: EventDraft, span: EditSpan) throws {
+    @discardableResult
+    func updateEvent(_ event: EventInfo, with draft: EventDraft, span: EditSpan) throws -> EventKey {
         try check(draft)
         guard let target = systemEvent(for: event) else { throw CalendarStoreError.eventNotFound }
         guard target.calendar?.allowsContentModifications ?? false else { throw CalendarStoreError.calendarReadOnly }
@@ -88,6 +110,10 @@ final class EventKitCalendarStore: CalendarStore {
         // A rule cannot change for one occurrence; EventKit applies it from the occurrence onward.
         let effective: EditSpan = draft.recurrence == event.recurrence ? span : .futureEvents
         try perform { try store.save(target, span: Self.ekSpan(effective), commit: true) }
+        // "This and future events" from a later occurrence detaches it into a new series with its own id.
+        let saved = Self.externalID(of: target)
+        return EventKey(externalID: saved.isEmpty ? event.key.externalID : saved,
+                        occurrenceStart: target.occurrenceDate ?? target.startDate ?? draft.start)
     }
 
     func deleteEvent(_ event: EventInfo, span: EditSpan) throws {

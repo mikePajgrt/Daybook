@@ -100,6 +100,25 @@ public struct CategoryAssignments: Equatable, Sendable {
                         : unassign(change.categoryID, from: key, scope: change.scope)
     }
 
+    /// What a series split by "this and future events" hands to its new series: the old series'
+    /// categories for the whole new series, and the old series' occurrence categories from the split
+    /// onward at the same starts. EventKit gives the new series no link to the old one, so the caller
+    /// passes both ids. The old series keeps its own assignments for its earlier occurrences.
+    public func carriedOver(from oldID: String, to newID: String, splitAt start: Date) -> [CategoryAssignment] {
+        guard oldID != newID else { return [] }
+        let fromSeries = (series[oldID] ?? []).map {
+            CategoryAssignment(categoryID: $0, externalID: newID, occurrenceStart: nil)
+        }
+        let fromOccurrences = occurrences
+            .filter { $0.key.externalID == oldID && $0.key.occurrenceStart >= start }
+            .flatMap { key, ids in
+                ids.map { CategoryAssignment(categoryID: $0, externalID: newID, occurrenceStart: key.occurrenceStart) }
+            }
+        return (fromSeries + fromOccurrences).sorted {
+            ($0.occurrenceStart ?? .distantPast, $0.categoryID.uuidString) < ($1.occurrenceStart ?? .distantPast, $1.categoryID.uuidString)
+        }
+    }
+
     /// Removes every assignment of a category. Returns how many went.
     @discardableResult
     public mutating func remove(category categoryID: UUID) -> Int {
