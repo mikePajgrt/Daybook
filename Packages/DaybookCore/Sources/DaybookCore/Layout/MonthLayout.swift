@@ -51,11 +51,61 @@ public enum MonthLayout {
 
     /// Places `events` into the weeks of the month containing `month`.
     public static func layout(month: Date, events: [EventInfo], calendar: Calendar) -> [WeekLayout] {
+        layout(weeks: weeks(containing: month, calendar: calendar), month: month, events: events, calendar: calendar)
+    }
+
+    /// Places `events` into `weeks`. Days of the month containing `month` are marked as in the month.
+    public static func layout(weeks: [[Date]], month: Date, events: [EventInfo], calendar: Calendar) -> [WeekLayout] {
         let monthInterval = calendar.dateInterval(of: .month, for: month)
         let ranged = events.map { (event: $0, days: dayRange(of: $0, calendar: calendar)) }
-        return weeks(containing: month, calendar: calendar).map { days in
+        return weeks.map { days in
             week(days: days, monthInterval: monthInterval, events: ranged)
         }
+    }
+
+    // MARK: - A run of months
+
+    /// The weeks covering every month from the one containing `first` to the one containing `last`,
+    /// as one continuous column: a week shared by two months appears once.
+    public static func weeks(fromMonth first: Date, throughMonth last: Date, calendar: Calendar) -> [[Date]] {
+        guard let start = calendar.dateInterval(of: .month, for: first)?.start,
+              let end = calendar.dateInterval(of: .month, for: last)?.start else { return [] }
+        var result: [[Date]] = []
+        var month = start
+        while month <= end {
+            for week in weeks(containing: month, calendar: calendar) where week.first.map({ day in
+                result.last.map { day > $0[0] } ?? true
+            }) ?? false {
+                result.append(week)
+            }
+            guard let next = calendar.date(byAdding: .month, value: 1, to: month) else { break }
+            month = next
+        }
+        return result
+    }
+
+    /// The first day of the month a week mostly belongs to: the month of its middle day.
+    public static func owner(of week: [Date], calendar: Calendar) -> Date? {
+        guard !week.isEmpty else { return nil }
+        return calendar.dateInterval(of: .month, for: week[week.count / 2])?.start
+    }
+
+    /// The first days of the first and last month of a window of `radius` months either side of `date`'s month.
+    public static func window(around date: Date, radius: Int, calendar: Calendar) -> (first: Date, last: Date) {
+        let month = calendar.dateInterval(of: .month, for: date)?.start ?? calendar.startOfDay(for: date)
+        let first = calendar.date(byAdding: .month, value: -radius, to: month) ?? month
+        let last = calendar.date(byAdding: .month, value: radius, to: month) ?? month
+        return (first, last)
+    }
+
+    /// From the first day of the window's first week to the day after its last week.
+    public static func interval(of window: (first: Date, last: Date), calendar: Calendar) -> DateInterval {
+        let days = weeks(fromMonth: window.first, throughMonth: window.last, calendar: calendar).flatMap { $0 }
+        guard let start = days.first, let last = days.last,
+              let end = calendar.date(byAdding: .day, value: 1, to: last) else {
+            return DateInterval(start: window.first, duration: 0)
+        }
+        return DateInterval(start: start, end: end)
     }
 
     /// First and last day an event touches. An event ending exactly at midnight
