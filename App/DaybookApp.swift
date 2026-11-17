@@ -27,10 +27,8 @@ struct DaybookApp: App {
     }
 
     private var content: some View {
-        Text("Daybook: \(model.weeks.count) týdnů, \(model.calendars.count) kalendářů")
-            .foregroundStyle(Theme.ink)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Theme.ground)
+        MonthView()
+            .environment(model)
             .task { model.start() }
     }
 }
