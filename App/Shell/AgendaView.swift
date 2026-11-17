@@ -6,6 +6,7 @@ import SwiftUI
 /// time-grid columns can hold them at that size.
 struct AgendaView: View {
     @Environment(AppModel.self) private var model
+    @Environment(CategoryModel.self) private var categoryModel
     let days: [Date]
     let color: (String) -> Color
     /// Diameter of the interchange circle around today's number.
@@ -64,6 +65,12 @@ struct AgendaView: View {
                                 .font(.caption)
                                 .foregroundStyle(Theme.secondaryInk)
                                 .monospacedDigit()
+                            let categories = categoryModel.categories(for: event.key)
+                            if !categories.isEmpty {
+                                CategorySymbolsView.names(categories)
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.secondaryInk)
+                            }
                         }
                     }
                     .accessibilityElement(children: .combine)

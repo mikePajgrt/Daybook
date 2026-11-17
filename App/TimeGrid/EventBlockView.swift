@@ -17,6 +17,9 @@ struct EventBlockView: View {
 
     /// Widths of the title's longest word and of the place's first word, measured in the block's type.
     @State private var longestTitleWord: CGFloat = 0
+    @Environment(CategoryModel.self) private var categoryModel
+
+    private var categories: [Category] { categoryModel.categories(for: placement.event.key) }
     @State private var firstPlaceWord: CGFloat = 0
 
     /// Room for text: the block less the line, the dot's overhang and the text insets.
@@ -72,8 +75,15 @@ struct EventBlockView: View {
         .background(Theme.blockFill(color))
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel([title, timeRange, placement.event.location, calendarTitle]
+        .accessibilityLabel([title, timeRange, placement.event.location, calendarTitle, CategoryText.spoken(categories)]
             .compactMap { $0 }.joined(separator: ", "))
+    }
+
+    @ViewBuilder private var symbols: some View {
+        if !categories.isEmpty {
+            CategorySymbolsView(categories: categories)
+                .foregroundStyle(Theme.blockSecondaryInk)
+        }
     }
 
     /// Invisible measurements of the words that decide wrapping, in the same type as the text.
@@ -106,10 +116,14 @@ struct EventBlockView: View {
                 .truncationMode(.tail)
                 .foregroundStyle(Theme.ink)
             if time {
-                // The whole range on one line, else the start alone, else nothing.
+                // The whole range on one line, else the start alone, else nothing. Category symbols
+                // follow the time where both fit; they never displace it.
+                let start = Text(placement.event.start, format: .dateTime.hour().minute())
                 ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 4) { Text(timeRange).fixedSize(); symbols }
                     Text(timeRange).fixedSize()
-                    Text(placement.event.start, format: .dateTime.hour().minute()).fixedSize()
+                    HStack(spacing: 4) { start.fixedSize(); symbols }
+                    start.fixedSize()
                     Color.clear.frame(width: 0, height: 0)
                 }
                 .font(.caption2)

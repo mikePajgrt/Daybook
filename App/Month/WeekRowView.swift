@@ -144,7 +144,10 @@ struct SpanView: View {
     /// The line runs on unbroken before it.
     var labelOffset: CGFloat = 0
 
+    @Environment(CategoryModel.self) private var categoryModel
+
     var body: some View {
+        let categories = categoryModel.categories(for: span.event.key)
         let lead: CGFloat = span.continuesBefore ? 0 : 4
         let trail: CGFloat = span.continuesAfter ? 0 : 4
         let inset: CGFloat = compact ? 3 : 6
@@ -158,6 +161,8 @@ struct SpanView: View {
                 .font(.caption2.weight(.semibold))
                 .fontWidth(compact ? .condensed : .standard)
                 .lineLimit(1)
+                .withCategorySymbols(categories, spacing: 3)
+                .font(.caption2)
                 .layoutPriority(1)
             if span.startColumn == span.endColumn && !span.continuesAfter {
                 Spacer(minLength: 0)
@@ -172,6 +177,7 @@ struct SpanView: View {
         .padding(.leading, span.continuesBefore ? 0 : inset)
         .padding(.trailing, span.continuesAfter ? 0 : inset)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(EventRowView.title(of: span.event))
+        .accessibilityLabel([EventRowView.title(of: span.event), CategoryText.spoken(categories)]
+            .compactMap { $0 }.joined(separator: ", "))
     }
 }

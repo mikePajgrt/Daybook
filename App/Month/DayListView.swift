@@ -4,6 +4,7 @@ import SwiftUI
 /// Everything planned on one day, in full. Presented from the month on compact widths.
 struct DayListView: View {
     @Environment(AppModel.self) private var model
+    @Environment(CategoryModel.self) private var categoryModel
     @Environment(\.dismiss) private var dismiss
     let day: Date
 
@@ -28,6 +29,12 @@ struct DayListView: View {
                         Text([when(event), info?.title].compactMap { $0 }.joined(separator: " · "))
                             .font(.subheadline)
                             .foregroundStyle(Theme.secondaryInk)
+                        let categories = categoryModel.categories(for: event.key)
+                        if !categories.isEmpty {
+                            CategorySymbolsView.names(categories)
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.secondaryInk)
+                        }
                     }
                 }
                 .accessibilityElement(children: .combine)

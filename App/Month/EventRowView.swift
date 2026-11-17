@@ -11,6 +11,7 @@ struct EventRowView: View {
     var dimmed = false
 
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(CategoryModel.self) private var categoryModel
 
     static func title(of event: EventInfo) -> String {
         event.title.isEmpty ? "Bez názvu" : event.title
@@ -25,7 +26,8 @@ struct EventRowView: View {
     }
 
     var body: some View {
-        HStack(spacing: compact ? 4 : 6) {
+        let categories = categoryModel.categories(for: event.key)
+        return HStack(spacing: compact ? 4 : 6) {
             StationMark(color: color)
                 .opacity(dimmed ? 0.6 : 1)
             if !compact {
@@ -44,13 +46,15 @@ struct EventRowView: View {
             Text(Self.title(of: event))
                 .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.ink)
                 .lineLimit(1)
+                .withCategorySymbols(categories, spacing: compact ? 2 : 4)
             Spacer(minLength: 0)
         }
         .font(font)
         .fontWidth(compact ? .condensed : .standard)
         .padding(.leading, compact ? 4 : 8)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(event.start.formatted(date: .omitted, time: .shortened)), \(Self.title(of: event))")
+        .accessibilityLabel([event.start.formatted(date: .omitted, time: .shortened), Self.title(of: event),
+                             CategoryText.spoken(categories)].compactMap { $0 }.joined(separator: ", "))
     }
 }
 
