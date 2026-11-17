@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T00:00:00Z",
+  "title": "Design System: Daybook",
+  "extensions": {
+    "colorMeta": {
+      "midnight": { "role": "primary", "displayName": "Midnight", "canonical": "sRGB(0.055, 0.102, 0.227)", "tonalRamp": ["oklch(15% 0.05 265)", "oklch(23% 0.07 265)", "oklch(35% 0.08 265)", "oklch(48% 0.08 265)", "oklch(62% 0.07 265)", "oklch(75% 0.05 265)", "oklch(87% 0.03 265)", "oklch(95% 0.012 265)"] },
+      "porcelain": { "role": "primary", "displayName": "Porcelain", "canonical": "sRGB(0.957, 0.945, 0.918)", "tonalRamp": ["oklch(15% 0.008 85)", "oklch(28% 0.01 85)", "oklch(42% 0.012 85)", "oklch(56% 0.012 85)", "oklch(70% 0.012 85)", "oklch(82% 0.012 85)", "oklch(91% 0.011 85)", "oklch(95.5% 0.01 85)"] },
+      "rail-dark": { "role": "neutral", "displayName": "Deep Rail (dark)", "canonical": "sRGB(0.039, 0.078, 0.188)", "tonalRamp": ["oklch(13% 0.045 265)", "oklch(20% 0.06 265)", "oklch(32% 0.075 265)", "oklch(46% 0.08 265)", "oklch(60% 0.07 265)", "oklch(74% 0.05 265)", "oklch(86% 0.03 265)", "oklch(95% 0.012 265)"] },
+      "rail-light": { "role": "neutral", "displayName": "Deep Rail (light)", "canonical": "sRGB(0.918, 0.902, 0.867)", "tonalRamp": ["oklch(15% 0.01 85)", "oklch(28% 0.012 85)", "oklch(42% 0.014 85)", "oklch(56% 0.015 85)", "oklch(70% 0.015 85)", "oklch(82% 0.015 85)", "oklch(92% 0.014 85)", "oklch(95% 0.011 85)"] },
+      "station-light": { "role": "neutral", "displayName": "Station White", "canonical": "sRGB(1, 1, 1)", "tonalRamp": ["oklch(15% 0 0)", "oklch(28% 0 0)", "oklch(42% 0 0)", "oklch(56% 0 0)", "oklch(70% 0 0)", "oklch(82% 0 0)", "oklch(92% 0 0)", "oklch(100% 0 0)"] },
+      "outside-ink-dark": { "role": "neutral", "displayName": "Outside Ink (dark)", "canonical": "sRGB(0.561, 0.592, 0.678)", "tonalRamp": ["oklch(15% 0.02 268)", "oklch(28% 0.035 268)", "oklch(42% 0.04 268)", "oklch(55% 0.04 268)", "oklch(68% 0.038 268)", "oklch(80% 0.03 268)", "oklch(90% 0.018 268)", "oklch(95% 0.01 268)"] },
+      "outside-ink-light": { "role": "neutral", "displayName": "Outside Ink (light)", "canonical": "sRGB(0.357, 0.384, 0.471)", "tonalRamp": ["oklch(15% 0.02 270)", "oklch(28% 0.04 270)", "oklch(41% 0.045 270)", "oklch(50% 0.045 270)", "oklch(64% 0.04 270)", "oklch(78% 0.03 270)", "oklch(89% 0.018 270)", "oklch(95% 0.01 270)"] },
+      "secondary-ink-dark": { "role": "neutral", "displayName": "Secondary Ink (dark)", "canonical": "porcelain at 62% opacity" },
+      "secondary-ink-light": { "role": "neutral", "displayName": "Secondary Ink (light)", "canonical": "midnight at 62% opacity" },
+      "block-secondary-ink-dark": { "role": "neutral", "displayName": "Block Secondary Ink (dark)", "canonical": "porcelain at 80% opacity" },
+      "block-secondary-ink-light": { "role": "neutral", "displayName": "Block Secondary Ink (light)", "canonical": "midnight at 80% opacity" },
+      "rule-dark": { "role": "neutral", "displayName": "Rule (dark)", "canonical": "porcelain at 16% opacity" },
+      "rule-light": { "role": "neutral", "displayName": "Rule (light)", "canonical": "midnight at 16% opacity" },
+      "weekend-dark": { "role": "neutral", "displayName": "Weekend Tint (dark)", "canonical": "black at 18% opacity" },
+      "weekend-light": { "role": "neutral", "displayName": "Weekend Tint (light)", "canonical": "midnight at 5% opacity" },
+      "line-fallback": { "role": "neutral", "displayName": "Line Fallback", "canonical": "sRGB(0.56, 0.56, 0.58)", "tonalRamp": ["oklch(15% 0.003 286)", "oklch(28% 0.004 286)", "oklch(42% 0.005 286)", "oklch(56% 0.006 286)", "oklch(66% 0.006 286)", "oklch(78% 0.005 286)", "oklch(89% 0.004 286)", "oklch(95% 0.002 286)"] },
+      "line-preset-red": { "role": "tertiary", "displayName": "Line Preset Red", "canonical": "sRGB(0.93, 0.27, 0.27)", "tonalRamp": ["oklch(15% 0.05 25)", "oklch(28% 0.1 25)", "oklch(42% 0.16 25)", "oklch(54% 0.2 25)", "oklch(64% 0.2 25)", "oklch(76% 0.13 25)", "oklch(88% 0.06 25)", "oklch(95% 0.025 25)"] },
+      "line-preset-orange": { "role": "tertiary", "displayName": "Line Preset Orange", "canonical": "sRGB(0.86, 0.40, 0.05)", "tonalRamp": ["oklch(15% 0.04 50)", "oklch(28% 0.08 50)", "oklch(42% 0.12 50)", "oklch(54% 0.15 50)", "oklch(65% 0.17 50)", "oklch(77% 0.12 50)", "oklch(88% 0.06 50)", "oklch(95% 0.025 50)"] },
+      "line-preset-amber": { "role": "tertiary", "displayName": "Line Preset Amber", "canonical": "sRGB(0.72, 0.50, 0.00)", "tonalRamp": ["oklch(15% 0.035 80)", "oklch(28% 0.06 80)", "oklch(42% 0.09 80)", "oklch(54% 0.115 80)", "oklch(64% 0.13 80)", "oklch(77% 0.11 80)", "oklch(88% 0.06 80)", "oklch(95% 0.025 80)"] },
+      "line-preset-green": { "role": "tertiary", "displayName": "Line Preset Green", "canonical": "sRGB(0.12, 0.60, 0.35)", "tonalRamp": ["oklch(15% 0.035 155)", "oklch(28% 0.07 155)", "oklch(42% 0.1 155)", "oklch(52% 0.125 155)", "oklch(60% 0.135 155)", "oklch(75% 0.1 155)", "oklch(88% 0.055 155)", "oklch(95% 0.025 155)"] },
+      "line-preset-teal": { "role": "tertiary", "displayName": "Line Preset Teal", "canonical": "sRGB(0.00, 0.60, 0.62)", "tonalRamp": ["oklch(15% 0.03 200)", "oklch(28% 0.055 200)", "oklch(42% 0.08 200)", "oklch(52% 0.095 200)", "oklch(62% 0.105 200)", "oklch(76% 0.08 200)", "oklch(88% 0.045 200)", "oklch(95% 0.02 200)"] },
+      "line-preset-blue": { "role": "tertiary", "displayName": "Line Preset Blue", "canonical": "sRGB(0.23, 0.51, 1.00)", "tonalRamp": ["oklch(15% 0.05 262)", "oklch(28% 0.11 262)", "oklch(42% 0.17 262)", "oklch(53% 0.2 262)", "oklch(63% 0.2 262)", "oklch(76% 0.12 262)", "oklch(88% 0.06 262)", "oklch(95% 0.025 262)"] },
+      "line-preset-violet": { "role": "tertiary", "displayName": "Line Preset Violet", "canonical": "sRGB(0.66, 0.36, 0.93)", "tonalRamp": ["oklch(15% 0.05 300)", "oklch(28% 0.11 300)", "oklch(42% 0.16 300)", "oklch(53% 0.2 300)", "oklch(62% 0.21 300)", "oklch(76% 0.13 300)", "oklch(88% 0.06 300)", "oklch(95% 0.025 300)"] },
+      "line-preset-pink": { "role": "tertiary", "displayName": "Line Preset Pink", "canonical": "sRGB(0.91, 0.30, 0.60)", "tonalRamp": ["oklch(15% 0.05 355)", "oklch(28% 0.1 355)", "oklch(42% 0.15 355)", "oklch(54% 0.19 355)", "oklch(64% 0.2 355)", "oklch(77% 0.13 355)", "oklch(88% 0.06 355)", "oklch(95% 0.025 355)"] }
+    },
+    "typographyMeta": {
+      "period-title": { "displayName": "Period title", "purpose": "The period on screen in the toolbar. Fixed 22 pt bold on Mac with the year in regular weight and secondary ink; the navigation bar's inline title on iOS." },
+      "title": { "displayName": "Title", "purpose": "SwiftUI .title2 bold: event name in the detail, headline of the access screen. .title3 for the editor's title field (semibold) and the agenda's day number (bold)." },
+      "headline": { "displayName": "Headline", "purpose": "SwiftUI .headline: month name above the month navigator." },
+      "body": { "displayName": "Body", "purpose": "SwiftUI .body: event titles in the day sheet and agenda, form rows, sidebar calendar names." },
+      "day-number": { "displayName": "Day number", "purpose": "SwiftUI .callout semibold with tabular figures; .footnote in columns under 130 pt. Day numbers in the month and in time-grid headers." },
+      "detail": { "displayName": "Detail", "purpose": "SwiftUI .subheadline: date and time under a detail title, supporting line of a day-sheet row. Also the month event row on Mac." },
+      "event-row": { "displayName": "Event row", "purpose": "SwiftUI .caption; .caption2 and condensed width in columns under 130 pt. Time and title of an event in a month cell." },
+      "label": { "displayName": "Label", "purpose": "SwiftUI .caption semibold: weekday header, event block titles, section labels inside the detail. Sentence case." },
+      "micro": { "displayName": "Micro", "purpose": "SwiftUI .caption2 with tabular figures: hour labels, time and place inside a block. Semibold for the label set into a span line." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "mode-crossfade", "value": "opacity, 0.2s ease-in-out", "purpose": "Switching between day, week and month." },
+      { "name": "system", "value": "platform default", "purpose": "Sheets, popovers, menus and navigation move as the system moves them; the build adds no other animation." }
+    ],
+    "breakpoints": [
+      { "name": "compact-size-class", "value": "horizontalSizeClass == .compact", "purpose": "Single column shell, bottom bar controls, day opens as a sheet." },
+      { "name": "narrow-column", "value": "130pt column width", "purpose": "Below it: condensed type, tighter insets, no time in month rows." },
+      { "name": "minimum-grid-column", "value": "110pt column width", "purpose": "Time-grid columns never go narrower; the days page instead." },
+      { "name": "two-line-block-title", "value": "140pt block width", "purpose": "At or above it a block title may take two lines." },
+      { "name": "navigator-beside-day", "value": "day keeps 400pt beside a 300pt navigator", "purpose": "Otherwise the month navigator moves to the foot of the rail." },
+      { "name": "accessibility-text-size", "value": "dynamicTypeSize.isAccessibilitySize", "purpose": "Time grid always, month in narrow columns: full-width agenda rows." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Event Row with Station Mark",
+      "kind": "custom",
+      "refersTo": "event-row",
+      "description": "One timed event in a month cell: a piece of its calendar's line, a station dot, the time and the title.",
+      "html": "<div class=\"ds-cell\"><div class=\"ds-event-row\" style=\"--line:#3b82ff\"><span class=\"ds-station\"></span><span class=\"ds-time\">8:30</span><span class=\"ds-row-title\">Retro</span></div><div class=\"ds-event-row\" style=\"--line:#1f9959\"><span class=\"ds-station\"></span><span class=\"ds-time\">13:30</span><span class=\"ds-row-title\">Ema: plavání</span></div><div class=\"ds-event-row\" style=\"--line:#ed4545\"><span class=\"ds-station\"></span><span class=\"ds-time\">16:00</span><span class=\"ds-row-title\">Běh Stromovka</span></div></div>",
+      "css": ".ds-cell { background: #0e1a3a; padding: 6px 0; width: 200px; font-family: -apple-system, system-ui, sans-serif; } .ds-event-row { display: flex; align-items: stretch; gap: 6px; height: 17px; padding-left: 8px; font-size: 12px; line-height: 17px; color: #f4f1ea; white-space: nowrap; } .ds-station { position: relative; flex: none; width: 3px; background: var(--line); } .ds-station::after { content: \"\"; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -5px 0 0 -5px; border-radius: 50%; background: #f4f1ea; border: 1.5px solid var(--line); } .ds-time { flex: none; width: 5ch; text-align: right; color: rgba(244,241,234,0.62); font-variant-numeric: tabular-nums; } .ds-row-title { overflow: hidden; text-overflow: ellipsis; }"
+    },
+    {
+      "name": "Span Line",
+      "kind": "custom",
+      "refersTo": "span-line",
+      "description": "An all-day or multi-day event: a horizontal line with rounded ends and the title set into it.",
+      "html": "<div class=\"ds-span-wrap\"><div class=\"ds-span\" style=\"--line:#1f9959\"><span class=\"ds-span-stub\"></span><span class=\"ds-span-label\">Hlídání Emy</span><span class=\"ds-span-run\"></span></div><div class=\"ds-span ds-span-continues\" style=\"--line:#ed4545\"><span class=\"ds-span-stub\"></span><span class=\"ds-span-label\">Lisabon</span><span class=\"ds-span-run\"></span></div></div>",
+      "css": ".ds-span-wrap { background: #0e1a3a; padding: 6px 0; width: 320px; font-family: -apple-system, system-ui, sans-serif; } .ds-span { display: flex; align-items: center; gap: 5px; height: 17px; padding: 0 6px; color: #f4f1ea; font-size: 11px; font-weight: 600; white-space: nowrap; } .ds-span-stub { flex: none; width: 10px; height: 8px; background: var(--line); border-radius: 4px 0 0 4px; } .ds-span-run { flex: 1; height: 8px; background: var(--line); border-radius: 0 4px 4px 0; } .ds-span-continues { padding-right: 0; } .ds-span-continues .ds-span-run { border-radius: 0; }"
+    },
+    {
+      "name": "Interchange Circle",
+      "kind": "custom",
+      "refersTo": "interchange-circle",
+      "description": "Today's day number in a filled ink circle, beside an ordinary day and a day of the neighbouring month.",
+      "html": "<div class=\"ds-days\"><span class=\"ds-day\">16</span><span class=\"ds-day ds-day-today\">17</span><span class=\"ds-day\">18</span><span class=\"ds-day ds-day-outside\">1</span></div>",
+      "css": ".ds-days { display: flex; gap: 24px; align-items: center; background: #0e1a3a; padding: 10px 12px; font-family: -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: #f4f1ea; } .ds-day { min-width: 22px; height: 22px; line-height: 22px; text-align: center; } .ds-day-today { background: #f4f1ea; color: #0e1a3a; border-radius: 50%; } .ds-day-outside { color: #8f97ad; }"
+    },
+    {
+      "name": "Event Block",
+      "kind": "card",
+      "refersTo": "event-block",
+      "description": "A timed event in the week and day views: the line and station on the left, on a 22% OKLab tint of the calendar's colour.",
+      "html": "<div class=\"ds-grid\"><div class=\"ds-block\" style=\"--line:#3b82ff\"><span class=\"ds-block-line\"></span><div class=\"ds-block-text\"><div class=\"ds-block-title\">Review roadmapy</div><div class=\"ds-block-meta\">10:00 – 11:00</div><div class=\"ds-block-meta\">Zasedačka Vltava</div></div></div><div class=\"ds-block\" style=\"--line:#db660d\"><span class=\"ds-block-line\"></span><div class=\"ds-block-text\"><div class=\"ds-block-title\">All-hands</div><div class=\"ds-block-meta\">14:30 – 16:00</div></div></div></div>",
+      "css": ".ds-grid { display: flex; gap: 2px; background: #0e1a3a; padding: 8px; font-family: -apple-system, system-ui, sans-serif; } .ds-block { display: flex; width: 150px; height: 64px; border-radius: 4px; overflow: hidden; background: color-mix(in oklab, #0e1a3a, var(--line) 22%); } .ds-block-line { position: relative; flex: none; width: 3px; margin-left: 2px; background: var(--line); } .ds-block-line::after { content: \"\"; position: absolute; left: 50%; top: 4px; width: 7px; height: 7px; margin-left: -5px; border-radius: 50%; background: #f4f1ea; border: 1.5px solid var(--line); } .ds-block-text { padding: 2px 3px 2px 5px; min-width: 0; } .ds-block-title { font-size: 12px; font-weight: 600; color: #f4f1ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-block-meta { font-size: 11px; color: rgba(244,241,234,0.8); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }"
+    },
+    {
+      "name": "Now Line",
+      "kind": "custom",
+      "refersTo": "now-line",
+      "description": "The current time on today's column: an interchange circle and an ink line over the hour rules.",
+      "html": "<div class=\"ds-now-wrap\"><div class=\"ds-hour-rule\"></div><div class=\"ds-now\"><span class=\"ds-now-dot\"></span><span class=\"ds-now-rule\"></span></div><div class=\"ds-hour-rule\"></div></div>",
+      "css": ".ds-now-wrap { background: #0e1a3a; width: 240px; padding: 16px 0; } .ds-hour-rule { height: 1px; background: rgba(244,241,234,0.16); margin: 14px 0; } .ds-now { display: flex; align-items: center; height: 11px; } .ds-now-dot { flex: none; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; background: #f4f1ea; border: 2px solid #0e1a3a; } .ds-now-rule { flex: 1; height: 2px; background: #f4f1ea; }"
+    },
+    {
+      "name": "Rail Calendar Row",
+      "kind": "nav",
+      "refersTo": "rail",
+      "description": "A calendar in the rail: a checkbox in the calendar's own colour, its name, and a lock when it is read-only. One tap toggles it.",
+      "html": "<div class=\"ds-rail\"><div class=\"ds-rail-header\">Google</div><button class=\"ds-rail-row\" style=\"--line:#1f9959\" aria-pressed=\"true\"><span class=\"ds-check\"><svg viewBox=\"0 0 16 16\" width=\"14\" height=\"14\"><path d=\"M3.5 8.5l3 3 6-7\" fill=\"none\" stroke=\"#0a1430\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span><span class=\"ds-rail-name\">Rodina</span></button><button class=\"ds-rail-row ds-rail-off\" style=\"--line:#db660d\" aria-pressed=\"false\"><span class=\"ds-check\"></span><span class=\"ds-rail-name\">Tým produkt<small>sdílený</small></span><svg class=\"ds-lock\" viewBox=\"0 0 16 16\" width=\"12\" height=\"12\"><path d=\"M4 7V5a4 4 0 018 0v2h1v7H3V7h1zm2 0h4V5a2 2 0 00-4 0v2z\" fill=\"rgba(244,241,234,0.62)\"/></svg></button></div>",
+      "css": ".ds-rail { background: #0a1430; width: 248px; padding: 12px 16px; font-family: -apple-system, system-ui, sans-serif; } .ds-rail-header { font-size: 13px; color: rgba(244,241,234,0.62); padding: 8px 0; } .ds-rail-row { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0; background: none; border: none; color: #f4f1ea; font: inherit; font-size: 17px; text-align: left; cursor: pointer; } .ds-rail-row:focus-visible { outline: 2px solid #f4f1ea; outline-offset: 2px; } .ds-check { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 4px; background: var(--line); } .ds-rail-off .ds-check { background: none; border: 2px solid var(--line); box-sizing: border-box; } .ds-rail-off .ds-rail-name { color: rgba(244,241,234,0.62); } .ds-rail-name { flex: 1; } .ds-rail-name small { display: block; font-size: 12px; color: rgba(244,241,234,0.62); }"
+    },
+    {
+      "name": "Sheet Row",
+      "kind": "card",
+      "refersTo": "sheet-row",
+      "description": "An event in the day sheet: rows in the ground colour on the rail, the calendar as a capsule of its colour beside title, time and calendar name.",
+      "html": "<div class=\"ds-sheet\"><div class=\"ds-sheet-row\" style=\"--line:#3b82ff\"><span class=\"ds-capsule\"></span><div><div class=\"ds-sheet-title\">Retro</div><div class=\"ds-sheet-sub\">8:30 – 10:00 · Práce</div></div></div></div>",
+      "css": ".ds-sheet { background: #0a1430; padding: 16px; width: 300px; font-family: -apple-system, system-ui, sans-serif; } .ds-sheet-row { display: flex; gap: 12px; align-items: stretch; background: #0e1a3a; padding: 11px 16px; border-radius: 26px; } .ds-capsule { flex: none; width: 4px; border-radius: 2px; background: var(--line); } .ds-sheet-title { font-size: 17px; color: #f4f1ea; } .ds-sheet-sub { margin-top: 2px; font-size: 15px; color: rgba(244,241,234,0.62); font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Bordered Ink Button",
+      "kind": "button",
+      "description": "In-content action in the event detail: the platform's bordered button tinted with ink. Approximation of the system control.",
+      "html": "<div class=\"ds-btn-wrap\"><button class=\"ds-btn-ink\">Upravit</button></div>",
+      "css": ".ds-btn-wrap { background: #0e1a3a; padding: 16px; } .ds-btn-ink { font-family: -apple-system, system-ui, sans-serif; font-size: 17px; color: #f4f1ea; background: rgba(244,241,234,0.16); border: none; border-radius: 9999px; padding: 7px 14px; cursor: pointer; transition: background 0.15s; } .ds-btn-ink:hover { background: rgba(244,241,234,0.24); } .ds-btn-ink:active { background: rgba(244,241,234,0.3); } .ds-btn-ink:focus-visible { outline: 2px solid #f4f1ea; outline-offset: 2px; }"
+    },
+    {
+      "name": "Line Swatches",
+      "kind": "chip",
+      "refersTo": "line-swatch",
+      "description": "Preset calendar colours: 28 pt circles in 44 pt targets, the chosen one in a 2 pt ink ring.",
+      "html": "<div class=\"ds-swatches\"><button class=\"ds-swatch ds-swatch-on\" style=\"--line:#ed4545\" aria-label=\"Červená\"></button><button class=\"ds-swatch\" style=\"--line:#db660d\" aria-label=\"Oranžová\"></button><button class=\"ds-swatch\" style=\"--line:#b88000\" aria-label=\"Jantarová\"></button><button class=\"ds-swatch\" style=\"--line:#1f9959\" aria-label=\"Zelená\"></button><button class=\"ds-swatch\" style=\"--line:#00999e\" aria-label=\"Tyrkysová\"></button><button class=\"ds-swatch\" style=\"--line:#3b82ff\" aria-label=\"Modrá\"></button><button class=\"ds-swatch\" style=\"--line:#a85ced\" aria-label=\"Fialová\"></button><button class=\"ds-swatch\" style=\"--line:#e84d99\" aria-label=\"Růžová\"></button></div>",
+      "css": ".ds-swatches { display: grid; grid-template-columns: repeat(4, 44px); gap: 4px; background: #0e1a3a; padding: 12px; width: max-content; } .ds-swatch { position: relative; width: 44px; height: 44px; padding: 0; border: none; background: none; cursor: pointer; } .ds-swatch::before { content: \"\"; position: absolute; inset: 8px; border-radius: 50%; background: var(--line); } .ds-swatch-on::after, .ds-swatch:focus-visible::after { content: \"\"; position: absolute; inset: 4px; border-radius: 50%; border: 2px solid #f4f1ea; } .ds-swatch:focus-visible { outline: none; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Midnight Transit Diagram",
+    "overview": "Daybook draws a month the way a network map draws a city. Each calendar is a line in its own colour, each event is a station dot on that line, an event that lasts several days is a horizontal line with rounded ends, and today is the interchange circle. The ground is one flat colour, midnight blue in the dark appearance and porcelain in the light one, and the two swap roles as ink. There is no third brand colour: every other colour on screen belongs to a calendar and was chosen by the user.\n\nThe system is dense and quiet. Week rows take the height of their fullest day, so the grid is uneven on purpose and no day ends in a count of hidden events. Type is the system face at Dynamic Type text styles with tabular figures, condensed when a column gets narrow. Structure comes from hairlines at low opacity and one step of tonal depth between the ground and the rail; controls, sheets and bars are the platform's own.\n\nThis record describes the SwiftUI build for iOS 26 and macOS 26. Sizes are points at the default text size and scale with Dynamic Type. Values in the frontmatter with a `-dark` or `-light` suffix are the two appearances of one adaptive token; `midnight` and `porcelain` are ground in one appearance and ink in the other.",
+    "keyCharacteristics": [
+      "Two grounds, one ink each, swapped between appearances; no brand accent.",
+      "Calendar colour appears only as line: a 3 pt vertical segment, an 8 pt horizontal line, a 22% tint of a block.",
+      "Every event is on screen; rows grow, cells never collapse into a count.",
+      "System type, tabular figures, condensed width under 130 pt columns.",
+      "Hairlines and one tonal step instead of shadows and cards.",
+      "Platform controls and platform motion."
+    ],
+    "rules": [
+      { "name": "The Line Is the Only Colour Rule", "body": "Hue on a calendar surface means \"this calendar\" and nothing else. Interface state, selection and emphasis are drawn in ink: the selected day is an ink ring, today is an ink circle, the current time is an ink line.", "section": "colors" },
+      { "name": "The Thinned Line Rule", "body": "A calendar colour used as a fill is mixed 22% into the ground in OKLab, never laid over it as transparency and never mixed in sRGB. The result is opaque, keeps ink legible on it, and keeps warm colours from turning brown on midnight.", "section": "colors" },
+      { "name": "The Colour Plus Name Rule", "body": "A calendar is never identified by colour alone. Wherever a calendar is chosen or named (sidebar, picker rows, event detail, day sheet, VoiceOver labels) its title is beside the colour.", "section": "colors" },
+      { "name": "The Tabular Figures Rule", "body": "Every number that sits in a column is set with tabular figures: day numbers, times, hour labels. In a month row the time is right-aligned in a slot as wide as \"00:00\", so titles share one left edge.", "section": "typography" },
+      { "name": "The Condense Before You Cut Rule", "body": "When a column is narrower than 130 pt, type switches to the condensed width and insets tighten before anything is removed. The month row then drops its time; the title stays.", "section": "typography" },
+      { "name": "The No Broken Words Rule", "body": "Text in a cell or block never wraps inside a word. Titles hold one line with a tail ellipsis (two lines in blocks 140 pt or wider); a time shows as a range, then as a start, then not at all, whichever fits whole.", "section": "typography" },
+      { "name": "The Nothing Hidden Rule", "body": "A day shows every event of its enabled calendars. Rows grow, strips grow, views scroll; no cell ends in \"+3 more\", a dot, or a count.", "section": "layout" },
+      { "name": "The Rows Before Columns Rule", "body": "When columns cannot hold a title at the current text size, the layout changes to full-width rows. It does not shrink type and it does not truncate the list.", "section": "layout" },
+      { "name": "The One Step Rule", "body": "There are two surface levels, ground and rail. A new surface is one of them; it does not introduce a third tone, a gradient or a shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do draw calendar colour only as line: a 3 pt vertical segment, an 8 pt horizontal line, or a 22% OKLab tint of a block.",
+      "Do mark selection, today and the current time in ink (ring, filled circle, 2 pt line).",
+      "Do put new sheets on the rail colour with their rows in the ground colour.",
+      "Do set every figure that aligns in a column with tabular figures.",
+      "Do switch to condensed width below 130 pt columns, and to full-width rows at accessibility text sizes.",
+      "Do keep a calendar's name next to its colour wherever a calendar is identified.",
+      "Do check any new text colour on a tinted block against 4.5:1 in both appearances, and any new preset line colour against 3:1 on both grounds.",
+      "Do build new metrics as scaled metrics tied to a text style, so they grow with Dynamic Type."
+    ],
+    "donts": [
+      "Don't hide events behind a count, a dot or a \"more\" link in any view.",
+      "Don't give the interface a hue of its own on a calendar surface; a coloured control reads as a calendar line.",
+      "Don't fill a block or a row with a calendar colour at full strength, or thin it with opacity instead of the OKLab mix.",
+      "Don't add shadows, gradients or a third surface tone.",
+      "Don't round the end of a span line where the event continues into another week.",
+      "Don't let text break inside a word; truncate the title, then drop the time.",
+      "Don't replace the navigator, the station mark or the interchange circle with system pickers or badges that bring their own accent colour."
+    ]
+  }
+}
