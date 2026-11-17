@@ -1,14 +1,33 @@
 import DaybookCore
 import SwiftUI
 
-/// Calendars grouped by account. One click or tap switches a calendar on or off.
+/// Calendars grouped by account, then categories. One click or tap switches either on or off.
 struct SidebarView: View {
     @Environment(AppModel.self) private var model
+    @Environment(CategoryModel.self) private var categories
     /// Row fill when the list is shown as an inset list (the iPhone sheet); `nil` keeps the sidebar style.
     var rowBackground: Color? = nil
 
     var body: some View {
-        List {
+        ScrollViewReader { reader in
+            list
+                .task {
+                    #if DEBUG
+                    if model.stagedScreens.contains("categories") {
+                        try? await Task.sleep(for: .milliseconds(500))
+                        reader.scrollTo(Self.categoriesID, anchor: .top)
+                    }
+                    await model.stageCategoryScreens()
+                    #endif
+                }
+        }
+    }
+
+    static let categoriesID = "categories"
+
+    private var list: some View {
+        @Bindable var categories = categories
+        return List {
             #if os(macOS)
             // The split view's navigation title does not render above a Mac sidebar.
             Text("Daybook")
@@ -40,6 +59,10 @@ struct SidebarView: View {
                     .foregroundStyle(Theme.ink)
                     .listRowBackground(rowBackground)
             }
+            if !model.calendars.isEmpty {
+                CategorySidebarSection(rowBackground: rowBackground)
+                    .id(Self.categoriesID)
+            }
         }
         .scrollContentBackground(.hidden)
         .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -57,6 +80,12 @@ struct SidebarView: View {
             CalendarEditorView(editor: editor) { model.calendarEditor = nil }
                 .presentationBackground(Theme.rail)
         }
+        .sheet(item: $categories.editor) { editor in
+            CategoryEditorView(editor: editor) { categories.editor = nil }
+                .environment(categories)
+                .presentationBackground(Theme.rail)
+        }
+        .categoryDeleteConfirmation(categories)
         .overlay {
             if model.calendars.isEmpty {
                 ContentUnavailableView("Žádné kalendáře",

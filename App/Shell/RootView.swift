@@ -7,6 +7,7 @@ struct RootView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showsCalendars = false
+    @State private var calendarsDetent: PresentationDetent = .medium
     /// Width of the detail column (regular width), to pick a period title that fits beside the controls.
     @State private var detailWidth: CGFloat = 0
 
@@ -41,7 +42,7 @@ struct RootView: View {
             NavigationStack {
                 current.toolbar {
                     ToolbarItem(placement: .navigation) {
-                        Button("Kalendáře", systemImage: "sidebar.leading") { showsCalendars = true }
+                        Button("Kalendáře a kategorie", systemImage: "sidebar.leading") { showsCalendars = true }
                     }
                     #if os(iOS)
                     // The top bar already holds the calendars, the title and back / Today / forward.
@@ -54,18 +55,22 @@ struct RootView: View {
             .sheet(isPresented: $showsCalendars) {
                 NavigationStack {
                     SidebarView(rowBackground: Theme.ground)
-                        .navigationTitle("Kalendáře")
+                        .navigationTitle("Kalendáře a kategorie")
                         .toolbar {
                             ToolbarItem(placement: .confirmationAction) {
                                 Button("Hotovo") { showsCalendars = false }
                             }
                         }
                 }
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.medium, .large], selection: $calendarsDetent)
                 .presentationBackground(Theme.rail)
             }
             .onAppear {
                 if model.stagedScreens.contains("calendars") { showsCalendars = true }
+                if model.stagedScreens.contains("categories") {
+                    calendarsDetent = .large
+                    showsCalendars = true
+                }
             }
         } else {
             NavigationSplitView {
