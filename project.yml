@@ -27,6 +27,10 @@ targets:
         LSApplicationCategoryType: public.app-category.productivity
         NSCalendarsFullAccessUsageDescription: "Daybook zobrazuje a upravuje události z kalendářů, které máte v zařízení."
         UILaunchScreen: {}
+        # Empty unless DAYBOOK_CLOUDKIT_CONTAINER is set: categories then stay on the device.
+        DaybookCloudKitContainer: $(DAYBOOK_CLOUDKIT_CONTAINER)
+        # iCloud sync, step 4 of 4 (see docs/superpowers/plans/2026-11-17-m4-categories.md):
+        # UIBackgroundModes: [remote-notification]
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
@@ -42,5 +46,15 @@ targets:
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic
-        "CODE_SIGN_IDENTITY[sdk=macosx*]": "-"
-        "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": App/Daybook.entitlements
+        # iCloud sync for categories is off: this build has no team and no CloudKit container.
+        # To turn it on, follow "Turning on iCloud sync" in docs/superpowers/plans/2026-11-17-m4-categories.md:
+        # 1. your team id:
+        # DEVELOPMENT_TEAM: ABCDE12345
+        # 2. the container (also create it at developer.apple.com and give the app id iCloud and Push):
+        DAYBOOK_CLOUDKIT_CONTAINER: ""
+        # DAYBOOK_CLOUDKIT_CONTAINER: iCloud.app.daybook.Daybook
+        # 3. comment out the two "unsigned build" lines and uncomment the two entitlement lines after them:
+        "CODE_SIGN_IDENTITY[sdk=macosx*]": "-" # unsigned build
+        "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": App/Daybook.entitlements # unsigned build
+        # "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": App/DaybookCloud-macOS.entitlements
+        # "CODE_SIGN_ENTITLEMENTS[sdk=iphone*]": App/DaybookCloud-iOS.entitlements
