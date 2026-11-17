@@ -142,7 +142,8 @@ struct RootView: View {
         let year = model.focusedDate.formatted(.dateTime.year())
         let numericWithYear = model.mode == .month ? numeric.joined : "\(numeric.name) \(year)"
         let room = detailWidth - Self.trailingControlsWidth
-        let font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        // The bar's title grows a little at accessibility sizes.
+        let font = UIFont.systemFont(ofSize: dynamicTypeSize.isAccessibilitySize ? 21 : 17, weight: .semibold)
         for candidate in [long, numericWithYear] {
             let width = (candidate as NSString).size(withAttributes: [.font: font]).width
             if width <= room { return candidate }

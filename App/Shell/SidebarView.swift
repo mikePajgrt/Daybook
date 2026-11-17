@@ -85,7 +85,7 @@ struct SidebarView: View {
                 .environment(categories)
                 .presentationBackground(Theme.rail)
         }
-        .categoryDeleteConfirmation(categories)
+
         .overlay {
             if model.calendars.isEmpty {
                 ContentUnavailableView("Žádné kalendáře",

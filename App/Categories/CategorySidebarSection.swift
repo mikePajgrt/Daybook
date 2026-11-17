@@ -24,6 +24,8 @@ struct CategorySidebarSection: View {
                     Divider()
                     Button("Smazat kategorii…", systemImage: "trash", role: .destructive) { categories.pendingDelete = category }
                 }
+                // The question hangs on the row it is about.
+                .categoryDeleteConfirmation(categories, for: category)
                 .listRowBackground(rowBackground)
             }
             .onMove { categories.move(fromOffsets: $0, toOffset: $1) }
@@ -54,6 +56,8 @@ struct CategorySidebarSection: View {
 }
 
 /// A filter row for a category or "Bez kategorie": checkbox in ink, symbol, name.
+/// At accessibility sizes the name moves under the checkbox and symbol, so it has the row's whole
+/// width and wraps only between words.
 private struct FilterToggleRow: View {
     let title: String
     let symbol: String
@@ -61,24 +65,30 @@ private struct FilterToggleRow: View {
     let action: () -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    /// One column for every symbol, so names share a left edge whatever the symbol's width.
+    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 26
 
     var body: some View {
         Button(action: action) {
-            HStack(alignment: large ? .firstTextBaseline : .center, spacing: 10) {
-                Image(systemName: isOn ? "checkmark.square.fill" : "square")
-                    .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
-                    .imageScale(.large)
-                Image(systemName: symbol)
-                    .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
-                    .frame(minWidth: 22)
-                    .accessibilityHidden(true)
-                Text(title)
-                    .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
-                    // At accessibility sizes the name wraps between words instead of losing letters.
-                    .lineLimit(large ? nil : 1)
-                    .fixedSize(horizontal: false, vertical: large)
-                Spacer(minLength: 0)
+            Group {
+                if large {
+                    // Checkbox and symbol on one line, the name below with the row's whole width.
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 10) {
+                            checkbox
+                            symbolImage
+                        }
+                        name
+                    }
+                } else {
+                    HStack(spacing: 10) {
+                        checkbox
+                        symbolImage.frame(width: symbolWidth)
+                        name
+                    }
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -88,20 +98,39 @@ private struct FilterToggleRow: View {
         .accessibilityAddTraits(.isToggle)
     }
 
+    private var checkbox: some View {
+        Image(systemName: isOn ? "checkmark.square.fill" : "square")
+            .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
+            .imageScale(.large)
+    }
+
+    private var name: some View {
+        Text(title)
+            .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
+            // Long names take a second line, between words, rather than losing letters.
+            .lineLimit(large ? nil : 2)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var symbolImage: some View {
+        Image(systemName: symbol)
+            .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
+            .accessibilityHidden(true)
+    }
+
     private var large: Bool { dynamicTypeSize.isAccessibilitySize }
 }
 
 extension View {
-    /// The confirmation before a category is deleted: names it and says how many events lose it.
-    func categoryDeleteConfirmation(_ categories: CategoryModel) -> some View {
-        let pending = categories.pendingDelete
-        return confirmationDialog("Smazat kategorii „\(pending?.name ?? "")“?",
-                                  isPresented: Binding(get: { categories.pendingDelete != nil },
-                                                       set: { if !$0 { categories.pendingDelete = nil } }),
-                                  titleVisibility: .visible, presenting: pending) { category in
+    /// The confirmation before `category` is deleted: names it and says how many events lose it.
+    func categoryDeleteConfirmation(_ categories: CategoryModel, for category: Category) -> some View {
+        confirmationDialog("Smazat kategorii „\(category.name)“?",
+                           isPresented: Binding(get: { categories.pendingDelete?.id == category.id },
+                                                set: { if !$0 { categories.pendingDelete = nil } }),
+                           titleVisibility: .visible) {
             Button("Smazat kategorii", role: .destructive) { categories.delete(category) }
             Button("Ponechat", role: .cancel) {}
-        } message: { category in
+        } message: {
             Text(CategoryText.deleteMessage(categories.eventCount(of: category)))
         }
     }

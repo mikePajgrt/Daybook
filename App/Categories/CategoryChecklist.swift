@@ -10,6 +10,9 @@ struct CategoryChecklist: View {
     @Binding var scope: CategoryScope
     @Binding var selection: CategorySelection
 
+    /// One column for every symbol, so names share a left edge.
+    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 26
+
     var body: some View {
         if isRecurring {
             Picker("Přiřadit", selection: $scope) {
@@ -26,7 +29,7 @@ struct CategoryChecklist: View {
             Button { selection.toggle(category.id, scope: scope) } label: {
                 HStack(spacing: 10) {
                     Image(systemName: category.symbol)
-                        .frame(minWidth: 24)
+                        .frame(width: symbolWidth)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 0) {
                         Text(category.name)
