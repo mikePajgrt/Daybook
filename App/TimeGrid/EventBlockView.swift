@@ -3,8 +3,9 @@ import SwiftUI
 
 /// One timed event in the grid: its calendar's line on the left with a station dot,
 /// then the title (always), the time and the place when the block has room.
-/// Text never breaks inside a word: narrow blocks hold the title on one line with a tail ellipsis,
-/// and the time shows only when it fits on one line.
+/// Text never breaks inside a word: the title wraps onto as many lines as the block holds when its
+/// longest word fits the width, and otherwise holds one line with a tail ellipsis. The time shows only
+/// when it fits on one line, and the place only when its first word fits whole.
 struct EventBlockView: View {
     let placement: TimedPlacement
     let color: RGBA
@@ -14,8 +15,24 @@ struct EventBlockView: View {
     /// One width for the whole grid: condensed when its day columns are narrow.
     let condensed: Bool
 
-    /// Below this width a second title line would only hold a word fragment.
-    private var titleLines: Int { width < 140 ? 1 : 2 }
+    /// Widths of the title's longest word and of the place's first word, measured in the block's type.
+    @State private var longestTitleWord: CGFloat = 0
+    @State private var firstPlaceWord: CGFloat = 0
+
+    /// Room for text: the block less the line, the dot's overhang and the text insets.
+    private var textWidth: CGFloat { width - 13 }
+
+    /// Wrapping only happens between words: when a word is wider than the block, one line and an ellipsis.
+    private var titleWraps: Bool { longestTitleWord > 0 && longestTitleWord <= textWidth }
+
+    private var location: String? {
+        guard let location = placement.event.location, !location.isEmpty else { return nil }
+        return location
+    }
+
+    private static func words(_ text: String) -> [String] {
+        text.split(whereSeparator: \.isWhitespace).map(String.init)
+    }
 
     private var title: String { EventRowView.title(of: placement.event) }
 
@@ -51,6 +68,7 @@ struct EventBlockView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background { probes }
         .background(Theme.blockFill(color))
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .accessibilityElement(children: .ignore)
@@ -58,11 +76,33 @@ struct EventBlockView: View {
             .compactMap { $0 }.joined(separator: ", "))
     }
 
+    /// Invisible measurements of the words that decide wrapping, in the same type as the text.
+    private var probes: some View {
+        let firstPlace = location.flatMap { Self.words($0).first } ?? ""
+        return ZStack {
+            // One word per line: the stack is as wide as the widest word.
+            VStack(spacing: 0) {
+                ForEach(Array(Self.words(title).enumerated()), id: \.offset) { _, word in Text(word) }
+            }
+                .font(.caption.weight(.semibold))
+                .fixedSize()
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { longestTitleWord = $0 }
+            Text(firstPlace)
+                .font(.caption2)
+                .fixedSize()
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { firstPlaceWord = $0 }
+        }
+        .fontWidth(condensed ? .condensed : .standard)
+        .hidden()
+        .accessibilityHidden(true)
+    }
+
     @ViewBuilder private func details(time: Bool, place: Bool) -> some View {
         VStack(alignment: .leading, spacing: 1) {
             Text(title)
                 .font(.caption.weight(.semibold))
-                .lineLimit(titleLines)
+                // As many whole-word lines as the block's height holds; the last one ends in an ellipsis.
+                .lineLimit(titleWraps ? nil : 1)
                 .truncationMode(.tail)
                 .foregroundStyle(Theme.ink)
             if time {
@@ -76,7 +116,8 @@ struct EventBlockView: View {
                 .monospacedDigit()
                 .foregroundStyle(Theme.blockSecondaryInk)
             }
-            if place, let location = placement.event.location, !location.isEmpty {
+            // A place whose first word does not fit is dropped rather than shown as a stub.
+            if place, let location, firstPlaceWord > 0, firstPlaceWord <= textWidth {
                 Text(location)
                     .font(.caption2)
                     .lineLimit(1)

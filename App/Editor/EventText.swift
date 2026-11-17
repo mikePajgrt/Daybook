@@ -74,11 +74,10 @@ enum EventText {
 
     static func status(_ status: AttendeeStatus) -> String {
         switch status {
-        case .accepted: "Přijal(a)"
-        case .declined: "Odmítl(a)"
+        case .accepted: "Přijde"
+        case .declined: "Nepřijde"
         case .tentative: "Možná přijde"
-        case .pending: "Zatím neodpověděl(a)"
-        case .unknown: "Odpověď neznámá"
+        case .pending, .unknown: "Bez odpovědi"
         }
     }
 
@@ -93,12 +92,42 @@ enum EventText {
 
     // MARK: Time zones
 
-    /// "New York (východoamerický čas)".
+    /// "New York (východoamerický čas)", with the city in Czech ("Praha", not "Prague").
     static func zoneName(_ zone: TimeZone) -> String {
-        let city = zone.identifier.split(separator: "/").last.map { $0.replacingOccurrences(of: "_", with: " ") }
+        let fallback = zone.identifier.split(separator: "/").last.map { $0.replacingOccurrences(of: "_", with: " ") }
             ?? zone.identifier
-        let name = zone.localizedName(for: .generic, locale: Locale(identifier: "cs_CZ"))
+        let city = zone.identifier.contains("/") ? (localizedCity(zone) ?? fallback) : fallback
+        let name = zone.localizedName(for: .generic, locale: czech)
         return name.map { "\(city) (\($0))" } ?? city
+    }
+
+    private static let czech = Locale(identifier: "cs_CZ")
+
+    /// The zone's exemplar city in Czech (the "VVV" pattern), or `nil` when the formatter has none.
+    private static func localizedCity(_ zone: TimeZone) -> String? {
+        let formatter = DateFormatter()
+        formatter.locale = czech
+        formatter.timeZone = zone
+        formatter.dateFormat = "VVV"
+        let city = formatter.string(from: Date())
+        // Without a known city the pattern falls back to an offset or an "unknown" placeholder.
+        guard !city.isEmpty, !city.contains("GMT"), !city.contains("UTC"), !city.localizedCaseInsensitiveContains("nezn")
+        else { return nil }
+        return city
+    }
+
+    // MARK: Invitations
+
+    static let inviteUnavailableTitle = "Editor pozvánek se neotevřel"
+
+    /// Why the system invitation editor did not open, and what to do instead.
+    static func inviteUnavailableMessage(isDemo: Bool) -> String {
+        #if DEBUG
+        if isDemo {
+            return "V ukázkovém režimu nejsou události v systémovém kalendáři, takže se editor pozvánek neotevře."
+        }
+        #endif
+        return "Událost se v systémovém kalendáři nepodařilo najít. Pozvěte účastníky v aplikaci Kalendář nebo zkuste událost otevřít znovu."
     }
 
     // MARK: Problems and errors

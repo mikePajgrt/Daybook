@@ -10,27 +10,37 @@ struct CalendarColorPicker: View {
     private static let names = ["Červená", "Oranžová", "Jantarová", "Zelená", "Tyrkysová", "Modrá", "Fialová", "Růžová"]
 
     var body: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 44, maximum: 60), spacing: 4), count: 4),
-                  alignment: .leading, spacing: 4) {
-            ForEach(Array(Palette.calendarPresets.enumerated()), id: \.offset) { index, preset in
-                let selected = isClose(preset, color)
-                Button { color = preset } label: {
-                    Circle()
-                        .fill(Color(preset))
-                        .frame(width: 28, height: 28)
-                        .padding(4)
-                        .overlay { if selected { Circle().stroke(Theme.ink, lineWidth: 2) } }
-                        .frame(minWidth: 44, minHeight: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Self.names[index])
-                .accessibilityAddTraits(selected ? .isSelected : [])
+        // One row of eight where the card is wide enough (iPad, Mac), otherwise two rows of four;
+        // either way the swatches spread across the card's width.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 4) { swatches(0..<8) }
+            VStack(spacing: 4) {
+                HStack(spacing: 4) { swatches(0..<4) }
+                HStack(spacing: 4) { swatches(4..<8) }
             }
         }
         .padding(.vertical, 2)
         ColorPicker("Vlastní barva", selection: Binding(get: { Color(color) }, set: { color = rgba($0) }),
                     supportsOpacity: false)
+    }
+
+    private func swatches(_ range: Range<Int>) -> some View {
+        ForEach(range, id: \.self) { index in
+            let preset = Palette.calendarPresets[index]
+            let selected = isClose(preset, color)
+            Button { color = preset } label: {
+                Circle()
+                    .fill(Color(preset))
+                    .frame(width: 28, height: 28)
+                    .padding(4)
+                    .overlay { if selected { Circle().stroke(Theme.ink, lineWidth: 2) } }
+                    .frame(minWidth: 44, maxWidth: .infinity, minHeight: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Self.names[index])
+            .accessibilityAddTraits(selected ? .isSelected : [])
+        }
     }
 
     private func rgba(_ value: Color) -> RGBA {

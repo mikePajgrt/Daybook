@@ -7,6 +7,8 @@ struct RootView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showsCalendars = false
+    /// Width of the detail column (regular width), to pick a period title that fits beside the controls.
+    @State private var detailWidth: CGFloat = 0
 
     var body: some View {
         if model.access == .granted {
@@ -15,6 +17,8 @@ struct RootView: View {
                                      set: { model.editor = $0 })) { editor in
                     EventEditorView(editor: editor) { model.editor = nil }
                         .presentationBackground(Theme.rail)
+                        // iPad: a page-sized sheet shows more of the form without scrolling.
+                        .presentationSizing(.page)
                 }
                 .alert(model.notice?.title ?? "", isPresented: Binding(get: { model.notice != nil },
                                                                        set: { if !$0 { model.notice = nil } })) {
@@ -69,7 +73,9 @@ struct RootView: View {
                     .navigationTitle("Daybook")
                     .navigationSplitViewColumnWidth(min: 220, ideal: 248, max: 320)
             } detail: {
-                current.toolbar {
+                current
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { detailWidth = $0 }
+                    .toolbar {
                     ToolbarItem(placement: .primaryAction) { modePicker }
                     ToolbarItem(placement: .primaryAction) { newEventButton }
                 }
@@ -114,9 +120,35 @@ struct RootView: View {
     /// next to the toolbar buttons. The iPad toolbar also holds the switcher, so its weekday is abbreviated.
     private var navigationTitleText: String {
         let compact = sizeClass == .compact
+        #if os(iOS)
+        if !compact { return regularTitle }
+        #endif
         return title(short: compact, numeric: compact && dynamicTypeSize.isAccessibilitySize,
                      abbreviatedWeekday: true).joined
     }
+
+    #if os(iOS)
+    /// iPad: the longest form that fits beside the toolbar's controls ("16.–22. listopadu 2026"),
+    /// else months as numbers with the year ("16.–22. 11. 2026"), else without the year.
+    /// The bar truncates its title instead of offering a width, so the forms are measured here.
+    private var regularTitle: String {
+        let long = title(short: false, numeric: false, abbreviatedWeekday: true).joined
+        let numeric = title(short: false, numeric: true, abbreviatedWeekday: true)
+        let year = model.focusedDate.formatted(.dateTime.year())
+        let numericWithYear = model.mode == .month ? numeric.joined : "\(numeric.name) \(year)"
+        let room = detailWidth - Self.trailingControlsWidth
+        let font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        for candidate in [long, numericWithYear] {
+            let width = (candidate as NSString).size(withAttributes: [.font: font]).width
+            if width <= room { return candidate }
+        }
+        return numeric.joined
+    }
+
+    /// What the iPad toolbar's trailing group (switcher, "+", back, Today, forward) and the bar's
+    /// margins take from the detail column's width, measured on iPadOS 26.
+    private static let trailingControlsWidth: CGFloat = 445
+    #endif
 
     private var unitName: String {
         switch model.mode {

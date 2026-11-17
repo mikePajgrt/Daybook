@@ -41,6 +41,8 @@ struct DayListView: View {
                              set: { model.editor = $0 })) { editor in
             EventEditorView(editor: editor) { model.editor = nil }
                 .presentationBackground(Theme.rail)
+                // iPad: a page-sized sheet shows more of the form without scrolling.
+                .presentationSizing(.page)
         }
         // The world's colours instead of system grey: rows on the ground, set in the deeper rail.
         .scrollContentBackground(.hidden)

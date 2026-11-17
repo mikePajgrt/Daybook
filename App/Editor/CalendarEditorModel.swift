@@ -45,4 +45,12 @@ final class CalendarEditorModel: Identifiable {
     var draft: CalendarDraft { CalendarDraft(title: title, color: color, sourceID: sourceID) }
 
     var canSave: Bool { isNew ? draft.problems.isEmpty : true }
+
+    /// A new calendar always has something to create; a recolour only once the colour changed.
+    var hasChanges: Bool {
+        switch mode {
+        case .new: return true
+        case .recolor(let calendar): return color != calendar.color
+        }
+    }
 }

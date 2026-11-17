@@ -61,10 +61,10 @@ struct EventEditorView: View {
         } message: {
             Text(editor.errorMessage ?? "")
         }
-        .alert("Pozvánky tu teď otevřít nejde", isPresented: $inviteUnavailable) {
+        .alert(EventText.inviteUnavailableTitle, isPresented: $inviteUnavailable) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Systémový editor pozvánek pracuje jen s kalendáři v zařízení. V ukázkovém režimu se neotevře.")
+            Text(EventText.inviteUnavailableMessage(isDemo: !model.canOpenSystemEditor))
         }
         #if os(iOS)
         .sheet(item: $invite) { request in
@@ -86,9 +86,9 @@ struct EventEditorView: View {
     private var form: some View {
         Form {
             Section {
-                TextField("Název", text: $editor.draft.title, prompt: Text("Bez názvu"))
+                TextField("Název", text: $editor.draft.title, prompt: Text("Bez názvu").foregroundStyle(Theme.secondaryInk))
                     .font(.title3.weight(.semibold))
-                TextField("Místo", text: $editor.draft.location, prompt: Text("Místo"))
+                TextField("Místo", text: $editor.draft.location, prompt: Text("Místo").foregroundStyle(Theme.secondaryInk))
             }
             .listRowBackground(Theme.ground)
 
@@ -148,13 +148,13 @@ struct EventEditorView: View {
             .listRowBackground(Theme.ground)
 
             Section {
-                TextField("URL", text: $editor.draft.url, prompt: Text("Odkaz, třeba example.com"))
+                TextField("URL", text: $editor.draft.url, prompt: Text("Odkaz, třeba example.com").foregroundStyle(Theme.secondaryInk))
                     #if os(iOS)
                     .keyboardType(.URL)
                     .textInputAutocapitalization(.never)
                     #endif
                     .autocorrectionDisabled()
-                TextField("Poznámka", text: $editor.draft.notes, prompt: Text("Poznámka"), axis: .vertical)
+                TextField("Poznámka", text: $editor.draft.notes, prompt: Text("Poznámka").foregroundStyle(Theme.secondaryInk), axis: .vertical)
                     .lineLimit(3...8)
             } footer: {
                 problemText(.invalidURL)
@@ -164,6 +164,8 @@ struct EventEditorView: View {
             attendeeSection
         }
         .formStyle(.grouped)
+        // Picker values and switches in the world's ink instead of system grey and green.
+        .tint(Theme.ink)
         .scrollContentBackground(.hidden)
         .background(Theme.rail)
         .foregroundStyle(Theme.ink)

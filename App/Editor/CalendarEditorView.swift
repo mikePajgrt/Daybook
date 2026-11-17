@@ -16,6 +16,8 @@ struct CalendarEditorView: View {
                 }
             }
             .formStyle(.grouped)
+            // Picker values and switches in the world's ink instead of system grey and green.
+            .tint(Theme.ink)
             .scrollContentBackground(.hidden)
             .background(Theme.rail)
             .foregroundStyle(Theme.ink)
@@ -31,7 +33,7 @@ struct CalendarEditorView: View {
                     Button(editor.isNew ? "Vytvořit" : "Uložit") {
                         if model.save(editor) { onClose() }
                     }
-                    .disabled(!editor.canSave || (editor.isNew && editor.sources.isEmpty))
+                    .disabled(!editor.canSave || (editor.isNew && editor.sources.isEmpty) || !editor.hasChanges)
                 }
             }
         }
@@ -48,7 +50,7 @@ struct CalendarEditorView: View {
 
     @ViewBuilder private var newCalendarSections: some View {
         Section("Název") {
-            TextField("Název", text: $editor.title, prompt: Text("Například Výlety"))
+            TextField("Název", text: $editor.title, prompt: Text("Například Výlety").foregroundStyle(Theme.secondaryInk))
         }
         .listRowBackground(Theme.ground)
 

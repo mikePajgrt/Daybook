@@ -9,18 +9,21 @@ import AppKit
 /// A calendar's colour as a dot that keeps its colour inside system menus and pickers,
 /// which otherwise draw images as monochrome templates.
 enum CalendarSwatch {
+    /// Clear space drawn after the dot: menus and pickers set the name almost against the icon.
+    static let trailingGap: CGFloat = 6
+
     static func image(_ color: RGBA, diameter: CGFloat = 12) -> Image {
         #if canImport(UIKit)
-        let size = CGSize(width: diameter, height: diameter)
+        let size = CGSize(width: diameter + trailingGap, height: diameter)
         let drawn = UIGraphicsImageRenderer(size: size).image { context in
             UIColor(red: color.r, green: color.g, blue: color.b, alpha: color.a).setFill()
-            context.cgContext.fillEllipse(in: CGRect(origin: .zero, size: size))
+            context.cgContext.fillEllipse(in: CGRect(x: 0, y: 0, width: diameter, height: diameter))
         }
         return Image(uiImage: drawn.withRenderingMode(.alwaysOriginal))
         #else
-        let drawn = NSImage(size: NSSize(width: diameter, height: diameter), flipped: false) { rect in
+        let drawn = NSImage(size: NSSize(width: diameter + trailingGap, height: diameter), flipped: false) { _ in
             NSColor(srgbRed: color.r, green: color.g, blue: color.b, alpha: color.a).setFill()
-            NSBezierPath(ovalIn: rect).fill()
+            NSBezierPath(ovalIn: NSRect(x: 0, y: 0, width: diameter, height: diameter)).fill()
             return true
         }
         drawn.isTemplate = false

@@ -31,10 +31,9 @@ struct MonthNavigatorView: View {
                     .foregroundStyle(Theme.ink)
                     .accessibilityAddTraits(.isHeader)
                 Spacer()
-                Button("Předchozí měsíc", systemImage: "chevron.left") { page(by: -1) }
-                Button("Další měsíc", systemImage: "chevron.right") { page(by: 1) }
+                chevron("Předchozí měsíc", symbol: "chevron.left") { page(by: -1) }
+                chevron("Další měsíc", symbol: "chevron.right") { page(by: 1) }
             }
-            .labelStyle(.iconOnly)
             .buttonStyle(.borderless)
             .foregroundStyle(Theme.ink)
             HStack(spacing: 0) {
@@ -73,12 +72,29 @@ struct MonthNavigatorView: View {
                 .overlay {
                     if isShown { Circle().stroke(Theme.ink, lineWidth: 1.5).padding(isToday ? -3 : 0) }
                 }
-                .frame(maxWidth: .infinity, minHeight: cell + 4)
+                .frame(maxWidth: .infinity, minHeight: max(cell + 4, Self.minimumTarget))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(day.formatted(date: .complete, time: .omitted))
         .accessibilityAddTraits(isShown ? .isSelected : [])
+    }
+
+    /// Touch screens get 44 pt targets; the Mac keeps the compact month.
+    #if os(iOS)
+    private static let minimumTarget: CGFloat = 44
+    #else
+    private static let minimumTarget: CGFloat = 0
+    #endif
+
+    private func chevron(_ label: String, symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .frame(minWidth: Self.minimumTarget, minHeight: Self.minimumTarget)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel(label)
+        .help(label)
     }
 
     private func page(by count: Int) {

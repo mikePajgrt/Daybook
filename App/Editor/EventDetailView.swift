@@ -45,7 +45,12 @@ struct EventDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         content
-                        if event.isEditable { actions }
+                        // Editing is in the bar; deleting stays at the end, away from the reading.
+                        if event.isEditable {
+                            deleteButton
+                                .controlSize(.large)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
                     .padding(20)
                 }
@@ -55,6 +60,11 @@ struct EventDetailView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 #endif
                 .toolbar {
+                    if event.isEditable {
+                        ToolbarItem(placement: .primaryAction) {
+                            Button("Upravit", action: onEdit)
+                        }
+                    }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Hotovo", action: onClose)
                     }
@@ -62,28 +72,16 @@ struct EventDetailView: View {
             }
         }
         .foregroundStyle(Theme.ink)
-        .confirmationDialog(deleteTitle, isPresented: $asksDelete, titleVisibility: .visible) {
-            if event.isRecurring {
-                Button("Smazat jen tuto událost", role: .destructive) { delete(.thisEvent) }
-                Button("Smazat tuto a všechny budoucí", role: .destructive) { delete(.futureEvents) }
-            } else {
-                Button("Smazat událost", role: .destructive) { delete(.thisEvent) }
-            }
-            Button("Ponechat", role: .cancel) {}
-        } message: {
-            Text(event.isRecurring ? "Událost se opakuje. Vyberte, které výskyty smazat."
-                                   : "Událost zmizí ze všech zařízení, která tento kalendář používají.")
-        }
         .alert("Událost se nepodařilo smazat", isPresented: Binding(get: { deleteError != nil },
                                                                     set: { if !$0 { deleteError = nil } })) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(deleteError ?? "")
         }
-        .alert("Pozvánky tu teď otevřít nejde", isPresented: $inviteUnavailable) {
+        .alert(EventText.inviteUnavailableTitle, isPresented: $inviteUnavailable) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Systémový editor pozvánek pracuje jen s kalendáři v zařízení. V ukázkovém režimu se neotevře.")
+            Text(EventText.inviteUnavailableMessage(isDemo: !model.canOpenSystemEditor))
         }
         #if os(iOS)
         .sheet(item: $invite) { request in
@@ -236,13 +234,30 @@ struct EventDetailView: View {
                 .tint(Theme.ink)
                 .keyboardShortcut("e", modifiers: .command)
             Spacer()
-            Button("Smazat událost", systemImage: "trash", role: .destructive) { asksDelete = true }
-                .buttonStyle(.bordered)
-                // The view's ink would otherwise override the destructive colour.
-                .foregroundStyle(.red)
-                .tint(.red)
+            deleteButton
         }
         .controlSize(style == .popover ? .regular : .large)
+    }
+
+    /// The dialog hangs on the button, so it emerges from the control that asked.
+    private var deleteButton: some View {
+        Button("Smazat událost", systemImage: "trash", role: .destructive) { asksDelete = true }
+            .buttonStyle(.bordered)
+            // The view's ink would otherwise override the destructive colour.
+            .foregroundStyle(.red)
+            .tint(.red)
+        .confirmationDialog(deleteTitle, isPresented: $asksDelete, titleVisibility: .visible) {
+            if event.isRecurring {
+                Button("Smazat jen tuto událost", role: .destructive) { delete(.thisEvent) }
+                Button("Smazat tuto a všechny budoucí", role: .destructive) { delete(.futureEvents) }
+            } else {
+                Button("Smazat událost", role: .destructive) { delete(.thisEvent) }
+            }
+            Button("Ponechat", role: .cancel) {}
+        } message: {
+            Text(event.isRecurring ? "Událost se opakuje. Vyberte, které výskyty smazat."
+                                   : "Událost zmizí ze všech zařízení, která tento kalendář používají.")
+        }
     }
 
     // MARK: Actions
