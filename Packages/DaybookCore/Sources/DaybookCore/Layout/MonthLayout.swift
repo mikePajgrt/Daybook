@@ -85,29 +85,7 @@ public enum MonthLayout {
             }
         }
 
-        // Earlier first, then longer, then by title, so lanes are stable and long events sit on top.
-        spanning.sort { a, b in
-            if a.days.lowerBound != b.days.lowerBound { return a.days.lowerBound < b.days.lowerBound }
-            if a.days.upperBound != b.days.upperBound { return a.days.upperBound > b.days.upperBound }
-            return a.event.title < b.event.title
-        }
-
-        var lastColumnOfLane: [Int] = []
-        var spans: [SpanSegment] = []
-        for item in spanning {
-            let startColumn = days.firstIndex(of: max(item.days.lowerBound, firstDay)) ?? 0
-            let endColumn = days.firstIndex(of: min(item.days.upperBound, lastDay)) ?? days.count - 1
-            let lane = lastColumnOfLane.firstIndex { $0 < startColumn } ?? lastColumnOfLane.count
-            if lane == lastColumnOfLane.count {
-                lastColumnOfLane.append(endColumn)
-            } else {
-                lastColumnOfLane[lane] = endColumn
-            }
-            spans.append(SpanSegment(event: item.event, lane: lane,
-                                     startColumn: startColumn, endColumn: endColumn,
-                                     continuesBefore: item.days.lowerBound < firstDay,
-                                     continuesAfter: item.days.upperBound > lastDay))
-        }
+        let spans = SpanLanes.segments(days: days, items: spanning)
 
         let dayLayouts = days.enumerated().map { index, date in
             DayLayout(date: date,
