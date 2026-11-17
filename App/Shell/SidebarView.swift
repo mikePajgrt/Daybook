@@ -88,9 +88,8 @@ struct SidebarView: View {
 
         .overlay {
             if model.calendars.isEmpty {
-                ContentUnavailableView("Žádné kalendáře",
-                                       systemImage: "calendar.badge.exclamationmark",
-                                       description: Text("Přidejte účet iCloud, Exchange nebo Google v systémovém Nastavení."))
+                ContentUnavailableView("Žádné kalendáře", systemImage: "calendar.badge.exclamationmark",
+                                       description: Text(NoCalendarsView.whereToAdd))
             }
         }
     }
@@ -107,7 +106,7 @@ private struct CalendarToggleRow: View {
         Button(action: action) {
             HStack(alignment: large ? .firstTextBaseline : .center, spacing: 10) {
                 Image(systemName: isOn ? "checkmark.square.fill" : "square")
-                    .foregroundStyle(Color(calendar.color))
+                    .foregroundStyle(Theme.line(calendar.color))
                     .imageScale(.large)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(calendar.title)

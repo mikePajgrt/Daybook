@@ -55,7 +55,8 @@ struct DaybookApp: App {
                 syncState: arguments.contains("-demo-icloud-unavailable") ? .iCloudUnavailable : .localOnly)
             let model = AppModel(store: store, categoryStore: categoryStore, defaults: defaults, calendar: calendar,
                                  now: now, clockIsFixed: true, stagedScreens: staged)
-            model.stagedDetail = DemoStaging.detail(for: staged, today: model.today, calendar: calendar)
+            model.detailRequest = DemoStaging.detail(for: staged, today: model.today, calendar: calendar)
+                .map { DetailRequest(key: $0.key, asksDelete: $0.asksDelete) }
             _model = State(initialValue: model)
             demoColorScheme = arguments.contains("-demo-light") ? .light
                 : arguments.contains("-demo-dark") ? .dark : nil

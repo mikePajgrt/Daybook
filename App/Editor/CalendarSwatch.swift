@@ -35,12 +35,14 @@ enum CalendarSwatch {
 /// A calendar as a picker row: its colour and its name, so colour is never the only cue.
 struct CalendarLabel: View {
     let calendar: CalendarInfo
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Label {
             Text(calendar.title)
         } icon: {
-            CalendarSwatch.image(calendar.color)
+            // Drawn as an image, so the line colour for the appearance on screen is chosen here.
+            CalendarSwatch.image(Theme.lineRGBA(calendar.color, dark: colorScheme == .dark))
         }
     }
 }

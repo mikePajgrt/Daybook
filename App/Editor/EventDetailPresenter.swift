@@ -35,7 +35,7 @@ struct EventDetailPresenter: ViewModifier {
             .contentShape(Rectangle())
             .onTapGesture { shows = true }
             .accessibilityAddTraits(.isButton)
-            .accessibilityAction(named: "Otevřít podrobnosti") { shows = true }
+            .accessibilityAction(named: Text("Otevřít podrobnosti")) { shows = true }
             // Mac and iPad: categories straight from the event, without opening it.
             .contextMenu {
                 Button("Otevřít podrobnosti", systemImage: "info.circle") { shows = true }
@@ -49,11 +49,13 @@ struct EventDetailPresenter: ViewModifier {
                     .presentationDetents([.medium, .large])
                     .presentationBackground(Theme.ground)
             }
-            .task {
-                guard let staged = model.stagedDetail, staged.key == event.key else { return }
-                model.stagedDetail = nil
-                try? await Task.sleep(for: .milliseconds(800))
-                asksDelete = staged.asksDelete
+            // A chosen search result (or a debug staging) asks the view showing its event to open it.
+            .task(id: model.detailRequest?.id) {
+                guard let request = model.detailRequest, request.key == event.key else { return }
+                model.detailRequest = nil
+                // Let the view switch settle first: a popover cannot attach to a view still moving in.
+                try? await Task.sleep(for: .milliseconds(700))
+                asksDelete = request.asksDelete
                 shows = true
             }
     }

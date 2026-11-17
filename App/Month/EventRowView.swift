@@ -12,9 +12,10 @@ struct EventRowView: View {
 
     @Environment(\.colorSchemeContrast) private var contrast
     @Environment(CategoryModel.self) private var categoryModel
+    @Environment(AppModel.self) private var model
 
     static func title(of event: EventInfo) -> String {
-        event.title.isEmpty ? "Bez názvu" : event.title
+        event.title.isEmpty ? String(localized: "Bez názvu") : event.title
     }
 
     private var font: Font {
@@ -53,8 +54,9 @@ struct EventRowView: View {
         .fontWidth(compact ? .condensed : .standard)
         .padding(.leading, compact ? 4 : 8)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel([event.start.formatted(date: .omitted, time: .shortened), Self.title(of: event),
-                             CategoryText.spoken(categories)].compactMap { $0 }.joined(separator: ", "))
+        .accessibilityLabel(EventText.spoken(event, calendar: model.calendar,
+                                             calendarTitle: model.calendarInfo(event.calendarID)?.title,
+                                             categories: categories))
     }
 }
 

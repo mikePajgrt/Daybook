@@ -140,9 +140,7 @@ struct TimeGridView: View {
         return (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
     }
 
-    private func rgba(for calendarID: String) -> RGBA {
-        model.calendarInfo(calendarID)?.color ?? RGBA(r: 0.56, g: 0.56, b: 0.58)
-    }
+    private func rgba(for calendarID: String) -> RGBA { model.color(of: calendarID) }
 
-    private func color(for calendarID: String) -> Color { Color(rgba(for: calendarID)) }
+    private func color(for calendarID: String) -> Color { Theme.line(rgba(for: calendarID)) }
 }

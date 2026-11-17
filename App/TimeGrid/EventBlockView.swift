@@ -18,6 +18,7 @@ struct EventBlockView: View {
     /// Widths of the title's longest word and of the place's first word, measured in the block's type.
     @State private var longestTitleWord: CGFloat = 0
     @Environment(CategoryModel.self) private var categoryModel
+    @Environment(AppModel.self) private var model
 
     private var categories: [Category] { categoryModel.categories(for: placement.event.key) }
     @State private var firstPlaceWord: CGFloat = 0
@@ -46,7 +47,7 @@ struct EventBlockView: View {
     }
 
     var body: some View {
-        let line = Color(color)
+        let line = Theme.line(color)
         HStack(alignment: .top, spacing: 0) {
             Rectangle()
                 .fill(line)
@@ -75,7 +76,8 @@ struct EventBlockView: View {
         .background(Theme.blockFill(color))
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel([title, timeRange, placement.event.location, calendarTitle, CategoryText.spoken(categories)]
+        .accessibilityLabel([EventText.spoken(placement.event, calendar: model.calendar, calendarTitle: calendarTitle,
+                                              categories: categories), placement.event.location]
             .compactMap { $0 }.joined(separator: ", "))
     }
 

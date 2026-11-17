@@ -80,10 +80,24 @@ extension AppModel {
                 // Only the categories changed: the event itself is not written.
                 saved = original
             } else if let original = editor.original {
-                try store.updateEvent(original, with: editor.draft, span: span)
+                let updated = try store.updateEvent(original, with: editor.draft, span: span)
                 let start = editor.draft.isAllDay ? calendar.startOfDay(for: editor.draft.start) : editor.draft.start
-                let key = original.isRecurring && editor.draft.recurrence == original.recurrence
-                    ? original.key : EventKey(externalID: original.key.externalID, occurrenceStart: start)
+                let key: EventKey
+                if updated.externalID != original.key.externalID {
+                    // "This and future events" split the series: the new series keeps the old one's categories.
+                    key = updated
+                    do {
+                        try categoryModel.store.carryOver(from: original.key.externalID, to: updated.externalID,
+                                                          splitAt: original.key.occurrenceStart)
+                        categoryModel.reload()
+                    } catch {
+                        notice = Notice(title: String(localized: "Kategorie se nepřenesly"),
+                                        message: String(localized: "Událost se uložila, ale nová část opakování nemá kategorie původní série. \(CategoryText.message(for: error))"))
+                    }
+                } else {
+                    key = original.isRecurring && editor.draft.recurrence == original.recurrence
+                        ? original.key : EventKey(externalID: original.key.externalID, occurrenceStart: start)
+                }
                 saved = editor.draft.makeEvent(key: key, calendar: calendar, attendees: original.attendees)
             } else {
                 saved = try store.createEvent(editor.draft)

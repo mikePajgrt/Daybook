@@ -33,6 +33,24 @@ enum EventText {
         return "Časové pásmo: \(zoneName(zone))"
     }
 
+    // MARK: VoiceOver
+
+    /// What VoiceOver says for an event wherever it is drawn: time, title, calendar, categories.
+    /// "13:00 až 14:30, Návrh API, kalendář Práce, kategorie Porady a Soustředěná práce".
+    static func spoken(_ event: EventInfo, calendar: Calendar, calendarTitle: String?, categories: [Category]) -> String {
+        var parts: [String] = []
+        if event.isAllDay {
+            parts.append(String(localized: "celý den"))
+        } else {
+            let range = event.start..<max(event.end, event.start)
+            parts.append(range.formatted(.interval.hour().minute()))
+        }
+        parts.append(EventRowView.title(of: event))
+        if let calendarTitle { parts.append(String(localized: "kalendář \(calendarTitle)")) }
+        if let spoken = CategoryText.spoken(categories) { parts.append(spoken) }
+        return parts.joined(separator: ", ")
+    }
+
     // MARK: Recurrence
 
     /// "Každý týden", "Každé 2 týdny", "Každý měsíc do 30. 11. 2027".

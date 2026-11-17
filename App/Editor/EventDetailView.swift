@@ -179,9 +179,9 @@ struct EventDetailView: View {
 
     private var calendarRow: some View {
         HStack(spacing: 10) {
-            Capsule()
-                .fill(Color(calendarInfo?.color ?? RGBA(r: 0.56, g: 0.56, b: 0.58)))
-                .frame(width: 4, height: 22)
+            StationMark(color: Theme.line(calendarInfo?.color ?? Theme.fallbackLine))
+                .frame(height: 22)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
                 Text(calendarInfo?.title ?? "Neznámý kalendář")
                 if let source = calendarInfo?.sourceTitle, !source.isEmpty {

@@ -22,6 +22,8 @@ struct WeekRowView: View {
     let metrics: WeekMetrics
     let compact: Bool
     let color: (String) -> Color
+    /// The month on screen: its days are in full ink, the others in outside ink.
+    let month: DateInterval?
     /// Called when a day is tapped. `nil` where tapping a day does nothing.
     let onSelectDay: ((Date) -> Void)?
     /// Called when a day number is clicked (Mac, iPad: opens that day's view). `nil` leaves the number inert.
@@ -33,23 +35,33 @@ struct WeekRowView: View {
 
     @Environment(\.colorSchemeContrast) private var contrast
 
+    private func isInMonth(_ day: DayLayout) -> Bool {
+        month.map { day.date >= $0.start && day.date < $0.end } ?? day.isInMonth
+    }
+
+    /// How many events a day shows, timed and spanning, for VoiceOver.
+    private func eventCount(column: Int) -> Int {
+        week.days[column].timed.count + week.spans.filter { $0.startColumn <= column && column <= $0.endColumn }.count
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             ForEach(Array(week.days.enumerated()), id: \.element.date) { index, day in
-                dayCell(day, isLast: index == week.days.count - 1)
+                dayCell(day, column: index, isLast: index == week.days.count - 1)
             }
         }
         .overlay(alignment: .topLeading) { spans }
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.rule).frame(height: 1) }
     }
 
-    private func dayCell(_ day: DayLayout, isLast: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            dayNumber(day)
+    private func dayCell(_ day: DayLayout, column: Int, isLast: Bool) -> some View {
+        let inMonth = isInMonth(day)
+        return VStack(alignment: .leading, spacing: 0) {
+            dayNumber(day, inMonth: inMonth)
             Color.clear.frame(height: CGFloat(week.laneCount) * metrics.rowHeight)
             ForEach(day.timed) { event in
                 EventRowView(event: event, color: color(event.calendarID),
-                             compact: compact, dimmed: !day.isInMonth)
+                             compact: compact, dimmed: !inMonth)
                     .frame(height: metrics.rowHeight)
                     .opensEventDetail(event, when: eventsOpenDetail)
             }
@@ -62,26 +74,29 @@ struct WeekRowView: View {
             if !isLast { Rectangle().fill(Theme.rule).frame(width: 1) }
         }
         .modifier(DayCellTaps(day: day.date, onSelect: onSelectDay, onCreate: onCreateEvent))
+        // A day is one group: its date and how many events it has, then the events themselves.
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(day.date.formatted(date: .complete, time: .omitted))
+        .accessibilityLabel(DayText.spoken(day.date, isToday: day.date == today, count: eventCount(column: column)))
     }
 
-    @ViewBuilder private func dayNumber(_ day: DayLayout) -> some View {
+    @ViewBuilder private func dayNumber(_ day: DayLayout, inMonth: Bool) -> some View {
         if let onOpenDay {
-            Button { onOpenDay(day.date) } label: { numberLabel(day) }
+            Button { onOpenDay(day.date) } label: { numberLabel(day, inMonth: inMonth) }
                 .buttonStyle(.plain)
-                .accessibilityLabel("\(day.date.formatted(date: .complete, time: .omitted)), otevřít den")
+                .accessibilityLabel(DayText.spoken(day.date, isToday: day.date == today, count: nil))
+                .accessibilityHint(Text("Otevře den"))
                 #if os(macOS)
                 .pointerStyle(.link)
                 #endif
         } else {
-            numberLabel(day)
+            numberLabel(day, inMonth: inMonth)
+                .accessibilityHidden(true)
         }
     }
 
-    private func numberLabel(_ day: DayLayout) -> some View {
+    private func numberLabel(_ day: DayLayout, inMonth: Bool) -> some View {
         let isToday = day.date == today
-        let ink = day.isInMonth ? Theme.ink : Theme.outsideInk(contrast)
+        let ink = inMonth ? Theme.ink : Theme.outsideInk(contrast)
         return Text(verbatim: String(calendar.component(.day, from: day.date)))
             .font((compact ? Font.footnote : Font.callout).weight(.semibold))
             .monospacedDigit()
@@ -90,7 +105,7 @@ struct WeekRowView: View {
             .background { if isToday { Circle().fill(Theme.ink) } }
             .padding(.leading, isToday ? (compact ? 1 : 3) : (compact ? 3 : 6))
             .frame(height: metrics.numberHeight, alignment: .leading)
-            .accessibilityLabel(isToday ? "Dnes" : "")
+            .animation(.default, value: inMonth)
     }
 
     private var spans: some View {
@@ -145,6 +160,7 @@ struct SpanView: View {
     var labelOffset: CGFloat = 0
 
     @Environment(CategoryModel.self) private var categoryModel
+    @Environment(AppModel.self) private var model
 
     var body: some View {
         let categories = categoryModel.categories(for: span.event.key)
@@ -177,7 +193,8 @@ struct SpanView: View {
         .padding(.leading, span.continuesBefore ? 0 : inset)
         .padding(.trailing, span.continuesAfter ? 0 : inset)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel([EventRowView.title(of: span.event), CategoryText.spoken(categories)]
-            .compactMap { $0 }.joined(separator: ", "))
+        .accessibilityLabel(EventText.spoken(span.event, calendar: model.calendar,
+                                             calendarTitle: model.calendarInfo(span.event.calendarID)?.title,
+                                             categories: categories))
     }
 }

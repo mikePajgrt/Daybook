@@ -19,9 +19,9 @@ struct DayListView: View {
             ForEach(events) { event in
                 let info = model.calendarInfo(event.calendarID)
                 HStack(spacing: 12) {
-                    Capsule()
-                        .fill(Color(info?.color ?? RGBA(r: 0.56, g: 0.56, b: 0.58)))
-                        .frame(width: 4)
+                    // The same mark as everywhere: a piece of the calendar's line with the event's station.
+                    StationMark(color: Theme.line(info?.color ?? Theme.fallbackLine))
+                        .padding(.vertical, 2)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(EventRowView.title(of: event))
                             .font(.body)
