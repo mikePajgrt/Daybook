@@ -19,12 +19,14 @@ struct MonthView: View {
         VStack(spacing: 0) {
             weekdayHeader
             GeometryReader { proxy in
+                // Below this column width a time and a readable title no longer fit on one row.
+                let dense = proxy.size.width / 7 < 130
                 ScrollView {
                     VStack(spacing: 0) {
                         ForEach(model.weeks) { week in
                             WeekRowView(week: week, today: model.today, calendar: model.calendar,
-                                        compact: compact, color: color(for:),
-                                        onSelectDay: compact ? { selectedDay = SelectedDay(date: $0) } : nil)
+                                        compact: dense, color: color(for:),
+                                        onSelectDay: dense ? { selectedDay = SelectedDay(date: $0) } : nil)
                                 .frame(maxHeight: .infinity)
                         }
                     }

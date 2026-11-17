@@ -50,8 +50,8 @@ struct WeekRowView: View {
 
     private func dayNumber(_ day: DayLayout) -> some View {
         let isToday = day.date == today
-        return Text(day.date, format: .dateTime.day())
-            .font(.callout.weight(.semibold))
+        return Text(verbatim: String(calendar.component(.day, from: day.date)))
+            .font((compact ? Font.footnote : Font.callout).weight(.semibold))
             .monospacedDigit()
             .foregroundStyle(isToday ? Theme.ground : Theme.ink)
             .padding(.horizontal, isToday ? 6 : 0)
@@ -67,7 +67,7 @@ struct WeekRowView: View {
             let column = proxy.size.width / CGFloat(week.days.count)
             ZStack(alignment: .topLeading) {
                 ForEach(week.spans) { span in
-                    SpanView(span: span, color: color(span.event.calendarID))
+                    SpanView(span: span, color: color(span.event.calendarID), compact: compact)
                         .frame(width: column * CGFloat(span.endColumn - span.startColumn + 1), height: rowHeight)
                         .offset(x: column * CGFloat(span.startColumn),
                                 y: numberHeight + CGFloat(span.lane) * rowHeight)
@@ -82,6 +82,8 @@ struct WeekRowView: View {
 struct SpanView: View {
     let span: SpanSegment
     let color: Color
+    /// Narrow columns: tighter insets so a one-day label still fits its column.
+    let compact: Bool
 
     var body: some View {
         let lead: CGFloat = span.continuesBefore ? 0 : 4
@@ -91,15 +93,16 @@ struct SpanView: View {
                                    bottomTrailingRadius: trail, topTrailingRadius: trail)
                 .fill(color)
                 .frame(height: 8)
-                .padding(.leading, span.continuesBefore ? 0 : 6)
-                .padding(.trailing, span.continuesAfter ? 0 : 6)
+                .padding(.leading, span.continuesBefore ? 0 : (compact ? 2 : 6))
+                .padding(.trailing, span.continuesAfter ? 0 : (compact ? 2 : 6))
             Text(EventRowView.title(of: span.event))
                 .font(.caption2.weight(.semibold))
                 .lineLimit(1)
-                .padding(.horizontal, 4)
+                .fontWidth(compact ? .condensed : .standard)
+                .padding(.horizontal, compact ? 2 : 4)
                 .background(Theme.ground)
-                .padding(.leading, 16)
-                .padding(.trailing, 10)
+                .padding(.leading, compact ? 7 : 16)
+                .padding(.trailing, compact ? 5 : 10)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(EventRowView.title(of: span.event))

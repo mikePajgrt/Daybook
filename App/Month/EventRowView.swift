@@ -5,7 +5,7 @@ import SwiftUI
 struct EventRowView: View {
     let event: EventInfo
     let color: Color
-    /// iPhone width: no time, condensed type.
+    /// Narrow columns (iPhone, iPad beside the sidebar): no time, condensed type.
     let compact: Bool
 
     static func title(of event: EventInfo) -> String {
@@ -35,6 +35,7 @@ struct EventRowView: View {
                 Text(event.start, format: .dateTime.hour().minute())
                     .foregroundStyle(Theme.secondaryInk)
                     .monospacedDigit()
+                    .fixedSize()
             }
             Text(Self.title(of: event))
                 .lineLimit(1)
