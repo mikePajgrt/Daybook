@@ -64,6 +64,12 @@ macregion mac-editor-new.png -demo-dark -demo-editor-new
 macregion mac-editor-new-light.png -demo-light -demo-editor-new
 macregion mac-editor-edit.png -demo-dark -demo-editor-edit
 macregion mac-new-calendar.png -demo-dark -demo-new-calendar
+macshot mac-category-off.png -demo-dark -demo-category-off
+macshot mac-uncategorized-off.png -demo-light -demo-uncategorized-off
+macregion mac-category-editor.png -demo-dark -demo-category-editor
+macregion mac-category-delete.png -demo-dark -demo-category-delete
+macregion mac-editor-categories.png -demo-dark -demo-editor-categories
+macregion mac-detail-categories.png -demo-light -demo-detail-categories
 
 # shot DEVICE FILE [launch arguments...]
 shot() {
@@ -95,6 +101,9 @@ shot "$PHONE" phone-large-type.png
 shot "$PHONE" phone-week-large-type.png -demo-week
 shot "$PHONE" phone-editor-large-type.png -demo-editor-edit
 shot "$PHONE" phone-detail-large-type.png -demo-day-view -demo-detail
+shot "$PHONE" phone-categories-large-type.png -demo-categories
+shot "$PHONE" phone-category-editor-large-type.png -demo-categories -demo-category-editor
+shot "$PHONE" phone-editor-categories-large-type.png -demo-editor-categories
 xcrun simctl ui "$PHONE" content_size large
 shot "$PHONE" phone-light.png -demo-light
 shot "$PHONE" phone-week.png -demo-week
@@ -108,6 +117,15 @@ shot "$PHONE" phone-editor-new-light.png -demo-editor-new -demo-light
 shot "$PHONE" phone-editor-edit.png -demo-editor-edit
 shot "$PHONE" phone-new-calendar.png -demo-calendars -demo-new-calendar
 shot "$PHONE" phone-calendar-color.png -demo-calendars -demo-calendar-color
+shot "$PHONE" phone-categories.png -demo-categories
+shot "$PHONE" phone-categories-light.png -demo-categories -demo-light
+shot "$PHONE" phone-category-off.png -demo-category-off
+shot "$PHONE" phone-uncategorized-off.png -demo-uncategorized-off
+shot "$PHONE" phone-category-editor.png -demo-categories -demo-category-editor
+shot "$PHONE" phone-category-editor-icloud-light.png -demo-categories -demo-category-editor -demo-icloud-unavailable -demo-light
+shot "$PHONE" phone-category-delete.png -demo-categories -demo-category-delete
+shot "$PHONE" phone-editor-categories.png -demo-editor-categories
+shot "$PHONE" phone-detail-categories.png -demo-day-view -demo-detail-categories
 
 shot "$TABLET" tablet.png
 shot "$TABLET" tablet-off.png -demo-off
@@ -118,5 +136,16 @@ shot "$TABLET" tablet-delete.png -demo-delete
 shot "$TABLET" tablet-editor-edit.png -demo-editor-edit
 shot "$TABLET" tablet-editor-new-light.png -demo-editor-new -demo-light
 shot "$TABLET" tablet-new-calendar.png -demo-new-calendar
+shot "$TABLET" tablet-categories-light.png -demo-light
+shot "$TABLET" tablet-category-off.png -demo-category-off
+shot "$TABLET" tablet-uncategorized-off.png -demo-uncategorized-off
+shot "$TABLET" tablet-category-editor.png -demo-category-editor
+shot "$TABLET" tablet-category-delete.png -demo-category-delete
+shot "$TABLET" tablet-editor-categories.png -demo-editor-categories
+shot "$TABLET" tablet-detail-categories.png -demo-detail-categories
+xcrun simctl ui "$TABLET" content_size accessibility-large
+shot "$TABLET" tablet-week-large-type.png -demo-week
+shot "$TABLET" tablet-categories-large-type.png -demo-categories
+xcrun simctl ui "$TABLET" content_size large
 
 shasum "$OUT"/*.png
