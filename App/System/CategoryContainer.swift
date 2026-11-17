@@ -67,31 +67,41 @@ enum CategoryContainer {
     // MARK: Moving device-only data in
 
     /// Moves every category and assignment of the device-only store into `container` and empties
-    /// the device-only store. Same ids and same assignments are not copied twice; a category whose
-    /// name the synced store already has joins it.
+    /// the device-only store.
     private static func moveDeviceOnlyCategories(into container: ModelContainer) {
         guard FileManager.default.fileExists(atPath: localURL.path(percentEncoded: false)),
               let local = try? ModelContainer(for: schema, configurations: localConfiguration()) else { return }
-        let source = ModelContext(local)
-        let target = ModelContext(container)
         do {
-            let localCategories = try source.fetch(FetchDescriptor<CategoryRecord>())
-            let localAssignments = try source.fetch(FetchDescriptor<CategoryAssignmentRecord>())
-            guard !localCategories.isEmpty || !localAssignments.isEmpty else { return }
-            let plan = CategoryMerge.plan(
-                local: localCategories.map(\.value), localAssignments: localAssignments.map(\.value),
-                into: try target.fetch(FetchDescriptor<CategoryRecord>()).map(\.value),
-                existingAssignments: try target.fetch(FetchDescriptor<CategoryAssignmentRecord>()).map(\.value))
-            plan.categories.forEach { target.insert(CategoryRecord($0)) }
-            plan.assignments.forEach { target.insert(CategoryAssignmentRecord($0)) }
-            try target.save()
-            // Only after the synced store has them.
-            localCategories.forEach { source.delete($0) }
-            localAssignments.forEach { source.delete($0) }
-            try source.save()
-            log.info("Moved \(plan.categories.count) categories and \(plan.assignments.count) assignments into the synced store")
+            let moved = try moveCategories(from: local, into: container)
+            if moved.categories > 0 || moved.assignments > 0 {
+                log.info("Moved \(moved.categories) categories and \(moved.assignments) assignments into the synced store")
+            }
         } catch {
             log.error("Moving device-only categories failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    /// Moves everything `source` holds into `target` and then empties `source`. Same ids and same
+    /// assignments are not copied twice; a category whose name the target already has joins it
+    /// (see `CategoryMerge`). The source is emptied only after the target saved. Returns what was inserted.
+    @discardableResult
+    static func moveCategories(from source: ModelContainer, into target: ModelContainer) throws -> (categories: Int, assignments: Int) {
+        let from = ModelContext(source)
+        let into = ModelContext(target)
+        let localCategories = try from.fetch(FetchDescriptor<CategoryRecord>())
+        let localAssignments = try from.fetch(FetchDescriptor<CategoryAssignmentRecord>())
+        guard !localCategories.isEmpty || !localAssignments.isEmpty else { return (0, 0) }
+        let plan = CategoryMerge.plan(
+            local: localCategories.map(\.value), localAssignments: localAssignments.map(\.value),
+            into: try into.fetch(FetchDescriptor<CategoryRecord>()).map(\.value),
+            existingAssignments: try into.fetch(FetchDescriptor<CategoryAssignmentRecord>()).map(\.value))
+        plan.categories.forEach { into.insert(CategoryRecord($0)) }
+        plan.assignments.forEach { into.insert(CategoryAssignmentRecord($0)) }
+        try into.save()
+        // Only after the synced store has them.
+        localCategories.forEach { from.delete($0) }
+        localAssignments.forEach { from.delete($0) }
+        try from.save()
+        return (plan.categories.count, plan.assignments.count)
     }
 }

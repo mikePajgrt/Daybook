@@ -17,7 +17,9 @@ targets:
       - path: App
     dependencies:
       - package: DaybookCore
-    scheme: {}
+    scheme:
+      testTargets:
+        - DaybookAppTests
     info:
       path: App/Info.plist
       properties:
@@ -58,3 +60,24 @@ targets:
         "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": App/Daybook.entitlements # unsigned build
         # "CODE_SIGN_ENTITLEMENTS[sdk=macosx*]": App/DaybookCloud-macOS.entitlements
         # "CODE_SIGN_ENTITLEMENTS[sdk=iphone*]": App/DaybookCloud-iOS.entitlements
+
+  # The app's SwiftData category store, tested on the Mac without a host app or signing identity.
+  # The few app files it needs are compiled into the test bundle.
+  DaybookAppTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: AppTests
+      - path: App/System/CategoryRecords.swift
+      - path: App/System/SwiftDataCategoryStore.swift
+      - path: App/System/CategoryContainer.swift
+    dependencies:
+      - package: DaybookCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.daybook.DaybookAppTests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
