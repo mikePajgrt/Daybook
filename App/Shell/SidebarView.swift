@@ -72,29 +72,34 @@ private struct CalendarToggleRow: View {
     let isOn: Bool
     let action: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 10) {
+            HStack(alignment: large ? .firstTextBaseline : .center, spacing: 10) {
                 Image(systemName: isOn ? "checkmark.square.fill" : "square")
                     .foregroundStyle(Color(calendar.color))
                     .imageScale(.large)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(calendar.title)
                         .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
-                        .lineLimit(1)
-                    if calendar.isShared {
-                        Text("sdílený")
-                            .font(.caption)
-                            .foregroundStyle(Theme.secondaryInk)
+                        // At accessibility sizes the name wraps between words instead of losing letters.
+                        .lineLimit(large ? nil : 1)
+                        .fixedSize(horizontal: false, vertical: large)
+                    if large {
+                        // The caption and the lock go under the name, so the name keeps the row's width.
+                        if calendar.isShared || calendar.isReadOnly {
+                            HStack(spacing: 6) {
+                                if calendar.isShared { sharedCaption }
+                                if calendar.isReadOnly { lock }
+                            }
+                        }
+                    } else if calendar.isShared {
+                        sharedCaption
                     }
                 }
                 Spacer(minLength: 8)
-                if calendar.isReadOnly {
-                    Image(systemName: "lock.fill")
-                        .font(.caption)
-                        .foregroundStyle(Theme.secondaryInk)
-                        .accessibilityLabel("jen pro čtení")
-                }
+                if !large && calendar.isReadOnly { lock }
             }
             .contentShape(Rectangle())
         }
@@ -102,5 +107,21 @@ private struct CalendarToggleRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityValue(isOn ? "zapnutý" : "vypnutý")
         .accessibilityAddTraits(.isToggle)
+    }
+
+    private var large: Bool { dynamicTypeSize.isAccessibilitySize }
+
+    private var sharedCaption: some View {
+        Text("sdílený")
+            .font(.caption)
+            .foregroundStyle(Theme.secondaryInk)
+            .fixedSize()
+    }
+
+    private var lock: some View {
+        Image(systemName: "lock.fill")
+            .font(.caption)
+            .foregroundStyle(Theme.secondaryInk)
+            .accessibilityLabel("jen pro čtení")
     }
 }
