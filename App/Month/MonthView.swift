@@ -29,7 +29,7 @@ struct MonthView: View {
                 VStack(spacing: 0) {
                     weekdayHeader
                     GeometryReader { proxy in
-                        grid(viewport: proxy.size.height, dense: dense)
+                        grid(viewport: proxy.size.height, bottomInset: proxy.safeAreaInsets.bottom, dense: dense)
                     }
                 }
             }
@@ -54,9 +54,21 @@ struct MonthView: View {
         return needed.map { $0 + (viewport - total) * $0 / total }
     }
 
-    private func grid(viewport: CGFloat, dense: Bool) -> some View {
+    /// The week the month opens on: today's week on iPhone, where the month does not fit;
+    /// the month's first week where the whole month is meant to be scanned at once.
+    private var openingWeek: WeekLayout? {
+        guard compact else { return model.weeks.first }
+        return model.weeks.first { $0.days.contains { $0.date == model.today } } ?? model.weeks.first
+    }
+
+    private func grid(viewport: CGFloat, bottomInset: CGFloat, dense: Bool) -> some View {
         let metrics = WeekMetrics(rowHeight: rowHeight, numberHeight: numberHeight)
-        let rows = Array(zip(model.weeks, heights(viewport: viewport, metrics: metrics)))
+        let rowHeights = heights(viewport: viewport, metrics: metrics)
+        let rows = Array(zip(model.weeks, rowHeights))
+        // Room below the last week, so the opening week can reach the top even late in the month.
+        let opening = openingWeek.flatMap { week in model.weeks.firstIndex { $0.id == week.id } } ?? 0
+        let tail = rowHeights.isEmpty ? 0 : rowHeights[opening...].reduce(0, +)
+        let runout = opening > 0 ? max(0, viewport + bottomInset - tail) : 0
         return ScrollViewReader { reader in
             ScrollView {
                 VStack(spacing: 0) {
@@ -67,12 +79,11 @@ struct MonthView: View {
                             .frame(height: height)
                             .id(week.id)
                     }
+                    Color.clear.frame(height: runout)
                 }
             }
             .task(id: model.scrollKey) {
-                // Open on the week that holds today; a month without today opens at its top.
-                let target = model.weeks.first { $0.days.contains { $0.date == model.today } } ?? model.weeks.first
-                if let target { reader.scrollTo(target.id, anchor: .top) }
+                if let target = openingWeek { reader.scrollTo(target.id, anchor: .top) }
             }
         }
     }
