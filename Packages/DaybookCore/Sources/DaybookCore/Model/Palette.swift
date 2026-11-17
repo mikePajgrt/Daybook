@@ -81,6 +81,56 @@ public enum Palette {
         return rgb(fromOklab: (p.0 + (q.0 - p.0) * t, p.1 + (q.1 - p.1) * t, p.2 + (q.2 - p.2) * t))
     }
 
+    // MARK: - Lines
+
+    /// Contrast a calendar line keeps against the ground it is drawn on (WCAG 1.4.11, non-text).
+    public static let lineContrast = 3.0
+
+    /// A calendar's colour as a line on `ground`: unchanged when it already holds `minimumContrast`
+    /// against the ground, otherwise darkened (light ground) or lightened (dark ground) in OKLab
+    /// lightness just far enough. Hue is kept; chroma is reduced only where the lighter or darker
+    /// colour would leave the sRGB gamut. Opacity is kept.
+    public static func lineColor(_ color: RGBA, on ground: RGBA, minimumContrast: Double = lineContrast) -> RGBA {
+        let opaque = RGBA(r: color.r, g: color.g, b: color.b)
+        guard contrast(opaque, ground) < minimumContrast else { return color }
+        let lab = oklab(opaque)
+        let darken = luminance(ground) > 0.18
+        // Binary search between the colour's own lightness and black or white, for the smallest step that holds.
+        var near = lab.0
+        var far = darken ? 0.0 : 1.0
+        var best = inGamut(lightness: far, a: lab.1, b: lab.2)
+        for _ in 0..<40 {
+            let middle = (near + far) / 2
+            let candidate = inGamut(lightness: middle, a: lab.1, b: lab.2)
+            if contrast(candidate, ground) >= minimumContrast {
+                best = candidate
+                far = middle
+            } else {
+                near = middle
+            }
+        }
+        return RGBA(r: best.r, g: best.g, b: best.b, a: color.a)
+    }
+
+    /// The colour at OKLab lightness `l` in the hue of (`a`, `b`), with as much of that chroma as sRGB holds.
+    private static func inGamut(lightness l: Double, a: Double, b: Double) -> RGBA {
+        func fits(_ scale: Double) -> Bool {
+            let c = linearRGB(fromOklab: (l, a * scale, b * scale))
+            let tolerance = 1e-6
+            return [c.0, c.1, c.2].allSatisfy { $0 >= -tolerance && $0 <= 1 + tolerance }
+        }
+        var scale = 1.0
+        if !fits(1) {
+            var low = 0.0, high = 1.0
+            for _ in 0..<30 {
+                let middle = (low + high) / 2
+                if fits(middle) { low = middle } else { high = middle }
+            }
+            scale = low
+        }
+        return rgb(fromOklab: (l, a * scale, b * scale))
+    }
+
     // MARK: - Conversions
 
     private static func linear(_ c: Double) -> Double {
@@ -102,12 +152,17 @@ public enum Palette {
                 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
     }
 
-    private static func rgb(fromOklab lab: (Double, Double, Double)) -> RGBA {
+    private static func linearRGB(fromOklab lab: (Double, Double, Double)) -> (Double, Double, Double) {
         let l = pow(lab.0 + 0.3963377774 * lab.1 + 0.2158037573 * lab.2, 3)
         let m = pow(lab.0 - 0.1055613458 * lab.1 - 0.0638541728 * lab.2, 3)
         let s = pow(lab.0 - 0.0894841775 * lab.1 - 1.2914855480 * lab.2, 3)
-        return RGBA(r: gamma(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
-                    g: gamma(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
-                    b: gamma(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s))
+        return (4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+                -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+                -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s)
+    }
+
+    private static func rgb(fromOklab lab: (Double, Double, Double)) -> RGBA {
+        let c = linearRGB(fromOklab: lab)
+        return RGBA(r: gamma(c.0), g: gamma(c.1), b: gamma(c.2))
     }
 }
