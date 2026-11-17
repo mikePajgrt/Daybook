@@ -62,11 +62,25 @@ public struct EventInfo: Identifiable, Hashable, Sendable {
     public var isAllDay: Bool
     public var location: String?
     public var notes: String?
+    public var url: URL?
+    /// The series' rule, also on each of its occurrences. `nil` for a single event.
+    public var recurrence: RecurrenceRule?
+    public var attendees: [Attendee]
+    /// The first alert; further alerts are not edited by Daybook.
+    public var alert: AlertOffset?
+    /// The event's time zone; `nil` for all-day and floating events.
+    public var timeZoneID: String?
+    /// False when the event's calendar is read-only.
+    public var isEditable: Bool
 
     public var id: EventKey { key }
 
+    public var isRecurring: Bool { recurrence != nil }
+
     public init(key: EventKey, calendarID: String, title: String, start: Date, end: Date,
-                isAllDay: Bool, location: String? = nil, notes: String? = nil) {
+                isAllDay: Bool, location: String? = nil, notes: String? = nil, url: URL? = nil,
+                recurrence: RecurrenceRule? = nil, attendees: [Attendee] = [], alert: AlertOffset? = nil,
+                timeZoneID: String? = nil, isEditable: Bool = true) {
         self.key = key
         self.calendarID = calendarID
         self.title = title
@@ -75,5 +89,18 @@ public struct EventInfo: Identifiable, Hashable, Sendable {
         self.isAllDay = isAllDay
         self.location = location
         self.notes = notes
+        self.url = url
+        self.recurrence = recurrence
+        self.attendees = attendees
+        self.alert = alert
+        self.timeZoneID = timeZoneID
+        self.isEditable = isEditable
+    }
+
+    /// The same event under another key (a moved single event, an occurrence of a series).
+    public func with(key: EventKey) -> EventInfo {
+        EventInfo(key: key, calendarID: calendarID, title: title, start: start, end: end, isAllDay: isAllDay,
+                  location: location, notes: notes, url: url, recurrence: recurrence, attendees: attendees,
+                  alert: alert, timeZoneID: timeZoneID, isEditable: isEditable)
     }
 }
