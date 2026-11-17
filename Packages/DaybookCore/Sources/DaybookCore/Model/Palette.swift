@@ -24,9 +24,43 @@ public enum Palette {
     /// How much of the calendar's colour an event block's fill carries.
     public static let blockFillAmount = 0.22
 
-    /// Fill of an event block in the week and day views: `color` mixed into `ground` in OKLab.
+    /// Every chromatic calendar's block fill has at least this OKLab chroma, in the calendar's own hue.
+    public static let blockFillChromaFloor = 0.045
+    /// Calendar colours with less OKLab chroma than this are greys: their fill is the plain mix.
+    public static let achromaticBelow = 0.04
+
+    /// Fill of an event block in the week and day views: `color` mixed into `ground` in OKLab, then
+    /// turned to the calendar's own hue with at least `blockFillChromaFloor` of chroma. A plain mix
+    /// lets a blue ground cancel a warm colour (amber became grey on midnight); this keeps one rule
+    /// for every calendar: lightness from the mix, hue from the line.
     public static func blockFill(_ color: RGBA, on ground: RGBA) -> RGBA {
-        mix(ground, color, amount: blockFillAmount)
+        let mixed = mix(ground, color, amount: blockFillAmount)
+        let line = oklab(color)
+        let lineChroma = hypot(line.1, line.2)
+        guard lineChroma >= achromaticBelow else { return mixed }
+        let lab = oklab(mixed)
+        let chroma = max(hypot(lab.1, lab.2), blockFillChromaFloor)
+        return rgb(fromOklab: (lab.0, line.1 / lineChroma * chroma, line.2 / lineChroma * chroma))
+    }
+
+    /// OKLab chroma of a colour.
+    public static func chroma(_ c: RGBA) -> Double {
+        let lab = oklab(c)
+        return hypot(lab.1, lab.2)
+    }
+
+    /// OKLab hue angle of a colour, 0 to 360 degrees.
+    public static func hue(_ c: RGBA) -> Double {
+        let lab = oklab(c)
+        let degrees = atan2(lab.2, lab.1) * 180 / .pi
+        return degrees < 0 ? degrees + 360 : degrees
+    }
+
+    /// `color` at `opacity` composited over an opaque `background`, in sRGB as the screen does.
+    public static func over(_ color: RGBA, opacity: Double, on background: RGBA) -> RGBA {
+        RGBA(r: color.r * opacity + background.r * (1 - opacity),
+             g: color.g * opacity + background.g * (1 - opacity),
+             b: color.b * opacity + background.b * (1 - opacity))
     }
 
     /// WCAG relative luminance.
