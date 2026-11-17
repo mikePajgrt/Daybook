@@ -35,6 +35,15 @@ struct SidebarView: View {
             }
         }
         .scrollContentBackground(.hidden)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            // The day view's month navigator, when the day column has no room for it beside the day.
+            if model.mode == .day && model.dayNavigatorInSidebar {
+                MonthNavigatorView()
+                    .padding(12)
+                    .background(Theme.rail)
+                    .overlay(alignment: .top) { Rectangle().fill(Theme.rule).frame(height: 1) }
+            }
+        }
         .background(Theme.rail)
         .overlay {
             if model.calendars.isEmpty {

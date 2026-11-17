@@ -7,8 +7,10 @@ struct AllDayStripView: View {
     let dayCount: Int
     let columnWidth: CGFloat
     let laneHeight: CGFloat
-    /// Paged narrow columns: every day carries its own label, because the start may be scrolled away.
-    let labelsEveryDay: Bool
+    /// Paged columns: how far the days are scrolled. Each event's label then slides along its line
+    /// to stay at the visible leading edge, so one label per event is always readable.
+    /// `nil` when every day is on screen.
+    let pinnedOffset: CGFloat?
     let color: (String) -> Color
 
     static let padding: CGFloat = 4
@@ -17,18 +19,18 @@ struct AllDayStripView: View {
         laneCount == 0 ? 0 : CGFloat(laneCount) * laneHeight + padding * 2
     }
 
-    private var pieces: [SpanSegment] {
-        labelsEveryDay ? segments.flatMap { $0.splitByDay() } : segments
-    }
-
     var body: some View {
         let laneCount = (segments.map(\.lane).max() ?? -1) + 1
         ZStack(alignment: .topLeading) {
-            ForEach(Array(pieces.enumerated()), id: \.offset) { _, span in
-                SpanView(span: span, color: color(span.event.calendarID), compact: columnWidth < 130)
-                    .frame(width: columnWidth * CGFloat(span.endColumn - span.startColumn + 1), height: laneHeight)
-                    .offset(x: columnWidth * CGFloat(span.startColumn),
-                            y: Self.padding + CGFloat(span.lane) * laneHeight)
+            ForEach(segments) { span in
+                let x = columnWidth * CGFloat(span.startColumn)
+                let width = columnWidth * CGFloat(span.endColumn - span.startColumn + 1)
+                // Slide the label to the visible edge, but never past the start of the event's last day.
+                let slide = pinnedOffset.map { min(max(0, $0 - x), max(0, width - columnWidth)) } ?? 0
+                SpanView(span: span, color: color(span.event.calendarID),
+                         compact: columnWidth < TimeGridView.condensedBelow, labelOffset: slide)
+                    .frame(width: width, height: laneHeight)
+                    .offset(x: x, y: Self.padding + CGFloat(span.lane) * laneHeight)
             }
         }
         .frame(width: columnWidth * CGFloat(dayCount),

@@ -8,8 +8,8 @@ import AppKit
 #endif
 
 enum Theme {
-    private static let midnight = RGBA(r: 0.055, g: 0.102, b: 0.227)
-    private static let porcelain = RGBA(r: 0.957, g: 0.945, b: 0.918)
+    private static let midnight = Palette.midnight
+    private static let porcelain = Palette.porcelain
 
     /// The surface the month is drawn on.
     static let ground = Color.adaptive(light: porcelain, dark: midnight)
@@ -32,8 +32,11 @@ enum Theme {
     static let station = Color.adaptive(light: RGBA(r: 1, g: 1, b: 1), dark: porcelain)
     /// Hairlines between days and weeks.
     static let rule = ink.opacity(0.16)
-    /// Fill of an event block in the week and day views: the calendar's colour, thinned so ink stays legible.
-    static func blockFill(_ color: Color) -> Color { color.opacity(0.22) }
+    /// Fill of an event block in the week and day views: the calendar's colour mixed into the ground
+    /// in OKLab, so ink stays legible and warm colours do not turn brown on midnight.
+    static func blockFill(_ color: RGBA) -> Color {
+        .adaptive(light: Palette.blockFill(color, on: porcelain), dark: Palette.blockFill(color, on: midnight))
+    }
     /// Time and place inside an event block. Darker than `secondaryInk`, because the block's tint
     /// lowers contrast; holds 4.5:1 on a tinted block in both appearances.
     static let blockSecondaryInk = ink.opacity(0.8)

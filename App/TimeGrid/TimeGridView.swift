@@ -2,11 +2,11 @@ import DaybookCore
 import SwiftUI
 
 /// The week and day views: day headers and the all-day strip on top, then the hours scrolling below.
-/// When there are more days than `visibleColumns`, the days page horizontally a day at a time,
-/// with the header and strip following, while the hour axis stays put.
+/// When there are more days than fit (at most `visibleColumns`, and no column narrower than
+/// `minimumColumnWidth`), the days page horizontally a day at a time, with the header and strip
+/// following, while the hour axis stays put.
 struct TimeGridView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let visibleColumns: Int
     /// Clicking a day header opens that day's view (week view only).
@@ -19,10 +19,15 @@ struct TimeGridView: View {
     @State private var offsetX: CGFloat = 0
     @State private var leadingDay: Date?
 
+    /// A day column is never narrower than this: below it titles and times have no room.
+    static let minimumColumnWidth: CGFloat = 110
+    /// Below this column width the grid sets condensed type.
+    static let condensedBelow: CGFloat = 130
+
     var body: some View {
-        // Narrow columns cannot hold an accessibility-size title without breaking it letter by letter:
-        // there the days become full-width rows, the way the month does.
-        if sizeClass == .compact && dynamicTypeSize.isAccessibilitySize {
+        // Grid columns cannot hold an accessibility-size title without breaking it letter by letter,
+        // on any width: there the days become full-width rows, the way the month does.
+        if dynamicTypeSize.isAccessibilitySize {
             AgendaView(days: model.gridDays, color: color(for:))
                 .background(Theme.ground)
                 .foregroundStyle(Theme.ink)
@@ -36,7 +41,8 @@ struct TimeGridView: View {
         let metrics = TimeGridMetrics(hourHeight: hourHeight, inset: labelInset)
         GeometryReader { proxy in
             let area = max(0, proxy.size.width - gutterWidth)
-            let shown = max(1, min(visibleColumns, days.count))
+            let fitting = Int(area / Self.minimumColumnWidth)
+            let shown = max(1, min(visibleColumns, days.count, fitting))
             let column = area / CGFloat(shown)
             let pages = days.count > shown
             VStack(spacing: 0) {
@@ -46,7 +52,7 @@ struct TimeGridView: View {
                         headers(days, column: column)
                         AllDayStripView(segments: model.allDaySegments, dayCount: days.count,
                                         columnWidth: column, laneHeight: laneHeight,
-                                        labelsEveryDay: pages, color: color(for:))
+                                        pinnedOffset: pages ? offsetX : nil, color: color(for:))
                     }
                     .frame(width: column * CGFloat(days.count), alignment: .leading)
                     .offset(x: pages ? -offsetX : 0)
@@ -114,7 +120,8 @@ struct TimeGridView: View {
                               isToday: day == model.today,
                               isLast: index == days.count - 1,
                               nowMinute: { nowMinute(on: day, clock: $0) },
-                              color: color(for:),
+                              color: rgba(for:),
+                              condensed: column < Self.condensedBelow,
                               calendarTitle: { model.calendarInfo($0)?.title })
                     .id(day)
                     .accessibilityLabel(day.formatted(date: .complete, time: .omitted))
@@ -128,7 +135,9 @@ struct TimeGridView: View {
         return (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
     }
 
-    private func color(for calendarID: String) -> Color {
-        Color(model.calendarInfo(calendarID)?.color ?? RGBA(r: 0.56, g: 0.56, b: 0.58))
+    private func rgba(for calendarID: String) -> RGBA {
+        model.calendarInfo(calendarID)?.color ?? RGBA(r: 0.56, g: 0.56, b: 0.58)
     }
+
+    private func color(for calendarID: String) -> Color { Color(rgba(for: calendarID)) }
 }

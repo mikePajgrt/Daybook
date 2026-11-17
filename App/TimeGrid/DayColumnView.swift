@@ -12,7 +12,9 @@ struct DayColumnView: View {
     let isLast: Bool
     /// Wall-clock minutes of the current time on `date`.
     let nowMinute: (Date) -> Int
-    let color: (String) -> Color
+    let color: (String) -> RGBA
+    /// Condensed type for the whole grid when its columns are narrow.
+    let condensed: Bool
     let calendarTitle: (String) -> String?
 
     private static let gap: CGFloat = 2
@@ -47,7 +49,8 @@ struct DayColumnView: View {
         let height = max(natural, metrics.minimumBlockHeight) - 1
         let blockWidth = max(slot - Self.gap, 1)
         return EventBlockView(placement: placement, color: color(placement.event.calendarID),
-                              calendarTitle: calendarTitle(placement.event.calendarID), width: blockWidth)
+                              calendarTitle: calendarTitle(placement.event.calendarID), width: blockWidth,
+                              condensed: condensed)
             .frame(width: blockWidth, height: max(height, 1))
             .offset(x: Self.gap + slot * CGFloat(placement.column), y: top)
     }

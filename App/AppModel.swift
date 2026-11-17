@@ -48,6 +48,8 @@ final class AppModel {
     private(set) var gridDays: [Date] = []
     private(set) var allDaySegments: [SpanSegment] = []
     private(set) var placements: [[TimedPlacement]] = []
+    /// The day view on a narrow detail column hands its month navigator to the sidebar.
+    var dayNavigatorInSidebar = false
     /// Demo mode freezes the clock so screenshots compare; otherwise `nil` and the real time is used.
     private let fixedNow: Date?
 

@@ -113,16 +113,20 @@ struct SpanView: View {
     let color: Color
     /// Narrow columns: tighter insets and condensed type.
     let compact: Bool
+    /// Moves the label along the line (paged columns keep it at the visible edge).
+    /// The line runs on unbroken before it.
+    var labelOffset: CGFloat = 0
 
     var body: some View {
         let lead: CGFloat = span.continuesBefore ? 0 : 4
         let trail: CGFloat = span.continuesAfter ? 0 : 4
         let inset: CGFloat = compact ? 3 : 6
         HStack(spacing: compact ? 3 : 5) {
+            // The line's start, lengthened by the label's slide so the line stays unbroken up to the label.
             UnevenRoundedRectangle(topLeadingRadius: lead, bottomLeadingRadius: lead,
                                    bottomTrailingRadius: 0, topTrailingRadius: 0)
                 .fill(color)
-                .frame(width: compact ? 6 : 10, height: 8)
+                .frame(width: (compact ? 6 : 10) + max(0, labelOffset), height: 8)
             Text(EventRowView.title(of: span.event))
                 .font(.caption2.weight(.semibold))
                 .fontWidth(compact ? .condensed : .standard)
