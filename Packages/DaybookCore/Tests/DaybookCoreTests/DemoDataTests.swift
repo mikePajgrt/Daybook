@@ -88,4 +88,53 @@ import Testing
         let holiday = store.events(in: interval, calendarIDs: ["demo-holidays"])
         #expect(!holiday.isEmpty && holiday.allSatisfy { !$0.isEditable })
     }
+
+    // MARK: Categories
+
+    private func categoryNames(_ store: InMemoryCategoryStore, _ key: EventKey) -> Set<String> {
+        Set(store.categories(for: key).map(\.name))
+    }
+
+    @Test func fiveCategoriesInOrder() {
+        let store = DemoData.categoryStore(month: november, calendar: cal)
+        #expect(store.categories().map(\.name) == ["Porady", "Soustředěná práce", "Děti", "Cestování", "Zdraví"])
+        #expect(store.categories().allSatisfy { CategorySymbols.offered.contains($0.symbol) })
+        #expect(Set(DemoData.categories.map(\.id)).count == 5)
+    }
+
+    @Test func theDetailedEventHasTwoCategoriesAndSomeEventsHaveNone() throws {
+        let store = DemoData.categoryStore(month: november, calendar: cal)
+        let events = DemoData.events(month: november, calendar: cal)
+        let api = try #require(events.first { $0.key.externalID == DemoData.detailedEventID })
+        #expect(categoryNames(store, api.key) == ["Porady", "Soustředěná práce"])
+        #expect(events.contains { store.categories(for: $0.key).isEmpty })
+        #expect(events.filter { !store.categories(for: $0.key).isEmpty }.count >= 20)
+    }
+
+    @Test func theSeriesHasASeriesAndAnOccurrenceAssignment() {
+        let calendarStore = DemoData.store(month: november, calendar: cal)
+        let store = DemoData.categoryStore(month: november, calendar: cal)
+        let interval = DateInterval(start: TestCalendar.date(2026, 11, 1), end: TestCalendar.date(2026, 12, 1))
+        let plan = calendarStore.events(in: interval, calendarIDs: Set(DemoData.calendars.map(\.id)))
+            .filter { $0.key.externalID == DemoData.seriesID }
+        #expect(plan.allSatisfy { categoryNames(store, $0.key).contains("Porady") })
+        let focused = plan.filter { categoryNames(store, $0.key).contains("Soustředěná práce") }
+        #expect(focused.map { cal.component(.day, from: $0.start) } == [16])
+        let scopes = Set(store.assignments().all.filter { $0.externalID == DemoData.seriesID }.map(\.scope))
+        #expect(scopes == [.series, .occurrence])
+    }
+
+    @Test func aReadOnlyEventHasACategory() throws {
+        let store = DemoData.categoryStore(month: november, calendar: cal)
+        let events = DemoData.events(month: november, calendar: cal)
+        let outage = try #require(events.first { $0.key.externalID == DemoData.readOnlyCategorizedEventID })
+        #expect(DemoData.calendars.first { $0.id == outage.calendarID }?.isReadOnly == true)
+        #expect(!store.categories(for: outage.key).isEmpty)
+    }
+
+    @Test func categoryAssignmentsAreDeterministic() {
+        let a = DemoData.categoryStore(month: november, calendar: cal).assignments()
+        let b = DemoData.categoryStore(month: november, calendar: cal).assignments()
+        #expect(a == b)
+    }
 }
