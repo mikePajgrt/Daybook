@@ -133,10 +133,17 @@ struct EventDetailView: View {
             }
             if let url = event.url {
                 detailRow("link", label: "Odkaz") {
-                    Link(url.absoluteString, destination: url)
-                        .lineLimit(2)
-                        .tint(Theme.ink)
-                        .underline()
+                    // Invitations carry other people's URLs: only web and mail links open.
+                    if EventLink.isOpenable(url) {
+                        Link(url.absoluteString, destination: url)
+                            .lineLimit(2)
+                            .tint(Theme.ink)
+                            .underline()
+                    } else {
+                        Text(url.absoluteString)
+                            .lineLimit(2)
+                            .textSelection(.enabled)
+                    }
                 }
             }
             if event.alert != nil {
