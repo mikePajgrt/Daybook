@@ -60,7 +60,7 @@ public enum MonthLayout {
 
     /// First and last day an event touches. An event ending exactly at midnight
     /// does not touch the day that starts at that midnight.
-    static func dayRange(of event: EventInfo, calendar: Calendar) -> ClosedRange<Date> {
+    public static func dayRange(of event: EventInfo, calendar: Calendar) -> ClosedRange<Date> {
         let first = calendar.startOfDay(for: event.start)
         var lastInstant = event.end
         if event.end > event.start, calendar.startOfDay(for: event.end) == event.end {

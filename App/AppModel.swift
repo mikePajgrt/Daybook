@@ -15,9 +15,17 @@ struct SelectedDay: Identifiable {
     var id: Date { date }
 }
 
+/// A message the app shows in an alert: a refused action or a failed write outside an editor.
+struct Notice: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
+}
+
 @MainActor
 @Observable
 final class AppModel {
+    static let lastCalendarKey = "lastCalendarID"
     static let hiddenCalendarsKey = "hiddenCalendarIDs"
     static let viewModeKey = "viewMode"
     /// For overlap, a timed event lasts at least this long: blocks are never drawn shorter.
@@ -29,8 +37,8 @@ final class AppModel {
     let stagedScreens: Set<String>
     /// Bumped by "Dnes", so the month scrolls back to today even when it is already on screen.
     private(set) var todayRequests = 0
-    private let store: CalendarStore
-    private let defaults: UserDefaults
+    let store: CalendarStore
+    let defaults: UserDefaults
     private var watcher: Task<Void, Never>?
 
     private(set) var access: CalendarAccess
@@ -48,6 +56,13 @@ final class AppModel {
     private(set) var gridDays: [Date] = []
     private(set) var allDaySegments: [SpanSegment] = []
     private(set) var placements: [[TimedPlacement]] = []
+    /// The event editor on screen, if any. Its form state lives in the editor model.
+    var editor: EventEditorModel?
+    /// The new-calendar or calendar-colour sheet on screen, if any.
+    var calendarEditor: CalendarEditorModel?
+    /// An alert about a refused action or a failed write outside an editor.
+    var notice: Notice?
+
     /// The day view on a narrow detail column hands its month navigator to the sidebar.
     var dayNavigatorInSidebar = false
     /// Demo mode freezes the clock so screenshots compare; otherwise `nil` and the real time is used.
@@ -86,30 +101,37 @@ final class AppModel {
         reload()
     }
 
+    /// Reads what the view on screen needs. Only values that changed are assigned, so a reload
+    /// that finds nothing new (the change stream echoing the app's own write) redraws nothing.
     func reload() {
-        access = store.access
-        calendars = access == .granted ? store.calendars() : []
+        update(\.access, to: store.access)
+        update(\.calendars, to: access == .granted ? store.calendars() : [])
         let interval = Period.interval(mode, containing: focusedDate, calendar: calendar)
-        loadedInterval = interval
+        update(\.loadedInterval, to: interval)
         var events: [EventInfo] = []
         if access == .granted {
             let visible = filter.visibleIDs(among: Set(calendars.map(\.id)))
             events = store.events(in: interval, calendarIDs: visible)
         }
         if mode == .month {
-            weeks = MonthLayout.layout(month: focusedDate, events: events, calendar: calendar)
-            gridDays = []
-            allDaySegments = []
-            placements = []
+            update(\.weeks, to: MonthLayout.layout(month: focusedDate, events: events, calendar: calendar))
+            update(\.gridDays, to: [])
+            update(\.allDaySegments, to: [])
+            update(\.placements, to: [])
         } else {
-            weeks = []
-            gridDays = Period.days(in: interval, calendar: calendar)
-            allDaySegments = TimeGridLayout.allDaySegments(days: gridDays, events: events, calendar: calendar)
-            placements = gridDays.map {
+            let days = Period.days(in: interval, calendar: calendar)
+            update(\.weeks, to: [])
+            update(\.gridDays, to: days)
+            update(\.allDaySegments, to: TimeGridLayout.allDaySegments(days: days, events: events, calendar: calendar))
+            update(\.placements, to: days.map {
                 TimeGridLayout.layout(day: $0, events: events, calendar: calendar,
                                       minimumDuration: Self.minimumBlockDuration)
-            }
+            })
         }
+    }
+
+    private func update<Value: Equatable>(_ path: ReferenceWritableKeyPath<AppModel, Value>, to value: Value) {
+        if self[keyPath: path] != value { self[keyPath: path] = value }
     }
 
     // MARK: - Calendars
