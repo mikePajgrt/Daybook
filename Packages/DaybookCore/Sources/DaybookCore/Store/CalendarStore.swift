@@ -21,3 +21,11 @@ public protocol CalendarStore: AnyObject {
     /// Emits whenever calendars or events changed outside the app's own reads.
     var changes: AsyncStream<Void> { get }
 }
+
+/// Which occurrences of a recurring event a change or deletion applies to.
+public enum EditSpan: Hashable, Sendable {
+    /// Only the occurrence the user picked.
+    case thisEvent
+    /// The occurrence the user picked and every later one.
+    case futureEvents
+}
