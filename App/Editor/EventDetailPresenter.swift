@@ -36,6 +36,11 @@ struct EventDetailPresenter: ViewModifier {
             .onTapGesture { shows = true }
             .accessibilityAddTraits(.isButton)
             .accessibilityAction(named: "Otevřít podrobnosti") { shows = true }
+            // Mac and iPad: categories straight from the event, without opening it.
+            .contextMenu {
+                Button("Otevřít podrobnosti", systemImage: "info.circle") { shows = true }
+                EventCategoryMenu(event: event)
+            }
             .popover(isPresented: Binding(get: { shows && !compact }, set: { shows = $0 })) {
                 detail(.popover)
             }
@@ -59,6 +64,7 @@ struct EventDetailPresenter: ViewModifier {
                         onEdit: edit,
                         asksDeleteAtStart: asksDelete)
             .environment(model)
+            .environment(model.categoryModel)
     }
 
     /// Closes the detail, then opens the editor once the popover or sheet has gone,

@@ -60,7 +60,7 @@ extension AppModel {
         guard event.isEditable else { return }
         editorInDaySheet = inDaySheet
         editor = EventEditorModel(draft: EventDraft(event: event, calendar: calendar), original: event,
-                                  calendar: calendar)
+                                  calendar: calendar, categories: categoryModel.selection(for: event.key))
     }
 
     private func explainNoWritableCalendar() {
@@ -76,7 +76,10 @@ extension AppModel {
     func save(_ editor: EventEditorModel, span: EditSpan = .thisEvent) -> EventInfo? {
         do {
             let saved: EventInfo
-            if let original = editor.original {
+            if let original = editor.original, !editor.draftChanged {
+                // Only the categories changed: the event itself is not written.
+                saved = original
+            } else if let original = editor.original {
                 try store.updateEvent(original, with: editor.draft, span: span)
                 let start = editor.draft.isAllDay ? calendar.startOfDay(for: editor.draft.start) : editor.draft.start
                 let key = original.isRecurring && editor.draft.recurrence == original.recurrence
@@ -87,6 +90,16 @@ extension AppModel {
             }
             defaults.set(editor.draft.calendarID, forKey: Self.lastCalendarKey)
             editor.didSave(as: saved)
+            if editor.categoriesChanged {
+                // Categories are Daybook's own data, written after the event so a new event has its key.
+                if let problem = categoryModel.apply(editor.categorySelection, from: editor.savedCategorySelection,
+                                                     to: saved.key) {
+                    editor.errorMessage = "Událost se uložila, ale kategorie ne. \(problem)"
+                    reload()
+                    return nil
+                }
+                editor.didSaveCategories()
+            }
             reload()
             return saved
         } catch {

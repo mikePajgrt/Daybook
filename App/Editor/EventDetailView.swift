@@ -7,6 +7,7 @@ struct EventDetailView: View {
     enum Style { case popover, sheet }
 
     @Environment(AppModel.self) private var model
+    @Environment(CategoryModel.self) private var categories
     let event: EventInfo
     let style: Style
     /// Closes the popover or sheet.
@@ -22,6 +23,9 @@ struct EventDetailView: View {
     @State private var invite: InviteRequest?
     #endif
     @State private var inviteUnavailable = false
+    /// The category checklist is open below the event's categories.
+    @State private var editsCategories = false
+    @State private var categoryScope: CategoryScope = .series
 
     private var calendarInfo: CalendarInfo? { model.calendarInfo(event.calendarID) }
     private var title: String { EventRowView.title(of: event) }
@@ -126,6 +130,8 @@ struct EventDetailView: View {
 
             calendarRow
 
+            categorySection
+
             if let location = event.location, !location.isEmpty {
                 detailRow("mappin.and.ellipse", label: "Místo") { Text(location) }
             }
@@ -159,7 +165,7 @@ struct EventDetailView: View {
 
             if !event.isEditable {
                 Label {
-                    Text("Kalendář „\(calendarInfo?.title ?? "")“ je jen pro čtení. Událost tu nejde upravit ani smazat.")
+                    Text("Kalendář „\(calendarInfo?.title ?? "")“ je jen pro čtení. Událost tu nejde upravit ani smazat, kategorie ano.")
                         .fixedSize(horizontal: false, vertical: true)
                 } icon: {
                     Image(systemName: "lock.fill")
@@ -191,6 +197,59 @@ struct EventDetailView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Kalendář \(calendarInfo?.title ?? "")")
+    }
+
+    /// The event's categories (symbol and name), and the checklist to change them. Categories are
+    /// Daybook's own data, so they can be changed on read-only calendars too.
+    private var categorySection: some View {
+        let assigned = categories.categories(for: event.key)
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("Kategorie").font(.caption.weight(.semibold)).foregroundStyle(Theme.secondaryInk)
+            if assigned.isEmpty {
+                Text("Žádné").foregroundStyle(Theme.secondaryInk)
+            } else {
+                ForEach(assigned) { category in
+                    Label(category.name, systemImage: category.symbol)
+                }
+            }
+            if categories.categories.isEmpty {
+                Text("Kategorie založíte v postranním panelu volbou Nová kategorie.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.secondaryInk)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                DisclosureGroup(isExpanded: $editsCategories) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        CategoryChecklist(categories: categories.categories, isRecurring: event.isRecurring,
+                                          scope: $categoryScope,
+                                          selection: Binding(get: { categories.selection(for: event.key) },
+                                                             set: { new in
+                                                                 let old = categories.selection(for: event.key)
+                                                                 if let problem = categories.apply(new, from: old, to: event.key) {
+                                                                     model.notice = Notice(title: "Kategorie se nepodařilo změnit",
+                                                                                           message: problem)
+                                                                 }
+                                                             }))
+                        if let text = CategoryChecklist.explanation(isRecurring: event.isRecurring, scope: categoryScope) {
+                            Text(text)
+                                .font(.caption)
+                                .foregroundStyle(Theme.secondaryInk)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(.top, 6)
+                } label: {
+                    Text(assigned.isEmpty ? "Přiřadit kategorie" : "Upravit kategorie")
+                        .foregroundStyle(Theme.ink)
+                }
+                .tint(Theme.ink)
+            }
+        }
+        .onAppear {
+            #if DEBUG
+            if model.stagedScreens.contains("detail-categories") { editsCategories = true }
+            #endif
+        }
     }
 
     private func detailRow<Value: View>(_ symbol: String, label: String,

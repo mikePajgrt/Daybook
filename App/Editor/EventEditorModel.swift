@@ -17,21 +17,35 @@ final class EventEditorModel: Identifiable {
     var draft: EventDraft
     /// The text of a failed save, shown in an alert while the form keeps its data.
     var errorMessage: String?
+    /// The event's categories as the form has them, and as they were when it opened or last saved.
+    var categorySelection: CategorySelection
+    private(set) var savedCategorySelection: CategorySelection
+    /// For an occurrence of a recurring event: whether category changes apply to the whole series.
+    var categoryScope: CategoryScope = .series
 
-    init(draft: EventDraft, original: EventInfo?, calendar: Calendar) {
+    init(draft: EventDraft, original: EventInfo?, calendar: Calendar,
+         categories: CategorySelection = CategorySelection()) {
         self.draft = draft
         self.savedDraft = draft
         self.original = original
         self.calendar = calendar
+        self.categorySelection = categories
+        self.savedCategorySelection = categories
     }
 
     var isNew: Bool { original == nil }
-    var hasChanges: Bool { draft != savedDraft }
+    /// Whether the event itself changed (categories are stored apart from it).
+    var draftChanged: Bool { draft != savedDraft }
+    var categoriesChanged: Bool { categorySelection != savedCategorySelection }
+    var hasChanges: Bool { draftChanged || categoriesChanged }
+    /// Only an occurrence of an existing recurring event offers "Jen tato událost".
+    var offersOccurrenceCategories: Bool { original?.isRecurring == true }
     var problems: [DraftProblem] { draft.problems(calendar: calendar) }
 
     /// The spans the save must ask about; empty when there is nothing to ask.
     var spanChoices: [EditSpan] {
-        guard let original, hasChanges else { return [] }
+        // A change of categories alone does not touch the event, so it asks nothing.
+        guard let original, draftChanged else { return [] }
         return draft.spanChoices(original: original)
     }
 
@@ -74,5 +88,10 @@ final class EventEditorModel: Identifiable {
     func didSave(as event: EventInfo) {
         original = event
         savedDraft = draft
+    }
+
+    /// Recorded after the categories were written.
+    func didSaveCategories() {
+        savedCategorySelection = categorySelection
     }
 }

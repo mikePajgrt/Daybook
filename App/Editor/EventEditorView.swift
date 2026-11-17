@@ -5,6 +5,7 @@ import SwiftUI
 /// A failed save shows the error and keeps every field; Cancel with changes asks first.
 struct EventEditorView: View {
     @Environment(AppModel.self) private var model
+    @Environment(CategoryModel.self) private var categoryModel
     @Bindable var editor: EventEditorModel
     /// Closes the sheet.
     let onClose: () -> Void
@@ -17,12 +18,19 @@ struct EventEditorView: View {
     @State private var invite: InviteRequest?
     #endif
     @State private var inviteUnavailable = false
+    /// Pages pushed inside the editor (the categories page).
+    @State private var path: [EditorPage] = []
+
+    enum EditorPage: Hashable { case categories }
 
     private var problems: [DraftProblem] { editor.problems }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             form
+                .navigationDestination(for: EditorPage.self) { _ in
+                    EventCategoriesPage(editor: editor)
+                }
                 .navigationTitle(editor.isNew ? "Nová událost" : "Upravit událost")
                 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
@@ -76,6 +84,14 @@ struct EventEditorView: View {
             .ignoresSafeArea()
         }
         #endif
+        .task {
+            #if DEBUG
+            if model.stagedScreens.contains("editor-categories") {
+                try? await Task.sleep(for: .milliseconds(700))
+                path = [.categories]
+            }
+            #endif
+        }
         #if os(macOS)
         .frame(minWidth: 460, idealWidth: 500, minHeight: 560, idealHeight: 680)
         #endif
@@ -96,6 +112,13 @@ struct EventEditorView: View {
                 Picker("Kalendář", selection: $editor.draft.calendarID) {
                     ForEach(writableCalendars) { calendar in
                         CalendarLabel(calendar: calendar).tag(calendar.id)
+                    }
+                }
+                NavigationLink(value: EditorPage.categories) {
+                    LabeledContent("Kategorie") {
+                        Text(categorySummary)
+                            .foregroundStyle(Theme.ink)
+                            .multilineTextAlignment(.trailing)
                     }
                 }
             }
@@ -201,6 +224,13 @@ struct EventEditorView: View {
     }
 
     // MARK: Choices
+
+    /// "Porady, Soustředěná práce", or "Žádné".
+    private var categorySummary: String {
+        let ids = editor.categorySelection.all
+        let names = categoryModel.categories.filter { ids.contains($0.id) }.map(\.name)
+        return names.isEmpty ? "Žádné" : names.joined(separator: ", ")
+    }
 
     private var dateComponents: DatePickerComponents {
         editor.isAllDay ? .date : [.date, .hourAndMinute]
