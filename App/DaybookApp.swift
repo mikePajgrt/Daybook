@@ -27,7 +27,7 @@ struct DaybookApp: App {
     }
 
     private var content: some View {
-        MonthView()
+        RootView()
             .environment(model)
             .task { model.start() }
     }
