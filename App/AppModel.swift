@@ -39,7 +39,10 @@ final class AppModel {
     private(set) var todayRequests = 0
     let store: CalendarStore
     let defaults: UserDefaults
+    /// Categories: Daybook's own data, kept outside the calendar database.
+    let categoryModel: CategoryModel
     private var watcher: Task<Void, Never>?
+    private var categoryWatcher: Task<Void, Never>?
 
     private(set) var access: CalendarAccess
     private(set) var calendars: [CalendarInfo] = []
@@ -75,7 +78,7 @@ final class AppModel {
     /// Any instant inside the month on screen (the month view's name for the focused date).
     var month: Date { focusedDate }
 
-    init(store: CalendarStore, defaults: UserDefaults = .standard,
+    init(store: CalendarStore, categoryStore: CategoryStore, defaults: UserDefaults = .standard,
          calendar: Calendar = .current, now: Date = Date(), clockIsFixed: Bool = false,
          stagedScreens: Set<String> = []) {
         self.stagedScreens = stagedScreens
@@ -88,6 +91,9 @@ final class AppModel {
         self.mode = defaults.string(forKey: Self.viewModeKey).flatMap(ViewMode.init(rawValue:)) ?? .month
         self.access = store.access
         self.filter = VisibilityFilter(storedValue: defaults.stringArray(forKey: Self.hiddenCalendarsKey) ?? [])
+        self.categoryModel = CategoryModel(store: categoryStore, defaults: defaults)
+        categoryModel.onChange = { [weak self] in self?.reload() }
+        categoryModel.onNotice = { [weak self] in self?.notice = $0 }
     }
 
     /// Loads the first month and keeps reloading when the system database changes.
@@ -97,6 +103,13 @@ final class AppModel {
         watcher = Task { [weak self] in
             guard let changes = self?.store.changes else { return }
             for await _ in changes { self?.reload() }
+        }
+        categoryWatcher = Task { [weak self] in
+            guard let changes = self?.categoryModel.store.changes else { return }
+            for await _ in changes {
+                self?.categoryModel.reload()
+                self?.reload()
+            }
         }
     }
 
@@ -115,7 +128,11 @@ final class AppModel {
         var events: [EventInfo] = []
         if access == .granted {
             let visible = filter.visibleIDs(among: Set(calendars.map(\.id)))
-            events = store.events(in: interval, calendarIDs: visible)
+            // Categories filter before any layout, so rows close up and grids re-lay-out.
+            events = filter.visibleEvents(store.events(in: interval, calendarIDs: visible),
+                                          categories: categoryModel.filter,
+                                          assignments: categoryModel.assignments,
+                                          known: categoryModel.knownIDs)
         }
         if mode == .month {
             update(\.weeks, to: MonthLayout.layout(month: focusedDate, events: events, calendar: calendar))

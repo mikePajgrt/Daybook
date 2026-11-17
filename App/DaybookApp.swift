@@ -24,12 +24,21 @@ struct DaybookApp: App {
         //   -demo-light, -demo-dark  force that appearance
         //   -demo-detail, -demo-detail-readonly, -demo-delete, -demo-editor-new, -demo-editor-edit,
         //   -demo-new-calendar, -demo-calendar-color  editing states (see DemoStaging)
+        //   -demo-category-off       the category Porady switched off
+        //   -demo-uncategorized-off  "Bez kategorie" switched off
+        //   -demo-icloud-unavailable the sync line's iCloud-unavailable state
+        //   -demo-categories, -demo-category-editor, -demo-category-delete, -demo-editor-categories,
+        //   -demo-detail-categories  category states (see DemoStaging)
         // On the Mac the demo window opens at 1440 x 900.
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-demo") {
             let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 17, hour: 10)) ?? Date()
             let defaults = UserDefaults(suiteName: "app.daybook.demo") ?? .standard
             defaults.set(arguments.contains("-demo-off") ? ["demo-work"] : [], forKey: AppModel.hiddenCalendarsKey)
+            var categoryFilter = CategoryFilter()
+            if arguments.contains("-demo-category-off") { categoryFilter.toggle(DemoData.meetingsCategoryID) }
+            if arguments.contains("-demo-uncategorized-off") { categoryFilter.toggleUncategorized() }
+            defaults.set(categoryFilter.storedValue, forKey: CategoryModel.filterKey)
             let mode: ViewMode = arguments.contains("-demo-week") ? .week
                 : arguments.contains("-demo-day-view") ? .day : .month
             defaults.set(mode.rawValue, forKey: AppModel.viewModeKey)
@@ -40,7 +49,11 @@ struct DaybookApp: App {
             if arguments.contains("-demo-calendars") { staged.insert("calendars") }
             staged.formUnion(DemoStaging.screens(in: arguments))
             defaults.removeObject(forKey: AppModel.lastCalendarKey)
-            let model = AppModel(store: store, defaults: defaults, calendar: calendar,
+            // Demo categories live in memory only, never in the on-disk store.
+            let categoryStore = DemoData.categoryStore(
+                month: now, calendar: calendar,
+                syncState: arguments.contains("-demo-icloud-unavailable") ? .iCloudUnavailable : .localOnly)
+            let model = AppModel(store: store, categoryStore: categoryStore, defaults: defaults, calendar: calendar,
                                  now: now, clockIsFixed: true, stagedScreens: staged)
             model.stagedDetail = DemoStaging.detail(for: staged, today: model.today, calendar: calendar)
             _model = State(initialValue: model)
@@ -50,7 +63,8 @@ struct DaybookApp: App {
             return
         }
         #endif
-        _model = State(initialValue: AppModel(store: EventKitCalendarStore(), calendar: calendar))
+        _model = State(initialValue: AppModel(store: EventKitCalendarStore(), categoryStore: CategoryContainer.makeStore(),
+                                              calendar: calendar))
         demoColorScheme = nil
         demoWindowSize = nil
     }
@@ -69,6 +83,7 @@ struct DaybookApp: App {
     private var content: some View {
         RootView()
             .environment(model)
+            .environment(model.categoryModel)
             .preferredColorScheme(demoColorScheme)
             #if DEBUG && os(macOS)
             .background { if let demoWindowSize { DemoWindowFrame(size: demoWindowSize) } }
