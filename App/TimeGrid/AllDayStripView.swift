@@ -30,7 +30,10 @@ struct AllDayStripView: View {
                 SpanView(span: span, color: color(span.event.calendarID),
                          compact: columnWidth < TimeGridView.condensedBelow, labelOffset: slide)
                     .frame(width: width, height: laneHeight)
-                    .offset(x: x, y: Self.padding + CGFloat(span.lane) * laneHeight)
+                    .opensEventDetail(span.event)
+                    // Padding rather than offset, so a popover points at the line itself.
+                    .padding(.leading, x)
+                    .padding(.top, Self.padding + CGFloat(span.lane) * laneHeight)
             }
         }
         .frame(width: columnWidth * CGFloat(dayCount),

@@ -7,6 +7,7 @@ import SwiftUI
 /// following, while the hour axis stays put.
 struct TimeGridView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let visibleColumns: Int
     /// Clicking a day header opens that day's view (week view only).
@@ -122,7 +123,11 @@ struct TimeGridView: View {
                               nowMinute: { nowMinute(on: day, clock: $0) },
                               color: rgba(for:),
                               condensed: column < Self.condensedBelow,
-                              calendarTitle: { model.calendarInfo($0)?.title })
+                              calendarTitle: { model.calendarInfo($0)?.title },
+                              onCreate: sizeClass == .compact ? nil : { minute in
+                                  model.beginNewEvent(at: TimeGridLayout.slotStart(day: day, minute: minute,
+                                                                                   calendar: model.calendar))
+                              })
                     .id(day)
                     .accessibilityLabel(day.formatted(date: .complete, time: .omitted))
             }

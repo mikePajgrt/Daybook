@@ -25,6 +25,8 @@ struct SidebarView: View {
                         .contextMenu {
                             Button("Zobrazit jen tento") { model.showOnly(calendar) }
                             Button("Zobrazit všechny") { model.showAll() }
+                            Divider()
+                            Button("Změnit barvu…", systemImage: "paintpalette") { model.beginRecoloring(calendar) }
                         }
                         .listRowBackground(rowBackground)
                     }
@@ -32,6 +34,11 @@ struct SidebarView: View {
                     Text(section.title)
                         .foregroundStyle(Theme.secondaryInk)
                 }
+            }
+            Section {
+                Button("Nový kalendář", systemImage: "plus") { model.beginNewCalendar() }
+                    .foregroundStyle(Theme.ink)
+                    .listRowBackground(rowBackground)
             }
         }
         .scrollContentBackground(.hidden)
@@ -45,6 +52,11 @@ struct SidebarView: View {
             }
         }
         .background(Theme.rail)
+        // Shown from the sidebar, so on iPhone it rises over the calendars sheet it was opened from.
+        .sheet(item: Binding(get: { model.calendarEditor }, set: { model.calendarEditor = $0 })) { editor in
+            CalendarEditorView(editor: editor) { model.calendarEditor = nil }
+                .presentationBackground(Theme.rail)
+        }
         .overlay {
             if model.calendars.isEmpty {
                 ContentUnavailableView("Žádné kalendáře",

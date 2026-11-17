@@ -31,8 +31,16 @@ struct DayListView: View {
                     }
                 }
                 .accessibilityElement(children: .combine)
+                .opensEventDetail(event)
                 .listRowBackground(Theme.ground)
             }
+        }
+        .environment(\.isInDaySheet, true)
+        // An editor opened from this sheet's events rises over it; the root cannot present while it is up.
+        .sheet(item: Binding(get: { model.editorInDaySheet ? model.editor : nil },
+                             set: { model.editor = $0 })) { editor in
+            EventEditorView(editor: editor) { model.editor = nil }
+                .presentationBackground(Theme.rail)
         }
         // The world's colours instead of system grey: rows on the ground, set in the deeper rail.
         .scrollContentBackground(.hidden)

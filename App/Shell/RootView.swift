@@ -11,6 +11,20 @@ struct RootView: View {
     var body: some View {
         if model.access == .granted {
             shell
+                .sheet(item: Binding(get: { model.editorInDaySheet ? nil : model.editor },
+                                     set: { model.editor = $0 })) { editor in
+                    EventEditorView(editor: editor) { model.editor = nil }
+                        .presentationBackground(Theme.rail)
+                }
+                .alert(model.notice?.title ?? "", isPresented: Binding(get: { model.notice != nil },
+                                                                       set: { if !$0 { model.notice = nil } })) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(model.notice?.message ?? "")
+                }
+                #if DEBUG
+                .task { await model.stageDemoScreens() }
+                #endif
         } else {
             AccessView(access: model.access) {
                 Task { await model.requestAccess() }
@@ -28,6 +42,8 @@ struct RootView: View {
                     #if os(iOS)
                     // The top bar already holds the calendars, the title and back / Today / forward.
                     ToolbarItem(placement: .bottomBar) { modePicker }
+                    ToolbarSpacer(.fixed, placement: .bottomBar)
+                    ToolbarItem(placement: .bottomBar) { newEventButton }
                     #endif
                 }
             }
@@ -55,6 +71,7 @@ struct RootView: View {
             } detail: {
                 current.toolbar {
                     ToolbarItem(placement: .primaryAction) { modePicker }
+                    ToolbarItem(placement: .primaryAction) { newEventButton }
                 }
             }
         }
@@ -70,6 +87,11 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: model.mode)
+    }
+
+    private var newEventButton: some View {
+        Button("Nová událost", systemImage: "plus") { model.beginNewEvent() }
+            .help("Nová událost (⌘N)")
     }
 
     private var modePicker: some View {

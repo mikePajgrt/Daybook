@@ -80,7 +80,10 @@ struct MonthView: View {
                                     metrics: metrics, compact: dense, color: color(for:),
                                     // iPhone: a tap on a day opens the day sheet. Mac and iPad: the day number opens the day view.
                                     onSelectDay: compact ? { selectedDay = SelectedDay(date: $0) } : nil,
-                                    onOpenDay: compact ? nil : { model.show(day: $0) })
+                                    onOpenDay: compact ? nil : { model.show(day: $0) },
+                                    // Mac and iPad: double-click on empty space creates an event that day.
+                                    onCreateEvent: compact ? nil : { model.beginNewEvent(onDay: $0) },
+                                    eventsOpenDetail: !compact)
                             .frame(height: height)
                             .id(week.id)
                     }

@@ -26,6 +26,10 @@ struct WeekRowView: View {
     let onSelectDay: ((Date) -> Void)?
     /// Called when a day number is clicked (Mac, iPad: opens that day's view). `nil` leaves the number inert.
     var onOpenDay: ((Date) -> Void)? = nil
+    /// Called when empty space in a day is double-clicked (Mac, iPad: creates an event). `nil` disables it.
+    var onCreateEvent: ((Date) -> Void)? = nil
+    /// Clicking an event opens its detail (Mac, iPad). On iPhone a tap opens the day instead.
+    var eventsOpenDetail = false
 
     @Environment(\.colorSchemeContrast) private var contrast
 
@@ -47,6 +51,7 @@ struct WeekRowView: View {
                 EventRowView(event: event, color: color(event.calendarID),
                              compact: compact, dimmed: !day.isInMonth)
                     .frame(height: metrics.rowHeight)
+                    .opensEventDetail(event, when: eventsOpenDetail)
             }
             Spacer(minLength: WeekMetrics.bottomInset)
         }
@@ -56,8 +61,7 @@ struct WeekRowView: View {
         .overlay(alignment: .trailing) {
             if !isLast { Rectangle().fill(Theme.rule).frame(width: 1) }
         }
-        .contentShape(Rectangle())
-        .onTapGesture { onSelectDay?(day.date) }
+        .modifier(DayCellTaps(day: day.date, onSelect: onSelectDay, onCreate: onCreateEvent))
         .accessibilityElement(children: .contain)
         .accessibilityLabel(day.date.formatted(date: .complete, time: .omitted))
     }
@@ -97,12 +101,35 @@ struct WeekRowView: View {
                     SpanView(span: span, color: color(span.event.calendarID), compact: compact)
                         .frame(width: column * CGFloat(span.endColumn - span.startColumn + 1),
                                height: metrics.rowHeight)
-                        .offset(x: column * CGFloat(span.startColumn),
-                                y: metrics.numberHeight + CGFloat(span.lane) * metrics.rowHeight)
+                        .opensEventDetail(span.event, when: eventsOpenDetail)
+                        // Padding rather than offset, so a popover points at the line itself.
+                        .padding(.leading, column * CGFloat(span.startColumn))
+                        .padding(.top, metrics.numberHeight + CGFloat(span.lane) * metrics.rowHeight)
                 }
             }
         }
-        .allowsHitTesting(false)
+        // On iPhone the lines are drawing only: a tap belongs to the day under them.
+        .allowsHitTesting(eventsOpenDetail)
+    }
+}
+
+/// Taps on a day cell: one tap selects the day (iPhone), a double click on empty space creates
+/// an event there (Mac, iPad). Events inside the cell take their own clicks first.
+private struct DayCellTaps: ViewModifier {
+    let day: Date
+    let onSelect: ((Date) -> Void)?
+    let onCreate: ((Date) -> Void)?
+
+    func body(content: Content) -> some View {
+        if let onSelect {
+            content.contentShape(Rectangle()).onTapGesture { onSelect(day) }
+        } else if let onCreate {
+            content.contentShape(Rectangle())
+                .onTapGesture(count: 2) { onCreate(day) }
+                .accessibilityAction(named: "Nová událost v tento den") { onCreate(day) }
+        } else {
+            content
+        }
     }
 }
 

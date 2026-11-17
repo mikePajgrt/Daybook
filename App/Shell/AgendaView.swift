@@ -67,6 +67,7 @@ struct AgendaView: View {
                         }
                     }
                     .accessibilityElement(children: .combine)
+                    .opensEventDetail(event)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

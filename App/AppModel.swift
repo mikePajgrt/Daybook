@@ -58,8 +58,12 @@ final class AppModel {
     private(set) var placements: [[TimedPlacement]] = []
     /// The event editor on screen, if any. Its form state lives in the editor model.
     var editor: EventEditorModel?
+    /// The editor opened from the iPhone day sheet and is shown on top of it, not from the root.
+    var editorInDaySheet = false
     /// The new-calendar or calendar-colour sheet on screen, if any.
     var calendarEditor: CalendarEditorModel?
+    /// Debug staging: the event whose detail opens by itself, and whether it asks to delete.
+    var stagedDetail: (key: EventKey, asksDelete: Bool)?
     /// An alert about a refused action or a failed write outside an editor.
     var notice: Notice?
 

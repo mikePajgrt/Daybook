@@ -36,10 +36,14 @@ extension AppModel {
 
     // MARK: Opening the editor
 
-    /// A new event on `day` (the focused day when `nil`) at the next full hour.
-    func beginNewEvent(onDay day: Date? = nil) {
+    /// A new event on the focused day at the next full hour.
+    func beginNewEvent() { beginNewEvent(onDay: focusedDay) }
+
+    /// A new event on `day` at the next full hour.
+    func beginNewEvent(onDay day: Date) {
         guard let calendarID = preferredCalendarID else { return explainNoWritableCalendar() }
-        let draft = EventDraft.newEvent(on: day ?? focusedDay, now: now(Date()), calendarID: calendarID,
+        editorInDaySheet = false
+        let draft = EventDraft.newEvent(on: day, now: now(Date()), calendarID: calendarID,
                                         calendar: calendar)
         editor = EventEditorModel(draft: draft, original: nil, calendar: calendar)
     }
@@ -47,12 +51,14 @@ extension AppModel {
     /// A new one-hour event at `start` (a time-grid slot).
     func beginNewEvent(at start: Date) {
         guard let calendarID = preferredCalendarID else { return explainNoWritableCalendar() }
+        editorInDaySheet = false
         editor = EventEditorModel(draft: EventDraft.newEvent(at: start, calendarID: calendarID, calendar: calendar),
                                   original: nil, calendar: calendar)
     }
 
-    func beginEditing(_ event: EventInfo) {
+    func beginEditing(_ event: EventInfo, inDaySheet: Bool = false) {
         guard event.isEditable else { return }
+        editorInDaySheet = inDaySheet
         editor = EventEditorModel(draft: EventDraft(event: event, calendar: calendar), original: event,
                                   calendar: calendar)
     }
@@ -89,16 +95,14 @@ extension AppModel {
         }
     }
 
-    /// Deletes an event. On failure the error is shown as a notice and `false` returned.
-    @discardableResult
-    func delete(_ event: EventInfo, span: EditSpan) -> Bool {
+    /// Deletes an event. Returns the error text when it failed, `nil` when it worked.
+    func deleteReportingError(_ event: EventInfo, span: EditSpan) -> String? {
         do {
             try store.deleteEvent(event, span: span)
             reload()
-            return true
+            return nil
         } catch {
-            notice = Notice(title: "Událost se nepodařilo smazat", message: EventText.message(for: error))
-            return false
+            return EventText.message(for: error)
         }
     }
 

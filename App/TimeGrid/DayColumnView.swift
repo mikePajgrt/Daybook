@@ -16,6 +16,8 @@ struct DayColumnView: View {
     /// Condensed type for the whole grid when its columns are narrow.
     let condensed: Bool
     let calendarTitle: (String) -> String?
+    /// Called with the wall-clock minute of a double click on empty space (Mac, iPad). `nil` disables it.
+    var onCreate: ((Double) -> Void)? = nil
 
     private static let gap: CGFloat = 2
 
@@ -23,6 +25,15 @@ struct DayColumnView: View {
         ZStack(alignment: .topLeading) {
             HourRules(metrics: metrics)
                 .stroke(Theme.rule, lineWidth: 1)
+            if let onCreate {
+                // Under the blocks, so a double click on an event does not also create one.
+                Color.clear
+                    .contentShape(Rectangle())
+                    .gesture(SpatialTapGesture(count: 2).onEnded { value in
+                        onCreate(Double(value.location.y - metrics.inset) * 60 / Double(metrics.hourHeight))
+                    })
+                    .accessibilityHidden(true)
+            }
             ForEach(placements) { placement in
                 block(placement)
             }
@@ -52,7 +63,10 @@ struct DayColumnView: View {
                               calendarTitle: calendarTitle(placement.event.calendarID), width: blockWidth,
                               condensed: condensed)
             .frame(width: blockWidth, height: max(height, 1))
-            .offset(x: Self.gap + slot * CGFloat(placement.column), y: top)
+            .opensEventDetail(placement.event)
+            // Padding rather than offset, so a popover points at the block itself.
+            .padding(.leading, Self.gap + slot * CGFloat(placement.column))
+            .padding(.top, top)
     }
 }
 
