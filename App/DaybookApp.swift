@@ -22,6 +22,8 @@ struct DaybookApp: App {
         //   -demo-denied     calendar access refused
         //   -demo-week, -demo-day-view  open the week or day view (the month otherwise)
         //   -demo-light, -demo-dark  force that appearance
+        //   -demo-detail, -demo-detail-readonly, -demo-delete, -demo-editor-new, -demo-editor-edit,
+        //   -demo-new-calendar, -demo-calendar-color  editing states (see DemoStaging)
         // On the Mac the demo window opens at 1440 x 900.
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-demo") {
@@ -31,14 +33,17 @@ struct DaybookApp: App {
             let mode: ViewMode = arguments.contains("-demo-week") ? .week
                 : arguments.contains("-demo-day-view") ? .day : .month
             defaults.set(mode.rawValue, forKey: AppModel.viewModeKey)
-            let store = InMemoryCalendarStore(calendars: DemoData.calendars,
-                                              events: DemoData.events(month: now, calendar: calendar),
-                                              access: arguments.contains("-demo-denied") ? .denied : .granted)
+            let store = DemoData.store(month: now, calendar: calendar,
+                                       access: arguments.contains("-demo-denied") ? .denied : .granted)
             var staged: Set<String> = []
             if arguments.contains("-demo-day") { staged.insert("day") }
             if arguments.contains("-demo-calendars") { staged.insert("calendars") }
-            _model = State(initialValue: AppModel(store: store, defaults: defaults, calendar: calendar,
-                                                  now: now, clockIsFixed: true, stagedScreens: staged))
+            staged.formUnion(DemoStaging.screens(in: arguments))
+            defaults.removeObject(forKey: AppModel.lastCalendarKey)
+            let model = AppModel(store: store, defaults: defaults, calendar: calendar,
+                                 now: now, clockIsFixed: true, stagedScreens: staged)
+            model.stagedDetail = DemoStaging.detail(for: staged, today: model.today, calendar: calendar)
+            _model = State(initialValue: model)
             demoColorScheme = arguments.contains("-demo-light") ? .light
                 : arguments.contains("-demo-dark") ? .dark : nil
             demoWindowSize = CGSize(width: 1440, height: 900)
