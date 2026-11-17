@@ -54,11 +54,13 @@ struct RootView: View {
     }
 
     /// The year must survive next to the toolbar buttons, so large text gets the short month name.
+    /// Czech formats an abbreviated month with a year as the full name, so the two parts are joined here.
     private var monthTitle: String {
-        let style: Date.FormatStyle = dynamicTypeSize.isAccessibilitySize && sizeClass == .compact
-            ? .dateTime.month(.abbreviated).year()
-            : .dateTime.month(.wide).year()
-        return model.month.formatted(style).localizedCapitalized
+        guard dynamicTypeSize.isAccessibilitySize && sizeClass == .compact else {
+            return model.month.formatted(.dateTime.month(.wide).year()).localizedCapitalized
+        }
+        let month = model.month.formatted(.dateTime.month(.abbreviated)).localizedCapitalized
+        return "\(month) \(model.month.formatted(.dateTime.year()))"
     }
 
     private var month: some View {
@@ -66,6 +68,23 @@ struct RootView: View {
             .navigationTitle(monthTitle)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #else
+            // The window title stays for the Window menu; the toolbar shows the month in the contract's type.
+            .toolbar(removing: .title)
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    let name = model.month.formatted(.dateTime.month(.wide)).localizedCapitalized
+                    let year = model.month.formatted(.dateTime.year())
+                    Text("\(Text(name).fontWeight(.bold)) \(Text(year).fontWeight(.regular).foregroundStyle(Theme.secondaryInk))")
+                        .font(.system(size: 22))
+                        .foregroundStyle(Theme.ink)
+                        .padding(.horizontal, 4)
+                        .accessibilityAddTraits(.isHeader)
+                }
+                .sharedBackgroundVisibility(.hidden)
+            }
+            .toolbarBackground(Theme.ground, for: .windowToolbar)
+            .toolbarBackgroundVisibility(.visible, for: .windowToolbar)
             #endif
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {

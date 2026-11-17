@@ -27,12 +27,19 @@ struct EventRowView: View {
     var body: some View {
         HStack(spacing: compact ? 4 : 6) {
             StationMark(color: color)
-                .opacity(dimmed ? 0.45 : 1)
+                .opacity(dimmed ? 0.6 : 1)
             if !compact {
-                Text(event.start, format: .dateTime.hour().minute())
-                    .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.secondaryInk)
+                // As wide as the widest time in this font, right-aligned, so titles share one left edge.
+                Text(verbatim: "00:00")
+                    .hidden()
+                    .overlay(alignment: .trailing) {
+                        Text(event.start, format: .dateTime.hour().minute())
+                            .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.secondaryInk)
+                            .fixedSize()
+                    }
                     .monospacedDigit()
                     .fixedSize()
+                    .accessibilityHidden(true)
             }
             Text(Self.title(of: event))
                 .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.ink)

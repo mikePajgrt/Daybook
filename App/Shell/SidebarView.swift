@@ -7,6 +7,13 @@ struct SidebarView: View {
 
     var body: some View {
         List {
+            #if os(macOS)
+            // The split view's navigation title does not render above a Mac sidebar.
+            Text("Daybook")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(Theme.ink)
+                .accessibilityAddTraits(.isHeader)
+            #endif
             ForEach(model.sections) { section in
                 Section(section.title) {
                     ForEach(section.calendars) { calendar in
