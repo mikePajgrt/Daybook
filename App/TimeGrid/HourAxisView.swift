@@ -38,7 +38,7 @@ struct HourAxisView: View {
 
     private func label(_ hour: Int) -> some View {
         let date = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: day) ?? day
-        return Text(date, format: .dateTime.hour().minute())
+        return Text(TimeText.time(date))
             .font(.caption2)
             .monospacedDigit()
             .foregroundStyle(Theme.secondaryInk)

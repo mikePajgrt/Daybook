@@ -18,12 +18,10 @@ enum EventText {
             }
             return String(localized: "Celý den, \((days.lowerBound..<days.upperBound).formatted(.interval.day().month(.defaultDigits).year()))")
         }
-        let time = Date.FormatStyle.dateTime.hour().minute()
-        let lastInstant = event.end > event.start ? event.end.addingTimeInterval(-1) : event.end
-        if calendar.isDate(event.start, inSameDayAs: lastInstant) {
-            return capitalized("\(event.start.formatted(longDay)), \((event.start..<event.end).formatted(.interval.hour().minute()))")
+        if TimeText.endsOnStartDay(event, calendar: calendar) {
+            return capitalized("\(event.start.formatted(longDay)), \(TimeText.range(event.start, event.end))")
         }
-        return (event.start..<event.end).formatted(.interval.day().month(.defaultDigits).year().hour().minute())
+        return TimeText.span(event, calendar: calendar, dateStyle: shortDay)
     }
 
     /// The event's time zone when it differs from the device's, e.g. "Čas: New York".
@@ -42,8 +40,7 @@ enum EventText {
         if event.isAllDay {
             parts.append(String(localized: "celý den"))
         } else {
-            let range = event.start..<max(event.end, event.start)
-            parts.append(range.formatted(.interval.hour().minute()))
+            parts.append(TimeText.span(event, calendar: calendar))
         }
         parts.append(EventRowView.title(of: event))
         if let calendarTitle { parts.append(String(localized: "kalendář \(calendarTitle)")) }

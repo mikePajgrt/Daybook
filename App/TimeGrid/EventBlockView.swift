@@ -40,11 +40,8 @@ struct EventBlockView: View {
 
     private var title: String { EventRowView.title(of: placement.event) }
 
-    private var timeRange: String {
-        let start = placement.event.start.formatted(date: .omitted, time: .shortened)
-        let end = placement.event.end.formatted(date: .omitted, time: .shortened)
-        return "\(start) – \(end)"
-    }
+    /// The same format as the hour axis beside the block.
+    private var timeRange: String { TimeText.range(placement.event.start, placement.event.end) }
 
     var body: some View {
         let line = Theme.line(color)
@@ -120,7 +117,7 @@ struct EventBlockView: View {
             if time {
                 // The whole range on one line, else the start alone, else nothing. Category symbols
                 // follow the time where both fit; they never displace it.
-                let start = Text(placement.event.start, format: .dateTime.hour().minute())
+                let start = Text(TimeText.time(placement.event.start))
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 4) { Text(timeRange).fixedSize(); symbols }
                     Text(timeRange).fixedSize()

@@ -93,11 +93,7 @@ struct AgendaView: View {
     /// "Celý den" for all-day events; the start time, or the span for events that cross midnight.
     private func when(_ event: EventInfo, on day: Date) -> String {
         if event.isAllDay { return String(localized: "Celý den") }
-        let start = event.start.formatted(date: .omitted, time: .shortened)
-        // An event ending at midnight still belongs to its start day.
-        let lastInstant = event.end > event.start ? event.end.addingTimeInterval(-1) : event.end
-        if model.calendar.isDate(event.start, inSameDayAs: lastInstant) { return start }
-        let end = event.end.formatted(date: .omitted, time: .shortened)
-        return "\(event.start.formatted(.dateTime.day().month(.defaultDigits))) \(start) – \(event.end.formatted(.dateTime.day().month(.defaultDigits))) \(end)"
+        if TimeText.endsOnStartDay(event, calendar: model.calendar) { return TimeText.time(event.start) }
+        return TimeText.span(event, calendar: model.calendar)
     }
 }

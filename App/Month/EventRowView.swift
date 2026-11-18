@@ -36,7 +36,7 @@ struct EventRowView: View {
                 Text(verbatim: "00:00")
                     .hidden()
                     .overlay(alignment: .trailing) {
-                        Text(event.start, format: .dateTime.hour().minute())
+                        Text(TimeText.time(event.start))
                             .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.secondaryInk)
                             .fixedSize()
                     }
