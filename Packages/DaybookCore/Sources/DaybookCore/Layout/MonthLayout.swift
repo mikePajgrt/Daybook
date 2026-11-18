@@ -90,6 +90,17 @@ public enum MonthLayout {
         return calendar.dateInterval(of: .month, for: week[week.count / 2])?.start
     }
 
+    /// The first day of the week the month view opens on for the month containing `month`.
+    /// Today's week when that month is today's month, so what is ahead is on screen; otherwise the month's
+    /// first week. Weeks start on `calendar.firstWeekday`.
+    public static func openingWeek(month: Date, today: Date, calendar: Calendar) -> Date? {
+        let weeks = weeks(containing: month, calendar: calendar)
+        guard let first = weeks.first?.first else { return nil }
+        guard calendar.isDate(month, equalTo: today, toGranularity: .month) else { return first }
+        let day = calendar.startOfDay(for: today)
+        return weeks.first { $0.contains(day) }?.first ?? first
+    }
+
     /// The first days of the first and last month of a window of `radius` months either side of `date`'s month.
     public static func window(around date: Date, radius: Int, calendar: Calendar) -> (first: Date, last: Date) {
         let month = calendar.dateInterval(of: .month, for: date)?.start ?? calendar.startOfDay(for: date)

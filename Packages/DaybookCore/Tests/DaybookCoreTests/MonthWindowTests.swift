@@ -64,4 +64,39 @@ import Testing
                                      events: [], calendar: cal)
         #expect(one == run)
     }
+
+    @Test func todaysMonthOpensOnTodaysWeek() {
+        // Tuesday 17 November 2026: its week starts on Monday the 16th.
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 11, 1), today: TestCalendar.date(2026, 11, 17, 10),
+                                        calendar: cal) == TestCalendar.date(2026, 11, 16))
+    }
+
+    @Test func anotherMonthOpensOnItsFirstWeek() {
+        // December's first week starts on Monday 30 November.
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 12, 10), today: TestCalendar.date(2026, 11, 17),
+                                        calendar: cal) == TestCalendar.date(2026, 11, 30))
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 10, 10), today: TestCalendar.date(2026, 11, 17),
+                                        calendar: cal) == TestCalendar.date(2026, 9, 28))
+    }
+
+    @Test func todayInTheMonthsLastWeekOpensThere() {
+        // Monday 30 November is in November's last week, which it starts.
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 11, 1), today: TestCalendar.date(2026, 11, 30),
+                                        calendar: cal) == TestCalendar.date(2026, 11, 30))
+        // The same day seen from December (its first week) is not December's today: its first week opens.
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 12, 1), today: TestCalendar.date(2026, 11, 30),
+                                        calendar: cal) == TestCalendar.date(2026, 11, 30))
+    }
+
+    @Test func weeksFollowTheLocalesFirstWeekday() {
+        // Weeks starting on Sunday: 17 November's week starts on Sunday the 15th.
+        let sunday = TestCalendar.prague(firstWeekday: 1)
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 11, 20), today: TestCalendar.date(2026, 11, 17),
+                                        calendar: sunday) == TestCalendar.date(2026, 11, 15))
+        // Sunday 22 November opens its own week in a Sunday-first locale, the week of the 16th in a Monday-first one.
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 11, 1), today: TestCalendar.date(2026, 11, 22),
+                                        calendar: sunday) == TestCalendar.date(2026, 11, 22))
+        #expect(MonthLayout.openingWeek(month: TestCalendar.date(2026, 11, 1), today: TestCalendar.date(2026, 11, 22),
+                                        calendar: cal) == TestCalendar.date(2026, 11, 16))
+    }
 }
