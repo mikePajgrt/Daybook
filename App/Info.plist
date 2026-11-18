@@ -22,6 +22,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>DaybookCloudKitContainer</key>
 	<string>$(DAYBOOK_CLOUDKIT_CONTAINER)</string>
+	<key>DaybookCloudKitEnvironment</key>
+	<string>$(DAYBOOK_CLOUDKIT_ENVIRONMENT)</string>
 	<key>DaybookCommit</key>
 	<string>$(DAYBOOK_COMMIT)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

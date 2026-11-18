@@ -10,6 +10,7 @@ import SwiftData
 /// If the synced store does not open, the device-only one is used and the sync line says so.
 enum CategoryContainer {
     static let infoKey = "DaybookCloudKitContainer"
+    static let environmentKey = "DaybookCloudKitEnvironment"
     private static let log = Logger(subsystem: "app.trim.daybook", category: "categories")
 
     static var schema: Schema { Schema([CategoryRecord.self, CategoryAssignmentRecord.self]) }
@@ -21,6 +22,30 @@ enum CategoryContainer {
         // An unexpanded "$(…)" means the build setting is missing.
         guard !trimmed.isEmpty, !trimmed.hasPrefix("$(") else { return nil }
         return trimmed
+    }
+
+    /// The CloudKit environment this build is signed for: "Production" or "Development" (also when unset).
+    static func cloudEnvironment(in bundle: Bundle = .main) -> String {
+        let value = (bundle.object(forInfoDictionaryKey: environmentKey) as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return value == "Production" ? "Production" : "Development"
+    }
+
+    /// The synced store's file name (without extension). A store carries one environment's sync state,
+    /// so each environment has its own file. Release builds in Production (TestFlight, App Store) keep
+    /// the original "Categories-cloud", which installed builds already have; a locally built Debug app
+    /// pointed at Production gets its own file, so it never reuses a file a Development build synced.
+    static func cloudStoreName(environment: String, debugBuild: Bool) -> String {
+        guard environment == "Production" else { return "Categories-cloud-development" }
+        return debugBuild ? "Categories-cloud-production-debug" : "Categories-cloud"
+    }
+
+    private static var isDebugBuild: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
     }
 
     /// The store the app uses: synced, device-only, or (when nothing can be opened) memory.
@@ -60,8 +85,11 @@ enum CategoryContainer {
     }
 
     private static func cloudConfiguration(_ id: String) -> ModelConfiguration {
-        ModelConfiguration("Categories-cloud", schema: schema, url: directory.appending(path: "Categories-cloud.store"),
-                           cloudKitDatabase: .private(id))
+        let environment = cloudEnvironment()
+        let name = cloudStoreName(environment: environment, debugBuild: isDebugBuild)
+        log.info("Synced categories: \(id, privacy: .public), \(environment, privacy: .public), \(name, privacy: .public).store")
+        return ModelConfiguration(name, schema: schema, url: directory.appending(path: "\(name).store"),
+                                  cloudKitDatabase: .private(id))
     }
 
     // MARK: Moving device-only data in

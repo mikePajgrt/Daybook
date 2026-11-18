@@ -4,7 +4,7 @@ import Foundation
 import OSLog
 import SwiftData
 
-/// Debug only: `-init-cloudkit-schema` creates the category store's record types (CD_CategoryRecord,
+/// Debug only, Development builds only: `-init-cloudkit-schema` creates the category store's record types (CD_CategoryRecord,
 /// CD_CategoryAssignmentRecord, every field) in the CloudKit Development environment, then quits.
 /// Apple's documented route for SwiftData: the same models as an NSManagedObjectModel, a Core Data
 /// CloudKit container on a throwaway store, `initializeCloudKitSchema()`. That call writes placeholder
@@ -30,6 +30,11 @@ enum CloudKitSchemaInitializer {
     private static func run() throws -> String {
         guard let containerID = CategoryContainer.cloudContainerID() else {
             throw Failure("this build names no CloudKit container (DAYBOOK_CLOUDKIT_CONTAINER is empty)")
+        }
+        // The schema is made in Development and deployed to Production in the CloudKit console.
+        guard CategoryContainer.cloudEnvironment() == "Development" else {
+            throw Failure("this build is signed for the Production environment; initialize the schema with a "
+                          + "Development build (scripts/build-mac-icloud.sh development)")
         }
         guard let model = NSManagedObjectModel.makeManagedObjectModel(for: [CategoryRecord.self,
                                                                              CategoryAssignmentRecord.self]) else {
