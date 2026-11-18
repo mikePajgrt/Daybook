@@ -14,7 +14,9 @@ struct RootView: View {
     @State private var detailWidth: CGFloat = 0
     #if os(iOS)
     /// iPad: what the bar really has, measured, to choose the widest title and switcher that fit.
-    @State private var bar = RegularBarMetrics()
+    @State private var bar = WideBarMetrics()
+    /// iPad: where the bar put the switcher's item. Only moves the switcher inside the item, never sizes it.
+    @State private var principalMinX: CGFloat = 0
     #endif
     /// Regular width: whether the rail shows. The filter chip opens it.
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
@@ -171,10 +173,18 @@ struct RootView: View {
                 current
                     .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { detailWidth = $0 }
                     #if os(iOS)
-                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { bar.detail = $0 }
+                    // Horizontal extent only, in whole points: the column's height and position change with
+                    // the bar itself and must not feed back into the bar's decision.
+                    .onGeometryChange(for: CGRect.self) {
+                        let frame = $0.frame(in: .global)
+                        return CGRect(x: frame.minX.rounded(), y: 0, width: frame.width.rounded(), height: 0)
+                    } action: {
+                        if bar.detailMinX != $0.minX { bar.detailMinX = $0.minX }
+                        if bar.detailWidth != $0.width { bar.detailWidth = $0.width }
+                    }
                     .background {
                         RegularBarProbes(titles: regularTitles, modeName: modeName) {
-                            bar.texts[$0] = $1
+                            if bar.texts[$0] != Double($1) { bar.texts[$0] = Double($1) }
                         }
                     }
                     #endif
@@ -208,13 +218,18 @@ struct RootView: View {
                             if isSearching {
                                 Color.clear.frame(width: 1, height: 1).accessibilityHidden(true)
                             } else {
-                                // Padded from where the bar starts the item to the place `regularBar` chose.
+                                // An item as wide as the room `regularBar` chose, whatever the bar does with it; the
+                                // switcher moves inside it to its place. The item's size never depends on where
+                                // the bar put it, so measuring that place cannot start another layout pass.
                                 HStack(spacing: 0) {
-                                    Color.clear.frame(width: RegularBarLayout.centringPad(for: choice, metrics: bar), height: 1)
+                                    Color.clear.frame(width: WideBarLayout.innerOffset(for: choice, itemMinX: Double(principalMinX)),
+                                                      height: 1)
                                     modePicker(asMenu: choice.pickerIsMenu, indicator: choice.menuIndicator)
+                                    Spacer(minLength: 0)
                                 }
-                                .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minX } action: {
-                                    bar.principalMinX = $0
+                                .frame(width: choice.slotWidth.map { CGFloat($0) }, alignment: .leading)
+                                .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minX.rounded() } action: {
+                                    if principalMinX != $0 { principalMinX = $0 }
                                 }
                             }
                         }
@@ -242,7 +257,7 @@ struct RootView: View {
             }
             #if os(iOS)
             // The bar's items change size with the text; measure them again.
-            .onChange(of: dynamicTypeSize) { bar = RegularBarMetrics() }
+            .onChange(of: dynamicTypeSize) { bar = WideBarMetrics() }
             #endif
             #if DEBUG
             .task {
@@ -457,8 +472,8 @@ struct RootView: View {
     }
 
     /// The widest title, switcher, filter indicator and new-event button that fit in the bar together.
-    private var regularBar: RegularBarChoice {
-        RegularBarLayout.choose(titles: regularTitles, filtering: !model.hiddenNames.isEmpty,
+    private var regularBar: WideBarChoice {
+        WideBarLayout.choose(titles: regularTitles, filtering: !model.hiddenNames.isEmpty,
                                 railHidden: columnVisibility == .detailOnly, metrics: bar)
     }
 
