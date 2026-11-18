@@ -109,11 +109,15 @@ private struct CalendarToggleRow: View {
                     .foregroundStyle(Theme.line(calendar.color))
                     .imageScale(.large)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(calendar.title)
-                        .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
-                        // At accessibility sizes the name wraps between words instead of losing letters.
-                        .lineLimit(large ? nil : 1)
-                        .fixedSize(horizontal: false, vertical: large)
+                    // At accessibility sizes the name wraps between words instead of losing letters.
+                    Group {
+                        if large {
+                            WholeWordText(calendar.title)
+                        } else {
+                            Text(calendar.title).lineLimit(1)
+                        }
+                    }
+                    .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
                     if large {
                         // The caption and the lock go under the name, so the name keeps the row's width.
                         if calendar.isShared || calendar.isReadOnly {

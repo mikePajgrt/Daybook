@@ -13,17 +13,16 @@ struct CategorySidebarSection: View {
             ForEach(categories.categories) { category in
                 // A tap on the row switches the filter; the trailing button offers the same management
                 // as the context menu, so it is findable without a long press or a secondary click.
-                HStack(spacing: 4) {
-                    FilterToggleRow(title: category.name, symbol: category.symbol,
-                                    isOn: categories.filter.isOn(category.id)) {
-                        categories.toggle(category)
-                    }
+                FilterToggleRow(title: category.name, symbol: category.symbol,
+                                isOn: categories.filter.isOn(category.id), hasMenu: true) {
+                    categories.toggle(category)
+                } menu: {
                     Menu {
                         manageItems(category)
                     } label: {
                         Image(systemName: "ellipsis.circle")
                             .foregroundStyle(Theme.secondaryInk)
-                            .frame(minWidth: 44, minHeight: 44)
+                            .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                     }
                     .menuStyle(.button)
@@ -40,8 +39,10 @@ struct CategorySidebarSection: View {
             .onMove { categories.move(fromOffsets: $0, toOffset: $1) }
 
             FilterToggleRow(title: CategoryText.uncategorized, symbol: "tag.slash",
-                            isOn: categories.filter.showsUncategorized) {
+                            isOn: categories.filter.showsUncategorized, hasMenu: false) {
                 categories.toggleUncategorized()
+            } menu: {
+                EmptyView()
             }
             .contextMenu {
                 Button("Zobrazit jen události bez kategorie") { categories.showOnlyUncategorized() }
@@ -79,66 +80,60 @@ extension CategorySidebarSection {
 }
 
 /// "+ Nový kalendář", "+ Nová kategorie": the title has its own column, so a wrapped line starts under
-/// the title and not under the plus.
+/// the title and not under the plus, and it wraps only between words.
 struct AddRowLabel: View {
-    let title: LocalizedStringKey
-    @ScaledMetric(relativeTo: .body) private var iconWidth: CGFloat = 26
+    let title: LocalizedStringResource
+    @ScaledMetric(relativeTo: .body) private var iconWidth: CGFloat = 24
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
             Image(systemName: "plus")
                 .frame(width: iconWidth)
                 .accessibilityHidden(true)
-            Text(title)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
+            WholeWordText(String(localized: title))
         }
         .contentShape(Rectangle())
     }
 }
 
-/// A filter row for a category or "Bez kategorie": checkbox in ink, symbol, name.
-/// At accessibility sizes the name moves under the checkbox and symbol, so it has the row's whole
-/// width and wraps only between words.
-private struct FilterToggleRow: View {
+/// A filter row for a category or "Bez kategorie": checkbox in ink, symbol, the name in its own column,
+/// and the row's menu button. One layout for every row; the name wraps only between words (condensing
+/// first when a word is wider than its column). At accessibility sizes the menu button joins the
+/// checkbox's line and the name goes below it with the row's whole width.
+private struct FilterToggleRow<MenuButton: View>: View {
     let title: String
     let symbol: String
     let isOn: Bool
+    /// Whether the row has a menu button; rows without one keep the same columns.
+    let hasMenu: Bool
     let action: () -> Void
+    @ViewBuilder let menu: () -> MenuButton
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     /// One column for every symbol, so names share a left edge whatever the symbol's width.
-    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 26
+    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 24
+    /// The menu button reaches this far into the row's trailing inset, so its 44 pt target costs the
+    /// name less of the rail's width.
+    private let menuOverhang: CGFloat = 20
 
     var body: some View {
         Button(action: action) {
             Group {
                 if large {
-                    // Checkbox and symbol on one line, the name below with the row's whole width.
                     VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 10) {
+                        HStack(spacing: 8) {
                             checkbox
                             symbolImage
                         }
+                        .frame(minHeight: 44, alignment: .leading)
                         name
                     }
                 } else {
-                    // One line when the name fits whole; otherwise the name goes under the checkbox and
-                    // symbol with the row's width, so a long word is never broken (a narrow rail beside
-                    // the row's menu button).
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 10) {
-                            checkbox
-                            symbolImage.frame(width: symbolWidth)
-                            name.lineLimit(1).fixedSize()
-                        }
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 10) {
-                                checkbox
-                                symbolImage.frame(width: symbolWidth)
-                            }
-                            name
-                        }
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        checkbox
+                        symbolImage.frame(width: symbolWidth)
+                        name
+                        if hasMenu { Color.clear.frame(width: 44 - menuOverhang, height: 1) }
                     }
                 }
             }
@@ -150,6 +145,10 @@ private struct FilterToggleRow: View {
         .accessibilityLabel(title)
         .accessibilityValue(isOn ? Text("zapnutá") : Text("vypnutá"))
         .accessibilityAddTraits(.isToggle)
+        // Over the button rather than inside it, so each keeps its own tap.
+        .overlay(alignment: large ? .topTrailing : .trailing) {
+            menu().offset(x: menuOverhang)
+        }
     }
 
     private var checkbox: some View {
@@ -159,11 +158,8 @@ private struct FilterToggleRow: View {
     }
 
     private var name: some View {
-        Text(title)
+        WholeWordText(title)
             .foregroundStyle(isOn ? Theme.ink : Theme.secondaryInk)
-            // Long names take a second line, between words, rather than losing letters.
-            .lineLimit(large ? nil : 2)
-            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var symbolImage: some View {
