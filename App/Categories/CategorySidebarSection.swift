@@ -123,10 +123,22 @@ private struct FilterToggleRow: View {
                         name
                     }
                 } else {
-                    HStack(spacing: 10) {
-                        checkbox
-                        symbolImage.frame(width: symbolWidth)
-                        name
+                    // One line when the name fits whole; otherwise the name goes under the checkbox and
+                    // symbol with the row's width, so a long word is never broken (a narrow rail beside
+                    // the row's menu button).
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 10) {
+                            checkbox
+                            symbolImage.frame(width: symbolWidth)
+                            name.lineLimit(1).fixedSize()
+                        }
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 10) {
+                                checkbox
+                                symbolImage.frame(width: symbolWidth)
+                            }
+                            name
+                        }
                     }
                 }
             }

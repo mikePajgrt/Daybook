@@ -62,7 +62,7 @@ import Testing
     @Test func seriesAndOccurrenceAssignmentsAndLookup() throws {
         let store = try store()
         let meetings = try store.createCategory(name: "Porady", symbol: "person.2")
-        let focus = try store.createCategory(name: "Soustředění", symbol: "brain.head.profile")
+        let focus = try store.createCategory(name: "Soustředění", symbol: "scope")
         let week = 7 * 86_400.0
         let first = EventKey(externalID: "series", occurrenceStart: monday)
         let second = EventKey(externalID: "series", occurrenceStart: monday.addingTimeInterval(week))

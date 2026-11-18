@@ -539,16 +539,6 @@
         }
       }
     },
-    "Hlava": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Head"
-          }
-        }
-      }
-    },
     "Hledat i ve vypnutých": {
       "localizations": {
         "en": {
@@ -2005,6 +1995,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Phone"
+          }
+        }
+      }
+    },
+    "Terč": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Target"
           }
         }
       }

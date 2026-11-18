@@ -11,7 +11,7 @@ struct RootView: View {
     /// Width of the detail column (regular width), to pick a period title that fits beside the controls.
     @State private var detailWidth: CGFloat = 0
     /// Regular width: whether the rail shows. The filter chip opens it.
-    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @FocusState private var searchFocused: Bool
 
     var body: some View {
@@ -61,6 +61,7 @@ struct RootView: View {
         if sizeClass == .compact {
             NavigationStack {
                 current
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { detailWidth = $0 }
                     .toolbar {
                         ToolbarItem(placement: .navigation) {
                             // While a filter hides something the button changes to the filter symbol, so the
@@ -172,8 +173,11 @@ struct RootView: View {
         return Button {
             withAnimation { columnVisibility = .all }
         } label: {
-            Label(text, systemImage: "line.3.horizontal.decrease.circle.fill")
-                .labelStyle(.titleAndIcon)
+            // An explicit stack: a toolbar would draw a Label as its icon alone.
+            HStack(spacing: 4) {
+                Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                Text(text)
+            }
         }
         .accessibilityLabel(Text(hiddenSummarySpoken ?? text))
         .help(Text(hiddenSummarySpoken ?? text))
@@ -249,6 +253,7 @@ struct RootView: View {
         let compact = sizeClass == .compact
         #if os(iOS)
         if !compact { return regularTitle }
+        if !dynamicTypeSize.isAccessibilitySize { return compactTitle }
         #endif
         return title(short: compact, numeric: compact && dynamicTypeSize.isAccessibilitySize,
                      abbreviatedWeekday: true).joined
@@ -272,6 +277,19 @@ struct RootView: View {
         }
         return numeric.joined
     }
+
+    /// iPhone: the short title ("Út 17. listopadu", "Tue 17 November") when it fits between the calendars
+    /// button and back / Today / forward, else months as numbers. Languages differ in length, so it is measured.
+    private var compactTitle: String {
+        let short = title(short: true, numeric: false, abbreviatedWeekday: true).joined
+        let font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        let room = detailWidth - Self.compactControlsWidth
+        if detailWidth == 0 || (short as NSString).size(withAttributes: [.font: font]).width <= room { return short }
+        return title(short: true, numeric: true, abbreviatedWeekday: true).joined
+    }
+
+    /// The calendars button, back / Today / forward and the bar's margins on an iPhone, measured on iOS 26.
+    private static let compactControlsWidth: CGFloat = 270
 
     /// What the iPad toolbar's trailing controls (back, Today, forward, switcher, search, new event) and
     /// the bar's margins take from the detail column's width, measured on iPadOS 26.

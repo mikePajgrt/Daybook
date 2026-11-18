@@ -5,7 +5,7 @@ extension DemoData {
     public static let categories: [Category] = [
         Category(id: uuid("00000000-0000-4000-8000-000000000001"), name: "Porady", symbol: "person.2", order: 0),
         Category(id: uuid("00000000-0000-4000-8000-000000000002"), name: "Soustředěná práce",
-                 symbol: "brain.head.profile", order: 1),
+                 symbol: "scope", order: 1),
         Category(id: uuid("00000000-0000-4000-8000-000000000003"), name: "Děti",
                  symbol: "figure.and.child.holdinghands", order: 2),
         Category(id: uuid("00000000-0000-4000-8000-000000000004"), name: "Cestování", symbol: "airplane", order: 3),

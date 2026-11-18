@@ -9,7 +9,7 @@ enum CategoryText {
     private static var symbolNames: [String: String] {
         [
             "person.2": String(localized: "Lidé"),
-            "brain.head.profile": String(localized: "Hlava"),
+            "scope": String(localized: "Terč"),
             "figure.and.child.holdinghands": String(localized: "Rodič s dítětem"),
             "airplane": String(localized: "Letadlo"),
             "heart": String(localized: "Srdce"),

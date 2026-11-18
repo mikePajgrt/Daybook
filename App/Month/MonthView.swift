@@ -14,6 +14,9 @@ struct MonthView: View {
     @State private var topWeek: Date?
     /// The user is dragging or the scroll is coasting: only then does the title follow the scroll.
     @State private var userScrolls = false
+    /// The weeks on screen, as the scroll view reports them; the title follows the month owning most of them.
+    @State private var visibleWeeks: [Date] = []
+    @State private var viewport: CGFloat = 0
 
     @ScaledMetric(relativeTo: .caption) private var rowHeight: CGFloat = 17
     @ScaledMetric(relativeTo: .caption) private var numberHeight: CGFloat = 28
@@ -114,59 +117,62 @@ struct MonthView: View {
             // Reduce Motion: a calendar switched off crossfades the month instead of closing rows up.
             .modifier(CrossfadeOnFilter())
         }
+        .onAppear { self.viewport = viewport }
+        .onChange(of: viewport) { self.viewport = viewport }
         .scrollPosition(id: $topWeek, anchor: .top)
         .onScrollPhaseChange { _, phase in
             userScrolls = phase == .interacting || phase == .decelerating
+            // The scroll came to rest: the month on screen settles with it.
+            if phase == .idle { followTitle(heights: rowHeights) }
         }
-        .onScrollGeometryChange(for: CGFloat.self) { $0.contentOffset.y + $0.contentInsets.top } action: { _, offset in
-            guard userScrolls else { return }
-            followTitle(offset: offset, viewport: viewport, heights: rowHeights)
+        // The weeks at least half on screen, as the scroll view itself reports them.
+        .onScrollTargetVisibilityChange(idType: Date.self, threshold: 0.5) { ids in
+            visibleWeeks = ids
+            if userScrolls { followTitle(heights: rowHeights) }
         }
         .task(id: model.scrollKey) {
             topWeek = openingWeek
             #if DEBUG
-            if model.stagedScreens.contains("scrolled") { await stageScroll(viewport: viewport, heights: rowHeights) }
+            if model.stagedScreens.contains("scrolled") { await stageScroll() }
             #endif
         }
     }
 
-    /// Makes the month that owns most of the viewport the month on screen.
-    private func followTitle(offset: CGFloat, viewport: CGFloat, heights: [CGFloat]) {
-        guard let owner = Self.owner(weeks: model.weeks, heights: heights, offset: offset, viewport: viewport,
+    /// Makes the month that owns most of the visible weeks the month on screen.
+    private func followTitle(heights: [CGFloat]) {
+        let visible = Set(visibleWeeks)
+        guard let owner = Self.owner(weeks: model.weeks.filter { visible.contains($0.id) },
+                                     heights: zip(model.weeks, heights).filter { visible.contains($0.0.id) }.map(\.1),
                                      calendar: model.calendar) else { return }
         model.scrolled(toMonth: owner)
     }
 
-    /// The month whose weeks cover most of the viewport from `offset` down.
-    static func owner(weeks: [WeekLayout], heights: [CGFloat], offset: CGFloat, viewport: CGFloat,
-                      calendar: Calendar) -> Date? {
+    /// The month whose weeks take the most height among `weeks` (the ones on screen); a week belongs to
+    /// the month of its middle day.
+    static func owner(weeks: [WeekLayout], heights: [CGFloat], calendar: Calendar) -> Date? {
         var shares: [Date: CGFloat] = [:]
-        var top: CGFloat = 0
         for (week, height) in zip(weeks, heights) {
-            let visible = min(top + height, offset + viewport) - max(top, offset)
-            if visible > 0, let month = MonthLayout.owner(of: week.days.map(\.date), calendar: calendar) {
-                shares[month, default: 0] += visible
+            if let month = MonthLayout.owner(of: week.days.map(\.date), calendar: calendar) {
+                shares[month, default: 0] += height
             }
-            top += height
-            if top > offset + viewport { break }
         }
         return shares.max { $0.value < $1.value }?.key
     }
 
     #if DEBUG
-    /// Debug staging: scrolls down across the month's end until the next month owns the viewport,
-    /// the way a user's scroll would, so the capture shows the title following.
-    private func stageScroll(viewport: CGFloat, heights: [CGFloat]) async {
-        try? await Task.sleep(for: .milliseconds(900))
+    /// Debug staging: scrolls down across the month's end, as a user would, so the capture shows the
+    /// title and the dimming following the month that now owns the screen.
+    private func stageScroll() async {
+        // After the events have filled in, so the rows have their real heights.
+        try? await Task.sleep(for: .milliseconds(1500))
         guard let next = model.calendar.date(byAdding: .month, value: 1, to: model.windowCenter),
               let nextStart = model.calendar.dateInterval(of: .month, for: next)?.start,
               let index = model.weeks.firstIndex(where: { $0.days.contains { $0.date == nextStart } }) else { return }
         // The week before the one holding the 1st at the top: the old month's last week, then the new month.
-        let target = max(0, index - 1)
-        withAnimation { topWeek = model.weeks[target].id }
-        let offset = heights.prefix(target).reduce(0, +)
-        try? await Task.sleep(for: .milliseconds(600))
-        followTitle(offset: offset, viewport: viewport, heights: heights)
+        withAnimation { topWeek = model.weeks[max(0, index - 1)].id }
+        try? await Task.sleep(for: .milliseconds(900))
+        let metrics = WeekMetrics(rowHeight: rowHeight, numberHeight: numberHeight)
+        followTitle(heights: heights(viewport: viewport, metrics: metrics))
     }
     #endif
 
