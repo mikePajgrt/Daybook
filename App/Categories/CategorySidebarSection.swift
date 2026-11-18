@@ -11,19 +11,28 @@ struct CategorySidebarSection: View {
     var body: some View {
         Section {
             ForEach(categories.categories) { category in
-                FilterToggleRow(title: category.name, symbol: category.symbol,
-                                isOn: categories.filter.isOn(category.id)) {
-                    categories.toggle(category)
+                // A tap on the row switches the filter; the trailing button offers the same management
+                // as the context menu, so it is findable without a long press or a secondary click.
+                HStack(spacing: 4) {
+                    FilterToggleRow(title: category.name, symbol: category.symbol,
+                                    isOn: categories.filter.isOn(category.id)) {
+                        categories.toggle(category)
+                    }
+                    Menu {
+                        manageItems(category)
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .foregroundStyle(Theme.secondaryInk)
+                            .frame(minWidth: 44, minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .menuStyle(.button)
+                    .buttonStyle(.borderless)
+                    .menuIndicator(.hidden)
+                    .fixedSize()
+                    .accessibilityLabel(Text("Upravit kategorii \(category.name)"))
                 }
-                .contextMenu {
-                    Button("Přejmenovat…", systemImage: "pencil") { categories.beginEditing(category, focus: .name) }
-                    Button("Změnit symbol…", systemImage: "square.grid.2x2") { categories.beginEditing(category, focus: .symbol) }
-                    Divider()
-                    Button("Zobrazit jen tuto") { categories.showOnly(category) }
-                    Button("Zobrazit všechny") { categories.showAll() }
-                    Divider()
-                    Button("Smazat kategorii…", systemImage: "trash", role: .destructive) { categories.pendingDelete = category }
-                }
+                .contextMenu { manageItems(category) }
                 // The question hangs on the row it is about.
                 .categoryDeleteConfirmation(categories, for: category)
                 .listRowBackground(rowBackground)
@@ -40,7 +49,8 @@ struct CategorySidebarSection: View {
             }
             .listRowBackground(rowBackground)
 
-            Button("Nová kategorie", systemImage: "plus") { categories.beginNew() }
+            Button { categories.beginNew() } label: { AddRowLabel(title: "Nová kategorie") }
+                .buttonStyle(.plain)
                 .foregroundStyle(Theme.ink)
                 .listRowBackground(rowBackground)
         } header: {
@@ -52,6 +62,38 @@ struct CategorySidebarSection: View {
                 .foregroundStyle(Theme.secondaryInk)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+extension CategorySidebarSection {
+    /// Rename, symbol, show only, show all, delete: on the row's menu button and its context menu.
+    @ViewBuilder func manageItems(_ category: Category) -> some View {
+        Button("Přejmenovat…", systemImage: "pencil") { categories.beginEditing(category, focus: .name) }
+        Button("Změnit symbol…", systemImage: "square.grid.2x2") { categories.beginEditing(category, focus: .symbol) }
+        Divider()
+        Button("Zobrazit jen tuto") { categories.showOnly(category) }
+        Button("Zobrazit všechny") { categories.showAll() }
+        Divider()
+        Button("Smazat kategorii…", systemImage: "trash", role: .destructive) { categories.pendingDelete = category }
+    }
+}
+
+/// "+ Nový kalendář", "+ Nová kategorie": the title has its own column, so a wrapped line starts under
+/// the title and not under the plus.
+struct AddRowLabel: View {
+    let title: LocalizedStringKey
+    @ScaledMetric(relativeTo: .body) private var iconWidth: CGFloat = 26
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Image(systemName: "plus")
+                .frame(width: iconWidth)
+                .accessibilityHidden(true)
+            Text(title)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .contentShape(Rectangle())
     }
 }
 

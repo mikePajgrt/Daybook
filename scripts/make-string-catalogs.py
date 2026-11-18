@@ -2,7 +2,9 @@
 """Writes App/Localizable.xcstrings and App/InfoPlist.xcstrings: Czech source, English translation.
 
 Usage: scripts/make-string-catalogs.py <exported en.xliff>
-Export the keys first with
+Export the keys first, from empty catalogs so only the code's strings are listed (an existing
+catalog adds its stale and plural entries to the export):
+  echo '{"sourceLanguage":"cs","strings":{},"version":"1.0"}' > App/Localizable.xcstrings   (same for InfoPlist)
   xcodebuild -exportLocalizations -project Daybook.xcodeproj -localizationPath <dir> -exportLanguage en
 English comes from scripts/english.json and plural variations from scripts/plurals.json. The script
 fails when a key has no English, so a new string cannot ship untranslated.

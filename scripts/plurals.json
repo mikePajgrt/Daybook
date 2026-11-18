@@ -1,21 +1,110 @@
 {
-"%lld dní předem": {"cs": {"one": "1 den předem", "few": "%lld dny předem", "many": "%lld dne předem", "other": "%lld dní předem"},
-                    "en": {"one": "1 day before", "other": "%lld days before"}},
-"%lld hodin předem": {"cs": {"one": "1 hodinu předem", "few": "%lld hodiny předem", "many": "%lld hodiny předem", "other": "%lld hodin předem"},
-                      "en": {"one": "1 hour before", "other": "%lld hours before"}},
-"%lld minut předem": {"cs": {"one": "1 minutu předem", "few": "%lld minuty předem", "many": "%lld minuty předem", "other": "%lld minut předem"},
-                      "en": {"one": "1 minute before", "other": "%lld minutes before"}},
-"%lld událostí": {"cs": {"one": "1 událost", "few": "%lld události", "many": "%lld události", "other": "%lld událostí"},
-                  "en": {"one": "1 event", "other": "%lld events"}},
-"Kategorii ztratí %lld událostí. Události samotné zůstanou v kalendáři.": {
-    "cs": {"one": "Kategorii ztratí 1 událost. Události samotné zůstanou v kalendáři.", "few": "Kategorii ztratí %lld události. Události samotné zůstanou v kalendáři.", "many": "Kategorii ztratí %lld události. Události samotné zůstanou v kalendáři.", "other": "Kategorii ztratí %lld událostí. Události samotné zůstanou v kalendáři."},
-    "en": {"one": "1 event will lose the category. The events themselves stay in the calendar.", "other": "%lld events will lose the category. The events themselves stay in the calendar."}},
-"Každých %lld dní": {"cs": {"one": "Každý den", "few": "Každé %lld dny", "many": "Každého %lld dne", "other": "Každých %lld dní"},
-                     "en": {"one": "Every day", "other": "Every %lld days"}},
-"Každých %lld týdnů": {"cs": {"one": "Každý týden", "few": "Každé %lld týdny", "many": "Každého %lld týdne", "other": "Každých %lld týdnů"},
-                       "en": {"one": "Every week", "other": "Every %lld weeks"}},
-"Každých %lld měsíců": {"cs": {"one": "Každý měsíc", "few": "Každé %lld měsíce", "many": "Každého %lld měsíce", "other": "Každých %lld měsíců"},
-                        "en": {"one": "Every month", "other": "Every %lld months"}},
-"Každých %lld let": {"cs": {"one": "Každý rok", "few": "Každé %lld roky", "many": "Každého %lld roku", "other": "Každých %lld let"},
-                     "en": {"one": "Every year", "other": "Every %lld years"}}
+ "%lld dní předem": {
+  "cs": {
+   "few": "%lld dny předem",
+   "many": "%lld dne předem",
+   "one": "1 den předem",
+   "other": "%lld dní předem"
+  },
+  "en": {
+   "one": "1 day before",
+   "other": "%lld days before"
+  }
+ },
+ "%lld hodin předem": {
+  "cs": {
+   "few": "%lld hodiny předem",
+   "many": "%lld hodiny předem",
+   "one": "1 hodinu předem",
+   "other": "%lld hodin předem"
+  },
+  "en": {
+   "one": "1 hour before",
+   "other": "%lld hours before"
+  }
+ },
+ "%lld minut předem": {
+  "cs": {
+   "few": "%lld minuty předem",
+   "many": "%lld minuty předem",
+   "one": "1 minutu předem",
+   "other": "%lld minut předem"
+  },
+  "en": {
+   "one": "1 minute before",
+   "other": "%lld minutes before"
+  }
+ },
+ "%lld událostí": {
+  "cs": {
+   "few": "%lld události",
+   "many": "%lld události",
+   "one": "1 událost",
+   "other": "%lld událostí"
+  },
+  "en": {
+   "one": "1 event",
+   "other": "%lld events"
+  }
+ },
+ "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři.": {
+  "cs": {
+   "few": "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři.",
+   "many": "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři.",
+   "one": "Kategorie je přiřazená k 1 události nebo sérii. Odebere se z ní, událost samotná zůstane v kalendáři.",
+   "other": "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři."
+  },
+  "en": {
+   "one": "The category is on 1 event or series. It will be removed from it; the event itself stays in the calendar.",
+   "other": "The category is on %lld events and series. It will be removed from them; the events themselves stay in the calendar."
+  }
+ },
+ "Každých %lld dní": {
+  "cs": {
+   "few": "Každé %lld dny",
+   "many": "Každého %lld dne",
+   "one": "Každý den",
+   "other": "Každých %lld dní"
+  },
+  "en": {
+   "one": "Every day",
+   "other": "Every %lld days"
+  }
+ },
+ "Každých %lld let": {
+  "cs": {
+   "few": "Každé %lld roky",
+   "many": "Každého %lld roku",
+   "one": "Každý rok",
+   "other": "Každých %lld let"
+  },
+  "en": {
+   "one": "Every year",
+   "other": "Every %lld years"
+  }
+ },
+ "Každých %lld měsíců": {
+  "cs": {
+   "few": "Každé %lld měsíce",
+   "many": "Každého %lld měsíce",
+   "one": "Každý měsíc",
+   "other": "Každých %lld měsíců"
+  },
+  "en": {
+   "one": "Every month",
+   "other": "Every %lld months"
+  }
+ },
+ "Každých %lld týdnů": {
+  "cs": {
+   "few": "Každé %lld týdny",
+   "many": "Každého %lld týdne",
+   "one": "Každý týden",
+   "other": "Každých %lld týdnů"
+  },
+  "en": {
+   "one": "Every week",
+   "other": "Every %lld weeks"
+  }
+ }
 }

@@ -35,6 +35,14 @@ struct SidebarView: View {
                 .foregroundStyle(Theme.ink)
                 .accessibilityAddTraits(.isHeader)
             #endif
+            // The day view's month navigator, when the day column has no room for it beside the day.
+            // It sits in the list and scrolls with it, so the calendars and categories keep the rail.
+            if model.mode == .day && model.dayNavigatorInSidebar {
+                Section {
+                    MonthNavigatorView()
+                        .listRowBackground(rowBackground)
+                }
+            }
             ForEach(model.sections) { section in
                 Section {
                     ForEach(section.calendars) { calendar in
@@ -55,7 +63,8 @@ struct SidebarView: View {
                 }
             }
             Section {
-                Button("Nový kalendář", systemImage: "plus") { model.beginNewCalendar() }
+                Button { model.beginNewCalendar() } label: { AddRowLabel(title: "Nový kalendář") }
+                    .buttonStyle(.plain)
                     .foregroundStyle(Theme.ink)
                     .listRowBackground(rowBackground)
             }
@@ -65,15 +74,6 @@ struct SidebarView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            // The day view's month navigator, when the day column has no room for it beside the day.
-            if model.mode == .day && model.dayNavigatorInSidebar {
-                MonthNavigatorView()
-                    .padding(12)
-                    .background(Theme.rail)
-                    .overlay(alignment: .top) { Rectangle().fill(Theme.rule).frame(height: 1) }
-            }
-        }
         .background(Theme.rail)
         // Shown from the sidebar, so on iPhone it rises over the calendars sheet it was opened from.
         .sheet(item: Binding(get: { model.calendarEditor }, set: { model.calendarEditor = $0 })) { editor in

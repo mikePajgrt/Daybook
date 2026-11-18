@@ -9,8 +9,9 @@ struct CategorySymbolsView: View {
     var body: some View {
         HStack(spacing: 2) {
             ForEach(categories) { category in
+                // Filled where the symbol has a fill: outlines blur into blobs at event-row size.
                 Image(systemName: category.symbol)
-                    .imageScale(.small)
+                    .symbolVariant(.fill)
             }
         }
         .foregroundStyle(Theme.secondaryInk)

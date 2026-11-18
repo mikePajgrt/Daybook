@@ -137,6 +137,7 @@ shot "$PHONE" phone-category-editor-icloud-light.png -demo-categories -demo-cate
 shot "$PHONE" phone-category-delete.png -demo-categories -demo-category-delete
 shot "$PHONE" phone-editor-categories.png -demo-editor-categories
 shot "$PHONE" phone-detail-categories.png -demo-day-view -demo-detail-categories
+shot "$PHONE" phone-editor-categories-empty.png -demo-editor-categories -demo-no-categories
 shot "$PHONE" phone-search.png -demo-search
 shot "$PHONE" phone-search-empty.png -demo-search-empty
 shot "$PHONE" phone-search-none.png -demo-search-none -demo-category-off

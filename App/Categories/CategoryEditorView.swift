@@ -8,6 +8,8 @@ struct CategoryEditorView: View {
     let onClose: () -> Void
 
     @FocusState private var nameFocused: Bool
+    /// The question before deleting the category being edited.
+    @State private var asksDelete = false
 
     var body: some View {
         NavigationStack {
@@ -45,6 +47,25 @@ struct CategoryEditorView: View {
                     Text("Kategorie vidíte jen vy. Do událostí se nezapisují, ostatní účastníci ani jiné aplikace je neuvidí.")
                 }
                 .listRowBackground(Theme.ground)
+
+                if case .edit(let category) = editor.mode {
+                    Section {
+                        Button("Smazat kategorii…", systemImage: "trash", role: .destructive) { asksDelete = true }
+                            .foregroundStyle(.red)
+                            // The question hangs on the button that asked.
+                            .confirmationDialog(Text("Smazat kategorii „\(category.name)“?"), isPresented: $asksDelete,
+                                                titleVisibility: .visible) {
+                                Button("Smazat kategorii", role: .destructive) {
+                                    categories.delete(category)
+                                    onClose()
+                                }
+                                Button("Ponechat", role: .cancel) {}
+                            } message: {
+                                Text(CategoryText.deleteMessage(categories.eventCount(of: category)))
+                            }
+                    }
+                    .listRowBackground(Theme.ground)
+                }
             }
             .formStyle(.grouped)
             .tint(Theme.ink)

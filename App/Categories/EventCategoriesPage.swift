@@ -7,14 +7,21 @@ import SwiftUI
 struct EventCategoriesPage: View {
     @Environment(CategoryModel.self) private var categories
     @Bindable var editor: EventEditorModel
+    /// A category made from this page. Its own sheet: the sidebar's cannot rise over the editor.
+    @State private var newCategory: CategoryEditorModel?
 
     var body: some View {
         Form {
             if categories.categories.isEmpty {
                 Section {
-                    Text("Zatím nemáte žádné kategorie. Založíte je v postranním panelu volbou Nová kategorie.")
+                    Text("Zatím nemáte žádné kategorie. Kategorie jsou vaše vlastní štítky, například Porady nebo Sport.")
                         .foregroundStyle(Theme.secondaryInk)
                         .fixedSize(horizontal: false, vertical: true)
+                    Button { newCategory = CategoryEditorModel(mode: .new, others: []) } label: {
+                        AddRowLabel(title: "Nová kategorie")
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Theme.ink)
                 }
                 .listRowBackground(Theme.ground)
             } else {
@@ -41,6 +48,11 @@ struct EventCategoriesPage: View {
         .background(Theme.rail)
         .foregroundStyle(Theme.ink)
         .navigationTitle("Kategorie")
+        .sheet(item: $newCategory) { editor in
+            CategoryEditorView(editor: editor) { newCategory = nil }
+                .environment(categories)
+                .presentationBackground(Theme.rail)
+        }
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif

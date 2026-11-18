@@ -8,9 +8,21 @@ struct CategorySymbolGrid: View {
     let choices: [String]
 
     @ScaledMetric(relativeTo: .title3) private var cell: CGFloat = 44
+    @State private var width: CGFloat = 0
+    private static let spacing: CGFloat = 6
+
+    /// The widest column count whose rows the symbols fill exactly, so no row ends with a few orphans;
+    /// when no such count of three or more fits, as many columns as fit.
+    static func columnCount(items: Int, width: CGFloat, cell: CGFloat, spacing: CGFloat) -> Int {
+        let fitting = max(1, Int((width + spacing) / (cell + spacing)))
+        if let even = (3...max(3, fitting)).reversed().first(where: { $0 <= fitting && items % $0 == 0 }) { return even }
+        return fitting
+    }
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: cell, maximum: cell * 1.5), spacing: 6)], spacing: 6) {
+        let count = width > 0 ? Self.columnCount(items: choices.count, width: width, cell: cell, spacing: Self.spacing) : 6
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: Self.spacing), count: count),
+                  spacing: Self.spacing) {
             ForEach(choices, id: \.self) { symbol in
                 let selected = symbol == selection
                 Button { selection = symbol } label: {
@@ -29,5 +41,6 @@ struct CategorySymbolGrid: View {
             }
         }
         .padding(.vertical, 4)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
     }
 }

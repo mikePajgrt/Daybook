@@ -51,9 +51,11 @@ struct MonthView: View {
                 .presentationDetents([.medium, .large])
                 .presentationBackground(Theme.rail)
         }
+        #if DEBUG
         .onAppear {
             if model.stagedScreens.contains("day") { selectedDay = SelectedDay(date: model.today) }
         }
+        #endif
     }
 
     /// The days of the month the window is centred on, for the agenda at accessibility sizes.

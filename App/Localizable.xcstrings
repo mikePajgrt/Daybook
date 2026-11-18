@@ -729,6 +729,58 @@
         }
       }
     },
+    "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři.": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři."
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorie je přiřazená k 1 události nebo sérii. Odebere se z ní, událost samotná zůstane v kalendáři."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorie je přiřazená k %lld událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři."
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "The category is on 1 event or series. It will be removed from it; the event itself stays in the calendar."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "The category is on %lld events and series. It will be removed from them; the events themselves stay in the calendar."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Kategorie jen této události": {
       "localizations": {
         "en": {
@@ -905,58 +957,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "The category could not be changed"
-          }
-        }
-      }
-    },
-    "Kategorii ztratí %lld událostí. Události samotné zůstanou v kalendáři.": {
-      "localizations": {
-        "cs": {
-          "variations": {
-            "plural": {
-              "few": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Kategorii ztratí %lld události. Události samotné zůstanou v kalendáři."
-                }
-              },
-              "many": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Kategorii ztratí %lld události. Události samotné zůstanou v kalendáři."
-                }
-              },
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Kategorii ztratí 1 událost. Události samotné zůstanou v kalendáři."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "Kategorii ztratí %lld událostí. Události samotné zůstanou v kalendáři."
-                }
-              }
-            }
-          }
-        },
-        "en": {
-          "variations": {
-            "plural": {
-              "one": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "1 event will lose the category. The events themselves stay in the calendar."
-                }
-              },
-              "other": {
-                "stringUnit": {
-                  "state": "translated",
-                  "value": "%lld events will lose the category. The events themselves stay in the calendar."
-                }
-              }
-            }
           }
         }
       }
@@ -1849,6 +1849,36 @@
         }
       }
     },
+    "Skryto: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden: %@"
+          }
+        }
+      }
+    },
+    "Skryto: %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden: %lld"
+          }
+        }
+      }
+    },
+    "Skryté: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidden: %@"
+          }
+        }
+      }
+    },
     "Slunce": {
       "localizations": {
         "en": {
@@ -2229,6 +2259,16 @@
         }
       }
     },
+    "Upravit kategorii %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit category %@"
+          }
+        }
+      }
+    },
     "Upravit událost": {
       "localizations": {
         "en": {
@@ -2429,12 +2469,12 @@
         }
       }
     },
-    "Zatím nemáte žádné kategorie. Založíte je v postranním panelu volbou Nová kategorie.": {
+    "Zatím nemáte žádné kategorie. Kategorie jsou vaše vlastní štítky, například Porady nebo Sport.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You have no categories yet. Create them in the sidebar with New Category."
+            "value": "You have no categories yet. Categories are your own labels, such as Meetings or Sport."
           }
         }
       }

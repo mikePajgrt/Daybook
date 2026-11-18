@@ -10,6 +10,8 @@ struct RootView: View {
     @State private var calendarsDetent: PresentationDetent = .medium
     /// Width of the detail column (regular width), to pick a period title that fits beside the controls.
     @State private var detailWidth: CGFloat = 0
+    /// Regular width: whether the rail shows. The filter chip opens it.
+    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
     @FocusState private var searchFocused: Bool
 
     var body: some View {
@@ -61,7 +63,15 @@ struct RootView: View {
                 current
                     .toolbar {
                         ToolbarItem(placement: .navigation) {
-                            Button("Kalendáře a kategorie", systemImage: "sidebar.leading") { showsCalendars = true }
+                            // While a filter hides something the button changes to the filter symbol, so the
+                            // month never looks complete when it is not; it opens the list that holds the switches.
+                            Button { showsCalendars = true } label: {
+                                Label("Kalendáře a kategorie",
+                                      systemImage: model.hiddenNames.isEmpty ? "sidebar.leading"
+                                                                             : "line.3.horizontal.decrease.circle.fill")
+                            }
+                            .accessibilityLabel(Text("Kalendáře a kategorie"))
+                            .accessibilityValue(hiddenSummarySpoken.map(Text.init) ?? Text(verbatim: ""))
                         }
                         navigationGroup
                         #if os(iOS)
@@ -79,6 +89,12 @@ struct RootView: View {
                 NavigationStack {
                     SidebarView(rowBackground: Theme.ground)
                         .navigationTitle("Kalendáře a kategorie")
+                        #if os(iOS)
+                        // An opaque bar: with the soft scroll edge, large rows blurred through the title.
+                        .toolbarBackground(Theme.ground, for: .navigationBar)
+                        .toolbarBackgroundVisibility(dynamicTypeSize.isAccessibilitySize ? .visible : .automatic,
+                                                     for: .navigationBar)
+                        #endif
                         .toolbar {
                             ToolbarItem(placement: .confirmationAction) {
                                 Button("Hotovo") { showsCalendars = false }
@@ -88,6 +104,7 @@ struct RootView: View {
                 .presentationDetents([.medium, .large], selection: $calendarsDetent)
                 .presentationBackground(Theme.rail)
             }
+            #if DEBUG
             .onAppear {
                 if model.stagedScreens.contains("calendars") { showsCalendars = true }
                 if model.stagedScreens.contains("categories") {
@@ -95,9 +112,10 @@ struct RootView: View {
                     showsCalendars = true
                 }
             }
+            #endif
             .modifier(SearchFocus(focused: $searchFocused))
         } else {
-            NavigationSplitView {
+            NavigationSplitView(columnVisibility: $columnVisibility) {
                 SidebarView()
                     .navigationTitle("Daybook")
                     .navigationSplitViewColumnWidth(min: 220, ideal: 248, max: 320)
@@ -109,6 +127,9 @@ struct RootView: View {
                     .searchFocused($searchFocused)
                     // Back / Today / forward, the switcher, search, and the new event at the far right.
                     .toolbar {
+                        if !model.hiddenNames.isEmpty {
+                            ToolbarItem(placement: .navigation) { filterChip }
+                        }
                         navigationGroup
                         ToolbarItem(placement: .primaryAction) { modePicker }
                         DefaultToolbarItem(kind: .search, placement: .primaryAction)
@@ -141,6 +162,28 @@ struct RootView: View {
             }
         }
         .animation(.default, value: model.mode)
+    }
+
+    /// "Skryto: Porady", or "Skryto: 3" when several things are hidden. Opens the rail with the switches.
+    private var filterChip: some View {
+        let hidden = model.hiddenNames
+        let text = hidden.count == 1 ? String(localized: "Skryto: \(hidden[0])")
+                                     : String(localized: "Skryto: \(hidden.count)")
+        return Button {
+            withAnimation { columnVisibility = .all }
+        } label: {
+            Label(text, systemImage: "line.3.horizontal.decrease.circle.fill")
+                .labelStyle(.titleAndIcon)
+        }
+        .accessibilityLabel(Text(hiddenSummarySpoken ?? text))
+        .help(Text(hiddenSummarySpoken ?? text))
+    }
+
+    /// "Skryté: Práce, Porady a Bez kategorie", for VoiceOver and the pointer's help.
+    private var hiddenSummarySpoken: String? {
+        let hidden = model.hiddenNames
+        guard !hidden.isEmpty else { return nil }
+        return String(localized: "Skryté: \(hidden.formatted(.list(type: .and)))")
     }
 
     /// The far-right primary action. Icon-only where the bar is tight; the label stays for VoiceOver.

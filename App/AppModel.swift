@@ -313,6 +313,15 @@ final class AppModel {
     /// The calendar's colour, or the fallback grey when it cannot be resolved.
     func color(of calendarID: String) -> RGBA { calendarInfo(calendarID)?.color ?? Theme.fallbackLine }
 
+    /// What the filters hide right now, in sidebar order: switched-off calendars, then categories,
+    /// then "Bez kategorie". Empty when everything is shown.
+    var hiddenNames: [String] {
+        let calendarNames = sections.flatMap(\.calendars).filter { !filter.isVisible($0.id) }.map(\.title)
+        let categoryNames = categoryModel.categories.filter { !categoryModel.filter.isOn($0.id) }.map(\.name)
+        let uncategorized = categoryModel.filter.showsUncategorized ? [] : [CategoryText.uncategorized]
+        return calendarNames + categoryNames + uncategorized
+    }
+
     func toggle(_ calendar: CalendarInfo) { updateFilter { $0.toggle(calendar.id) } }
 
     func showOnly(_ calendar: CalendarInfo) {

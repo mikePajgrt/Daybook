@@ -37,6 +37,7 @@ struct DaybookApp: App {
         //   -demo-no-accounts        access granted, but the system has no calendars
         //   -demo-search, -demo-search-empty, -demo-search-none  search states (see DemoStaging)
         //   -demo-scrolled           the month scrolled across its end into the next month
+        //   -demo-no-categories      no categories yet (the empty categories page)
         //   -demo-locale <id>        the app in another language, e.g. -demo-locale en
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-demo") {
@@ -61,9 +62,11 @@ struct DaybookApp: App {
             staged.formUnion(DemoStaging.screens(in: arguments))
             defaults.removeObject(forKey: AppModel.lastCalendarKey)
             // Demo categories live in memory only, never in the on-disk store.
-            let categoryStore = DemoData.categoryStore(
-                month: now, calendar: calendar,
-                syncState: arguments.contains("-demo-icloud-unavailable") ? .iCloudUnavailable : .localOnly)
+            let categoryStore = arguments.contains("-demo-no-categories")
+                ? InMemoryCategoryStore()
+                : DemoData.categoryStore(
+                    month: now, calendar: calendar,
+                    syncState: arguments.contains("-demo-icloud-unavailable") ? .iCloudUnavailable : .localOnly)
             let model = AppModel(store: store, categoryStore: categoryStore, defaults: defaults, calendar: calendar,
                                  now: now, clockIsFixed: true, stagedScreens: staged)
             model.detailRequest = DemoStaging.detail(for: staged, today: model.today, calendar: calendar)

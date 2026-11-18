@@ -62,10 +62,11 @@ enum CategoryText {
         }
     }
 
-    /// "Kategorii ztratí 3 události." for the delete confirmation.
+    /// For the delete confirmation. The count is of assignments: a whole series counts once, as one
+    /// event does, so the sentence names both.
     static func deleteMessage(_ count: Int) -> String {
         count == 0 ? String(localized: "Kategorie zatím není u žádné události. Události samotné zůstanou v kalendáři.")
-            : String(localized: "Kategorii ztratí \(count) událostí. Události samotné zůstanou v kalendáři.")
+            : String(localized: "Kategorie je přiřazená k \(count) událostem a sériím. Odebere se z nich, události samotné zůstanou v kalendáři.")
     }
 
     /// For VoiceOver: "kategorie Porady a Děti".
