@@ -2,6 +2,7 @@
 "%@   %@": "%1$@   %2$@",
 "%@ %@": "%1$@ %2$@",
 "%@ do %@": "%1$@ until %2$@",
+"%@ %@": "%1$@ %2$@",
 "Adresa URL není platná. Zkontrolujte ji, třeba example.com.": "The URL is not valid. Check it, for example example.com.",
 "Aktovka": "Briefcase",
 "Auto": "Car",
