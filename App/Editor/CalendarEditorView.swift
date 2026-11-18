@@ -17,10 +17,10 @@ struct CalendarEditorView: View {
             }
             .formStyle(.grouped)
             // Picker values and switches in the world's ink instead of system grey and green.
-            .tint(Theme.controlInk)
+            .themeTint(Theme.controlInk)
             .scrollContentBackground(.hidden)
             .background(Theme.rail)
-            .foregroundStyle(Theme.ink)
+            .themeForeground(Theme.ink)
             .navigationTitle(editor.isNew ? "Nový kalendář" : "Barva kalendáře")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

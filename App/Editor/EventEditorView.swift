@@ -199,10 +199,10 @@ struct EventEditorView: View {
         }
         .formStyle(.grouped)
         // Picker values and switches in the world's ink instead of system grey and green.
-        .tint(Theme.controlInk)
+        .themeTint(Theme.controlInk)
         .scrollContentBackground(.hidden)
         .background(Theme.rail)
-        .foregroundStyle(Theme.ink)
+        .themeForeground(Theme.ink)
     }
 
     @ViewBuilder private var attendeeSection: some View {

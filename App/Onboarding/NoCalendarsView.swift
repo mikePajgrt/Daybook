@@ -15,7 +15,7 @@ struct NoCalendarsView: View {
             if model.store.sources().contains(where: \.offersCalendarCreation) {
                 Button("Nový kalendář", systemImage: "plus") { model.beginNewCalendar() }
                     .buttonStyle(.bordered)
-                    .tint(Theme.controlInk)
+                    .themeTint(Theme.controlInk)
             }
         }
         .foregroundStyle(Theme.ink)

@@ -115,7 +115,7 @@ struct SearchResultsView: View {
                 if offersSearchInHidden {
                     Button("Hledat i ve vypnutých") { model.search.includesHidden = true }
                         .buttonStyle(.bordered)
-                        .tint(Theme.controlInk)
+                        .themeTint(Theme.controlInk)
                 }
             }
         } else if search.phase == .searching && search.results.isEmpty {
@@ -123,7 +123,7 @@ struct SearchResultsView: View {
             ProgressView {
                 Text("Hledám…")
             }
-            .tint(Theme.controlInk)
+            .themeTint(Theme.controlInk)
         }
     }
 

@@ -75,10 +75,10 @@ struct CategoryEditorView: View {
                 }
             }
             .formStyle(.grouped)
-            .tint(Theme.controlInk)
+            .themeTint(Theme.controlInk)
             .scrollContentBackground(.hidden)
             .background(Theme.rail)
-            .foregroundStyle(Theme.ink)
+            .themeForeground(Theme.ink)
             .navigationTitle(editor.isNew ? "Nová kategorie" : "Upravit kategorii")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

@@ -101,7 +101,7 @@ struct RootView: View {
                         .navigationTitle("Kalendáře a kategorie")
                         #if os(iOS)
                         // An opaque bar: with the soft scroll edge, large rows blurred through the title.
-                        .toolbarBackground(Theme.ground, for: .navigationBar)
+                        .themeToolbarBackground(Theme.ground, for: .navigationBar)
                         .toolbarBackgroundVisibility(dynamicTypeSize.isAccessibilitySize ? .visible : .automatic,
                                                      for: .navigationBar)
                         #endif
@@ -145,7 +145,7 @@ struct RootView: View {
                     #if os(iOS)
                     // An opaque bar at accessibility sizes, as on the sheets: large rows would blur
                     // through "Daybook" under the soft scroll edge.
-                    .toolbarBackground(Theme.rail, for: .navigationBar)
+                    .themeToolbarBackground(Theme.rail, for: .navigationBar)
                     .toolbarBackgroundVisibility(dynamicTypeSize.isAccessibilitySize ? .visible : .automatic,
                                                  for: .navigationBar)
                     // Settings at the foot of the rail, out of the way of the calendars.
@@ -267,6 +267,8 @@ struct RootView: View {
         Button { showsSettings = true } label: {
             Label("Nastavení", systemImage: "gearshape")
         }
+        // Ink like the bar's other buttons, not the system's blue.
+        .themeTint(Theme.ink)
         .help(Text("Nastavení"))
     }
 
@@ -498,7 +500,7 @@ struct RootView: View {
             #else
             // The window title stays for the Window menu; the toolbar shows the period in the contract's type.
             .toolbar(removing: .title)
-            .toolbarBackground(Theme.ground, for: .windowToolbar)
+            .themeToolbarBackground(Theme.ground, for: .windowToolbar)
             .toolbarBackgroundVisibility(.visible, for: .windowToolbar)
             #endif
     }

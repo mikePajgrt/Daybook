@@ -131,5 +131,47 @@ extension Color {
 
 extension View {
     /// Every switch in the app: the world's ink, with a dark-appearance track the knob stays visible on.
-    func switchTint() -> some View { tint(Theme.switchOn) }
+    func switchTint() -> some View { themeTint(Theme.switchOn) }
+
+    /// Tints controls with a theme colour, resolved to a plain `Color` first: bar buttons and other
+    /// controls the system draws itself ignore a custom shape style and fall back to white.
+    func themeTint(_ color: ThemeColor) -> some View { modifier(ThemeTint(color: color, foreground: false)) }
+
+    /// A foreground style for a whole screen, resolved to a plain `Color` so its bar buttons take it too.
+    func themeForeground(_ color: ThemeColor) -> some View { modifier(ThemeTint(color: color, foreground: true)) }
+
+    /// A bar's background in a theme colour, resolved to a plain `Color` for the system's own bars.
+    func themeToolbarBackground(_ color: ThemeColor, for bars: ToolbarPlacement) -> some View {
+        modifier(ThemeToolbarBackground(color: color, bars: bars))
+    }
+}
+
+private struct ThemeToolbarBackground: ViewModifier {
+    let color: ThemeColor
+    let bars: ToolbarPlacement
+    @Environment(\.colorTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    func body(content: Content) -> some View {
+        content.toolbarBackground(Color(color.rgba(theme.palette(dark: colorScheme == .dark), contrast == .increased)),
+                                  for: bars)
+    }
+}
+
+private struct ThemeTint: ViewModifier {
+    let color: ThemeColor
+    let foreground: Bool
+    @Environment(\.colorTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    func body(content: Content) -> some View {
+        let resolved = Color(color.rgba(theme.palette(dark: colorScheme == .dark), contrast == .increased))
+        if foreground {
+            content.foregroundStyle(resolved)
+        } else {
+            content.tint(resolved)
+        }
+    }
 }

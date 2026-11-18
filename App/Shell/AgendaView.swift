@@ -39,7 +39,7 @@ struct AgendaView: View {
         }
         #if os(iOS)
         // An opaque bar on the ground: with the soft scroll edge, large digits blurred through the title.
-        .toolbarBackground(Theme.ground, for: .navigationBar)
+        .themeToolbarBackground(Theme.ground, for: .navigationBar)
         .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         #endif
     }

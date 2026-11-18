@@ -34,10 +34,10 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .tint(Theme.controlInk)
+        .themeTint(Theme.controlInk)
         .scrollContentBackground(.hidden)
         .background(Theme.rail)
-        .foregroundStyle(Theme.ink)
+        .themeForeground(Theme.ink)
     }
 }
 
