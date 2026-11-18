@@ -1,5 +1,6 @@
-#if os(iOS)
 import SwiftUI
+
+#if os(iOS)
 
 /// What the iPad bar shows: the period title (always), the filter indicator, the view switcher and
 /// the new-event button, in the widest forms that fit together.
@@ -17,6 +18,8 @@ struct RegularBarChoice: Hashable {
 
     var title: String
     var pickerIsMenu: Bool
+    /// The menu's up-down chevron, when the bar has room for it after the title.
+    var menuIndicator = false
     var indicator: Indicator
     /// "Událost" beside the plus.
     var newEventWord: Bool
@@ -71,6 +74,7 @@ enum RegularBarLayout {
               let today = m.width(RegularBarProbes.todayKey), let word = m.width(RegularBarProbes.wordKey),
               let segmented = m.width(RegularBarProbes.segmentedKey),
               let menuLabel = m.width(RegularBarProbes.modeNameKey),
+              let menuWithIndicator = m.width(RegularBarProbes.modeMenuKey),
               let reference = m.width(RegularBarProbes.referenceKey),
               let symbol = m.width(RegularBarProbes.symbolKey), let count = m.width(RegularBarProbes.countKey),
               let labelled = m.width(RegularBarProbes.labelledKey)
@@ -79,13 +83,15 @@ enum RegularBarLayout {
         // Measured on one fixed word, so a longer word in another language is not taken for larger text.
         let scale = max(1, reference / referenceAtDefaultSize)
         let menu = menuLabel + menuPadding * scale
+        let indicatedMenu = menuWithIndicator + menuPadding * scale
         let start = m.detail.minX + (railHidden ? titleInsetAfterSidebarButton : titleInsetBesideRail)
         let indicators: [RegularBarChoice.Indicator] = filtering ? [.labelled, .symbolAndCount, .symbol] : [.none]
         // The forms say the same period; the longest that fits wins.
         let measured = titles.compactMap { title in m.width(title).map { (title, $0) } }.sorted { $0.1 > $1.1 }
         for (title, titleWidth) in measured {
             for indicator in indicators {
-                for isMenu in [false, true] {
+                // Segmented, then the menu with its chevron, then the menu titled with the view alone.
+                for (isMenu, chevron) in [(false, false), (true, true), (true, false)] {
                     for showsWord in [false] {
                         var x = start + titleWidth
                         switch indicator {
@@ -95,11 +101,11 @@ enum RegularBarLayout {
                         case .labelled: x += indicatorSpacing + labelled + 2 * indicatorInset
                         }
                         x += (indicator == .none ? groupGap : groupGapWithIndicator) + groupLeadingWithoutToday * scale
-                            + today + (isMenu ? menu : segmented) + rightOfPicker * scale
+                            + today + (isMenu ? (chevron ? indicatedMenu : menu) : segmented) + rightOfPicker * scale
                         if showsWord { x += word + wordGap }
                         if x <= m.detail.maxX {
-                            return RegularBarChoice(title: title, pickerIsMenu: isMenu, indicator: indicator,
-                                                    newEventWord: showsWord)
+                            return RegularBarChoice(title: title, pickerIsMenu: isMenu, menuIndicator: chevron,
+                                                    indicator: indicator, newEventWord: showsWord)
                         }
                     }
                 }
@@ -116,6 +122,7 @@ struct RegularBarProbes: View {
     static let wordKey = "\u{1}word"
     static let segmentedKey = "\u{1}segmented"
     static let modeNameKey = "\u{1}mode"
+    static let modeMenuKey = "\u{1}modemenu"
     static let symbolKey = "\u{1}symbol"
     static let countKey = "\u{1}count"
     static let labelledKey = "\u{1}labelled"
@@ -134,6 +141,7 @@ struct RegularBarProbes: View {
             measured(Self.referenceKey) { Text(verbatim: "Dnes").font(.body) }
             measured(Self.wordKey) { Text("Událost").font(.body) }
             measured(Self.modeNameKey) { Text(modeName).font(.body) }
+            measured(Self.modeMenuKey) { ModeMenuTitle(name: modeName, indicator: true).font(.body) }
             measured(Self.symbolKey) { FilterIndicatorLabel(count: nil) }
             measured(Self.countKey) { FilterIndicatorLabel(count: hiddenCount) }
             measured(Self.labelledKey) { FilterIndicatorLabel(count: hiddenCount, labelled: true) }
@@ -197,3 +205,20 @@ struct FilterIndicatorLabel: View {
     }
 }
 #endif
+
+/// The switcher's menu title: the current view and the up-down chevron of a pop-up menu, so it does not
+/// read as an action like "Dnes" beside it. One text, since a bar draws a symbol-and-text pair as its
+/// symbol alone. The full period title comes first: where both do not fit, the chevron gives way.
+struct ModeMenuTitle: View {
+    let name: LocalizedStringKey
+    /// The chevron goes when the bar needs its width for the full period title.
+    var indicator = true
+
+    var body: some View {
+        if indicator {
+            Text("\(Text(name))\u{2009}\(Text(Image(systemName: "chevron.up.chevron.down")).font(.caption2.weight(.bold)))")
+        } else {
+            Text(name)
+        }
+    }
+}

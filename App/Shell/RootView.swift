@@ -180,7 +180,7 @@ struct RootView: View {
                         if !isSearching {
                             navigationGroup
                             ToolbarItem(placement: .primaryAction) {
-                                modePicker(asMenu: choice.pickerIsMenu)
+                                modePicker(asMenu: choice.pickerIsMenu, indicator: choice.menuIndicator)
                             }
                         }
                         DefaultToolbarItem(kind: .search, placement: .primaryAction)
@@ -330,7 +330,7 @@ struct RootView: View {
 
     /// Day / Week / Month. Segmented; on an iPad bar too narrow for it, the system's pull-down menu
     /// showing the current view.
-    @ViewBuilder private func modePicker(asMenu: Bool) -> some View {
+    @ViewBuilder private func modePicker(asMenu: Bool, indicator: Bool = true) -> some View {
         let picker = Picker("Zobrazení", selection: Binding(get: { model.mode }, set: { model.setMode($0) })) {
             Text("Den").tag(ViewMode.day)
             Text("Týden").tag(ViewMode.week)
@@ -342,7 +342,7 @@ struct RootView: View {
             Menu {
                 picker.pickerStyle(.inline)
             } label: {
-                Text(modeName)
+                ModeMenuTitle(name: modeName, indicator: indicator)
             }
             .accessibilityLabel(Text("Zobrazení"))
             .accessibilityValue(Text(modeName))
