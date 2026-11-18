@@ -64,7 +64,6 @@ struct SearchResultsView: View {
             #endif
         }
         .scrollContentBackground(.hidden)
-        .scrollEdgeEffectStyle(.hard, for: .top)
         #if os(iOS)
         // iPhone: while searching there is no bar above the results, so they would pass under the status
         // bar's text. An opaque band of the list's ground fills the status bar's height instead.
