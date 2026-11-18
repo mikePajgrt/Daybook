@@ -14,6 +14,10 @@ struct CategoryEditorView: View {
     var body: some View {
         NavigationStack {
             Form {
+                if categories.syncState == .notSaved {
+                    Section { CategoryNotSavedNotice() }
+                        .listRowBackground(Theme.ground)
+                }
                 Section {
                     TextField("Název", text: $editor.name,
                               prompt: Text("Například Sport").foregroundStyle(Theme.secondaryInk))

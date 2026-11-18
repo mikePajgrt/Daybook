@@ -1,5 +1,6 @@
 import DaybookCore
 import Foundation
+import SwiftUI
 
 /// Czech wording for categories, in one place so the sidebar, the sheets and VoiceOver agree.
 enum CategoryText {
@@ -53,6 +54,12 @@ enum CategoryText {
         }
     }
 
+    /// When nothing can be saved, the warning at the top of the categories and in the category editor.
+    static var notSavedTitle: String { String(localized: "Kategorie se teď neukládají") }
+    static var notSavedAdvice: String {
+        String(localized: "Změny kategorií vydrží jen do zavření aplikace. Při dalším spuštění se Daybook pokusí uložení obnovit. Když se to opakuje, uvolněte místo v zařízení.")
+    }
+
     static func syncSymbol(_ state: CategorySyncState) -> String {
         switch state {
         case .localOnly: "internaldrive"
@@ -91,5 +98,24 @@ enum CategoryText {
         case .invalidSymbol: return String(localized: "Vyberte symbol kategorie.")
         case .system(let text): return text
         }
+    }
+}
+
+/// Changes to categories will be lost: said where they are made, not in a footnote.
+struct CategoryNotSavedNotice: View {
+    var body: some View {
+        Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(CategoryText.notSavedTitle).font(.body.weight(.semibold))
+                Text(CategoryText.notSavedAdvice)
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.secondaryInk)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        } icon: {
+            Image(systemName: "exclamationmark.triangle.fill")
+        }
+        .foregroundStyle(Theme.ink)
+        .accessibilityElement(children: .combine)
     }
 }

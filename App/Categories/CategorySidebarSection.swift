@@ -10,6 +10,10 @@ struct CategorySidebarSection: View {
 
     var body: some View {
         Section {
+            if categories.syncState == .notSaved {
+                CategoryNotSavedNotice()
+                    .listRowBackground(rowBackground)
+            }
             ForEach(categories.categories) { category in
                 // A tap on the row switches the filter; the trailing button offers the same management
                 // as the context menu, so it is findable without a long press or a secondary click.
@@ -58,10 +62,13 @@ struct CategorySidebarSection: View {
             Text("Kategorie")
                 .foregroundStyle(Theme.secondaryInk)
         } footer: {
-            Label(CategoryText.sync(categories.syncState), systemImage: CategoryText.syncSymbol(categories.syncState))
-                .font(.caption)
-                .foregroundStyle(Theme.secondaryInk)
-                .fixedSize(horizontal: false, vertical: true)
+            // Not being saved is said at the top of the section instead.
+            if categories.syncState != .notSaved {
+                Label(CategoryText.sync(categories.syncState), systemImage: CategoryText.syncSymbol(categories.syncState))
+                    .font(.caption)
+                    .foregroundStyle(Theme.secondaryInk)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }
@@ -97,8 +104,8 @@ struct AddRowLabel: View {
 }
 
 /// A filter row for a category or "Bez kategorie": checkbox in ink, symbol, the name in its own column,
-/// and the row's menu button. One layout for every row; the name wraps only between words (condensing
-/// first when a word is wider than its column). At accessibility sizes the menu button joins the
+/// and the row's menu button. One layout and one type width for every row; a name wraps only between
+/// words, and condenses only when a single word is wider than its column. At accessibility sizes the menu button joins the
 /// checkbox's line and the name goes below it with the row's whole width.
 private struct FilterToggleRow<MenuButton: View>: View {
     let title: String
@@ -111,10 +118,10 @@ private struct FilterToggleRow<MenuButton: View>: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     /// One column for every symbol, so names share a left edge whatever the symbol's width.
-    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 24
+    @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 22
     /// The menu button reaches this far into the row's trailing inset, so its 44 pt target costs the
-    /// name less of the rail's width.
-    private let menuOverhang: CGFloat = 20
+    /// name less of the rail's width: at 248 pt the column then holds "Soustředěná" at standard width.
+    private let menuOverhang: CGFloat = 26
 
     var body: some View {
         Button(action: action) {
@@ -129,7 +136,7 @@ private struct FilterToggleRow<MenuButton: View>: View {
                         name
                     }
                 } else {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
                         checkbox
                         symbolImage.frame(width: symbolWidth)
                         name
