@@ -78,7 +78,7 @@ struct RootView: View {
                             .accessibilityLabel(Text("Kalendáře a kategorie"))
                             .accessibilityValue(hiddenSummarySpoken.map(Text.init) ?? Text(verbatim: ""))
                         }
-                        navigationGroup
+                        navigationGroup(placement: .primaryAction)
                         #if os(iOS)
                         // The top bar already holds the calendars, the title and back / Today / forward.
                         ToolbarItem(placement: .bottomBar) { modePicker(asMenu: false) }
@@ -130,14 +130,6 @@ struct RootView: View {
                     .toolbarBackground(Theme.rail, for: .navigationBar)
                     .toolbarBackgroundVisibility(dynamicTypeSize.isAccessibilitySize ? .visible : .automatic,
                                                  for: .navigationBar)
-                    .toolbar {
-                        // With the rail on screen, what the filters hide is said at its top, beside the
-                        // switches; the detail bar keeps its room for the period and the controls.
-                        if !model.hiddenNames.isEmpty {
-                            ToolbarItem(placement: .topBarLeading) { railFilterStatus }
-                                .sharedBackgroundVisibility(.hidden)
-                        }
-                    }
                     #endif
             } detail: {
                 current
@@ -145,7 +137,7 @@ struct RootView: View {
                     #if os(iOS)
                     .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { bar.detail = $0 }
                     .background {
-                        RegularBarProbes(titles: regularTitles, modeName: modeName, hiddenCount: model.hiddenNames.count) {
+                        RegularBarProbes(titles: regularTitles, modeName: modeName) {
                             bar.texts[$0] = $1
                         }
                     }
@@ -154,47 +146,61 @@ struct RootView: View {
                                 prompt: Text("Hledat události"))
                     .searchFocused($searchFocused)
                     #if os(iOS)
-                    // The bar's own title gives way to anything beside it; this one stays.
-                    .toolbar(removing: .title)
+                    // The bar keeps its title slot: the view switcher takes it, in the middle (`.principal`);
+                    // the period is a leading item that stays.
+                    .navigationBarTitleDisplayMode(.inline)
                     #endif
-                    // Back / Today / forward, the switcher, search, and the new event at the far right.
-                    // While search results are shown, the period controls would do nothing, so they go.
+                    // Left to right: back / Today / forward, the period, the view switcher in the middle,
+                    // then the new event, the filter count and search at the far right. While search
+                    // results are shown, the period controls would do nothing, so they go.
                     .toolbar {
                         #if os(iOS)
                         let choice = regularBar
-                        // One leading item: a second glass button beside the title would cost the bar the
-                        // room it needs for the switcher and the plus.
+                        if !isSearching {
+                            navigationGroup(placement: .topBarLeading)
+                        }
                         ToolbarItem(placement: .topBarLeading) {
-                            HStack(spacing: RegularBarLayout.indicatorSpacing) {
-                                BarTitleText(text: isSearching ? String(localized: "Hledání") : choice.title)
-                                    .foregroundStyle(Theme.ink)
-                                    .accessibilityAddTraits(.isHeader)
-                                if choice.indicator != .none {
-                                    filterIndicator(choice.indicator)
-                                }
-                            }
-                            // A fresh item for each form, so the bar sizes it anew.
-                            .id(choice)
+                            BarTitleText(text: isSearching ? String(localized: "Hledání") : choice.title)
+                                .foregroundStyle(Theme.ink)
+                                .accessibilityAddTraits(.isHeader)
+                                // A fresh item for each form, so the bar sizes it anew.
+                                .id(choice)
                         }
                         .sharedBackgroundVisibility(.hidden)
-                        if !isSearching {
-                            navigationGroup
-                            ToolbarItem(placement: .primaryAction) {
-                                modePicker(asMenu: choice.pickerIsMenu, indicator: choice.menuIndicator)
+                        // The middle: the switcher; empty during a search, so the bar's own title stays away.
+                        ToolbarItem(placement: .principal) {
+                            if isSearching {
+                                Color.clear.frame(width: 1, height: 1).accessibilityHidden(true)
+                            } else {
+                                // Padded from where the bar starts the item to the bar's middle, where there is room.
+                                HStack(spacing: 0) {
+                                    Color.clear.frame(width: RegularBarLayout.centringPad(for: choice, metrics: bar), height: 1)
+                                    modePicker(asMenu: choice.pickerIsMenu, indicator: choice.menuIndicator)
+                                }
+                                .onGeometryChange(for: CGFloat.self) { $0.frame(in: .global).minX } action: {
+                                    bar.principalMinX = $0
+                                }
                             }
                         }
-                        DefaultToolbarItem(kind: .search, placement: .primaryAction)
-                        ToolbarItem(placement: .primaryAction) { newEventButton(iconOnly: !choice.newEventWord) }
-                        #else
+                        ToolbarItem(placement: .primaryAction) { newEventButton(iconOnly: true) }
                         if !model.hiddenNames.isEmpty {
-                            ToolbarItem(placement: .navigation) { filterChip }
+                            ToolbarItem(placement: .primaryAction) { filterBadge }
                         }
+
+                        #else
                         if !isSearching {
-                            navigationGroup
-                            ToolbarItem(placement: .primaryAction) { modePicker(asMenu: false) }
+                            navigationGroup(placement: .navigation)
+                        }
+                        ToolbarItem(placement: .navigation) { macTitle }
+                            .sharedBackgroundVisibility(.hidden)
+                        if !isSearching {
+                            ToolbarItem(placement: .principal) { modePicker(asMenu: false) }
+                        }
+                        ToolbarItem(placement: .primaryAction) { newEventButton(iconOnly: false) }
+                        if !model.hiddenNames.isEmpty {
+                            ToolbarItem(placement: .primaryAction) { filterBadge }
                         }
                         DefaultToolbarItem(kind: .search, placement: .primaryAction)
-                        ToolbarItem(placement: .primaryAction) { newEventButton(iconOnly: false) }
                         #endif
                     }
             }
@@ -241,56 +247,37 @@ struct RootView: View {
         .animation(.default, value: model.mode)
     }
 
-    /// Mac: "Skryto: Porady", or "Skryto: 3" when several things are hidden. Opens the rail with the switches.
-    private var filterChip: some View {
-        let hidden = model.hiddenNames
-        let text = hidden.count == 1 ? String(localized: "Skryto: \(hidden[0])")
-                                     : String(localized: "Skryto: \(hidden.count)")
-        return Button {
+    /// The wide bar's filter: the filter symbol with a badge counting the hidden calendars and categories,
+    /// shown only while something is hidden. It says what is hidden to VoiceOver and the pointer, and
+    /// brings the rail with the switches.
+    private var filterBadge: some View {
+        Button {
             withAnimation { columnVisibility = .all }
         } label: {
-            // An explicit stack: a toolbar would draw a Label as its icon alone.
-            HStack(spacing: 4) {
-                Image(systemName: "line.3.horizontal.decrease.circle.fill")
-                Text(text)
+            FilterCountBadge(count: model.hiddenNames.count)
+        }
+        .accessibilityLabel(Text(hiddenSummarySpoken ?? ""))
+        .accessibilityHint(Text("Otevře kalendáře a kategorie"))
+        .help(Text(hiddenSummarySpoken ?? ""))
+    }
+
+    #if os(macOS)
+    /// Mac: the period in the contract's type, the year lighter.
+    private var macTitle: some View {
+        let parts = title(short: false, numeric: false)
+        return Group {
+            if isSearching {
+                Text("Hledání").fontWeight(.bold)
+            } else if let year = parts.year {
+                Text("\(Text(parts.name).fontWeight(.bold)) \(Text(year).fontWeight(.regular).foregroundStyle(Theme.secondaryInk))")
+            } else {
+                Text(parts.name).fontWeight(.bold)
             }
         }
-        .accessibilityLabel(Text(hiddenSummarySpoken ?? text))
-        .help(Text(hiddenSummarySpoken ?? text))
-    }
-
-    #if os(iOS)
-    /// iPad: the filter symbol beside the title, with the count when the bar has room. It says what is
-    /// hidden to VoiceOver and the pointer, and opens the rail with the switches.
-    private func filterIndicator(_ form: RegularBarChoice.Indicator) -> some View {
-        // A tappable label rather than a bar button: the bar gives a button a wider slot than the
-        // symbol needs, and that slot would push the switcher into the overflow menu.
-        FilterIndicatorLabel(count: form == .symbol ? nil : model.hiddenNames.count, labelled: form == .labelled)
-            .foregroundStyle(Theme.ink)
-            .padding(.horizontal, RegularBarLayout.indicatorInset)
-            .contentShape(Rectangle().inset(by: -10))
-            .onTapGesture(perform: showRail)
-            .hoverEffect(.highlight)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(hiddenSummarySpoken ?? ""))
-            .accessibilityHint(Text("Otevře kalendáře a kategorie"))
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction(.default, showRail)
-            .help(Text(hiddenSummarySpoken ?? ""))
-    }
-
-    /// iPad, rail on screen: the filter symbol and how many things are hidden, at the rail's top.
-    private var railFilterStatus: some View {
-        FilterIndicatorLabel(count: model.hiddenNames.count)
-            .foregroundStyle(Theme.ink)
-            .dynamicTypeSize(...BarTitleText.largestSize)
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(hiddenSummarySpoken ?? ""))
-            .help(Text(hiddenSummarySpoken ?? ""))
-    }
-
-    private func showRail() {
-        withAnimation { columnVisibility = .all }
+        .font(.system(size: 22))
+        .foregroundStyle(Theme.ink)
+        .padding(.horizontal, 4)
+        .accessibilityAddTraits(.isHeader)
     }
     #endif
 
@@ -304,8 +291,9 @@ struct RootView: View {
     /// The far-right primary action. Icon-only where the bar is tight; the label stays for VoiceOver.
     @ViewBuilder private func newEventButton(iconOnly: Bool) -> some View {
         #if os(iOS)
-        // iOS bars draw the plus alone, as a plain bar button.
-        Button("Nová událost", systemImage: "plus") { model.beginNewEvent() }
+        // The plus alone: a titled bar button keeps room for its hidden title beside the symbol.
+        Button { model.beginNewEvent() } label: { Image(systemName: "plus") }
+            .accessibilityLabel(Text("Nová událost"))
             .help(Text("Nová událost (⌘N)"))
         #else
         Button { model.beginNewEvent() } label: {
@@ -317,8 +305,8 @@ struct RootView: View {
         #endif
     }
 
-    private var navigationGroup: some ToolbarContent {
-        ToolbarItemGroup(placement: .primaryAction) {
+    private func navigationGroup(placement: ToolbarItemPlacement) -> some ToolbarContent {
+        ToolbarItemGroup(placement: placement) {
             Button(previousLabel, systemImage: "chevron.left") { model.step(by: -1) }
                 .help(Text(previousLabel))
             Button("Dnes") { model.goToToday() }
@@ -408,10 +396,8 @@ struct RootView: View {
     }
 
     /// The widest title, switcher, filter indicator and new-event button that fit in the bar together.
-    /// The filter symbol joins the title only while the rail is hidden; otherwise the rail says it.
     private var regularBar: RegularBarChoice {
-        RegularBarLayout.choose(titles: regularTitles,
-                                filtering: !model.hiddenNames.isEmpty && columnVisibility == .detailOnly,
+        RegularBarLayout.choose(titles: regularTitles, filtering: !model.hiddenNames.isEmpty,
                                 railHidden: columnVisibility == .detailOnly, metrics: bar)
     }
 
@@ -455,25 +441,6 @@ struct RootView: View {
             #else
             // The window title stays for the Window menu; the toolbar shows the period in the contract's type.
             .toolbar(removing: .title)
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    let parts = title(short: false, numeric: false)
-                    Group {
-                        if isSearching {
-                            Text("Hledání").fontWeight(.bold)
-                        } else if let year = parts.year {
-                            Text("\(Text(parts.name).fontWeight(.bold)) \(Text(year).fontWeight(.regular).foregroundStyle(Theme.secondaryInk))")
-                        } else {
-                            Text(parts.name).fontWeight(.bold)
-                        }
-                    }
-                    .font(.system(size: 22))
-                    .foregroundStyle(Theme.ink)
-                    .padding(.horizontal, 4)
-                    .accessibilityAddTraits(.isHeader)
-                }
-                .sharedBackgroundVisibility(.hidden)
-            }
             .toolbarBackground(Theme.ground, for: .windowToolbar)
             .toolbarBackgroundVisibility(.visible, for: .windowToolbar)
             #endif
@@ -493,6 +460,29 @@ private struct NewEventLabelStyle: LabelStyle {
                 configuration.title
             }
         }
+    }
+}
+
+/// The filter symbol with how many calendars and categories are hidden, in an ink capsule: the system's
+/// badge is red, and hue on screen belongs to calendars.
+private struct FilterCountBadge: View {
+    let count: Int
+
+    var body: some View {
+        Image(systemName: "line.3.horizontal.decrease")
+            .overlay(alignment: .topTrailing) {
+                Text(count, format: .number)
+                    .font(.caption2.weight(.bold))
+                    .monospacedDigit()
+                    .foregroundStyle(Theme.ground)
+                    .padding(.horizontal, 4)
+                    .frame(minWidth: 16, minHeight: 16)
+                    .background(Capsule().fill(Theme.ink))
+                    .offset(x: 10, y: -8)
+                    .fixedSize()
+            }
+            .padding(.trailing, 4)
+            .accessibilityHidden(true)
     }
 }
 
