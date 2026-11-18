@@ -164,7 +164,7 @@ struct RootView: View {
                                 .foregroundStyle(Theme.ink)
                                 .accessibilityAddTraits(.isHeader)
                                 // A fresh item for each form, so the bar sizes it anew.
-                                .id(choice)
+                                .id(choice.title)
                         }
                         .sharedBackgroundVisibility(.hidden)
                         // The middle: the switcher; empty during a search, so the bar's own title stays away.
@@ -172,7 +172,7 @@ struct RootView: View {
                             if isSearching {
                                 Color.clear.frame(width: 1, height: 1).accessibilityHidden(true)
                             } else {
-                                // Padded from where the bar starts the item to the bar's middle, where there is room.
+                                // Padded from where the bar starts the item to the place `regularBar` chose.
                                 HStack(spacing: 0) {
                                     Color.clear.frame(width: RegularBarLayout.centringPad(for: choice, metrics: bar), height: 1)
                                     modePicker(asMenu: choice.pickerIsMenu, indicator: choice.menuIndicator)

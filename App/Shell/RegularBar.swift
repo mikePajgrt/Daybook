@@ -9,8 +9,9 @@ struct RegularBarChoice: Hashable {
     var pickerIsMenu: Bool
     /// The menu's up-down chevron, when the bar has room for it after the title.
     var menuIndicator = false
-    /// The switcher sits in the middle of the bar; otherwise right after the title.
-    var centred = false
+    /// Where the switcher starts, in global coordinates: on the bar's middle when both sides allow it,
+    /// else in the middle of the room between the title and the trailing items. `nil` before measuring.
+    var pickerMinX: CGFloat?
 }
 
 /// Widths measured on screen: the detail column, where the bar placed the middle item, and the bar's
@@ -45,8 +46,10 @@ enum RegularBarLayout {
     static let referenceAtDefaultSize: CGFloat = 39.5
 
     /// The first arrangement that fits. The title comes first and never shrinks for the switcher; then
-    /// the segmented switcher, then the menu with its chevron, then the menu alone; each in the bar's
-    /// middle where both sides hold their items, else right after the title.
+    /// the segmented switcher, then the menu with its chevron, then the menu alone. Each sits on the
+    /// bar's middle where both sides hold their items; where the title reaches past that, the switcher
+    /// takes the middle of the room left between the title and the trailing items, so the gaps either
+    /// side of it are equal instead of one empty stretch on the right.
     static func choose(titles: [String], filtering: Bool, railHidden: Bool, metrics m: RegularBarMetrics) -> RegularBarChoice {
         // Before the texts are measured, the last form, which is the shortest.
         let shortest = titles.allSatisfy({ m.width($0) != nil })
@@ -72,31 +75,23 @@ enum RegularBarLayout {
         let measured = titles.compactMap { title in m.width(title).map { (title, $0) } }.sorted { $0.1 > $1.1 }
         for (title, titleWidth) in measured {
             let principalStart = beforeTitle + titleWidth + itemSpacing
-            for form in forms {
-                for centred in [true, false] {
-                    let pickerStart = centred ? middle - form.width / 2 : principalStart
-                    guard pickerStart >= principalStart,
-                          pickerStart + form.width + trailingGap <= trailingStart else { continue }
-                    return RegularBarChoice(title: title, pickerIsMenu: form.isMenu, menuIndicator: form.chevron,
-                                            centred: centred)
-                }
+            let roomEnd = trailingStart - trailingGap
+            for form in forms where principalStart + form.width <= roomEnd {
+                let centred = middle - form.width / 2
+                let pickerStart = centred >= principalStart && centred + form.width <= roomEnd
+                    ? centred : principalStart + (roomEnd - principalStart - form.width) / 2
+                return RegularBarChoice(title: title, pickerIsMenu: form.isMenu, menuIndicator: form.chevron,
+                                        pickerMinX: pickerStart.rounded())
             }
         }
         return fallback
     }
 
-    /// The space before the switcher that puts its middle on the bar's middle.
+    /// The space before the switcher that moves it from where the bar starts the middle item to the
+    /// chosen place.
     static func centringPad(for choice: RegularBarChoice, metrics m: RegularBarMetrics) -> CGFloat {
-        guard choice.centred, m.principalMinX > 0 else { return 0 }
-        let width: CGFloat?
-        if choice.pickerIsMenu {
-            width = m.width(choice.menuIndicator ? RegularBarProbes.modeMenuKey : RegularBarProbes.modeNameKey)
-                .map { $0 + menuPadding }
-        } else {
-            width = m.width(RegularBarProbes.segmentedKey)
-        }
-        guard let width else { return 0 }
-        return max(0, m.detail.midX - width / 2 - m.principalMinX)
+        guard let target = choice.pickerMinX, m.principalMinX > 0 else { return 0 }
+        return max(0, target - m.principalMinX)
     }
 }
 
