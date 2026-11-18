@@ -1,3 +1,5 @@
+// Demo data exists in debug builds only: release builds carry no synthetic calendars.
+#if DEBUG
 import Foundation
 
 /// Synthetic calendars and events for demo mode and screenshots. Not real data.
@@ -174,3 +176,4 @@ public enum DemoData {
                               access: access, sources: sources, defaultCalendarID: defaultCalendarID, calendar: calendar)
     }
 }
+#endif

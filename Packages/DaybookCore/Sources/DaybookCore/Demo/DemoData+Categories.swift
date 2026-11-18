@@ -1,3 +1,5 @@
+// Demo data exists in debug builds only: release builds carry no synthetic calendars.
+#if DEBUG
 import Foundation
 
 /// Demo categories and their assignments. Synthetic, deterministic.
@@ -64,3 +66,4 @@ extension DemoData {
                               syncState: syncState)
     }
 }
+#endif
