@@ -5,6 +5,9 @@ import SwiftUI
 /// Above them, the switch that includes calendars and categories turned off in the sidebar.
 struct SearchResultsView: View {
     @Environment(AppModel.self) private var model
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    #endif
 
     var body: some View {
         @Bindable var search = model.search
@@ -14,12 +17,13 @@ struct SearchResultsView: View {
                 if (search.filterHidesSomething || search.includesHidden) && !offersSearchInHidden {
                     Section {
                         Toggle("Hledat i ve vypnutých", isOn: $search.includesHidden)
-                            .tint(Theme.ink)
+                            .switchTint()
                             .listRowBackground(Theme.ground)
                     } footer: {
                         Text("Zahrne i kalendáře a kategorie, které máte vypnuté.")
                     }
                 }
+                let firstPast = search.results.first { $0.day < model.today }?.day
                 ForEach(search.results) { day in
                     Section {
                         ForEach(day.events) { event in
@@ -30,7 +34,19 @@ struct SearchResultsView: View {
                             .listRowBackground(Theme.ground)
                         }
                     } header: {
-                        dayHeader(day.day)
+                        // Past days follow the upcoming ones under their own label.
+                        if day.day == firstPast {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Dříve")
+                                    .font(.headline)
+                                    .foregroundStyle(Theme.ink)
+                                    .accessibilityAddTraits(.isHeader)
+                                dayHeader(day.day)
+                            }
+                            .padding(.top, 12)
+                        } else {
+                            dayHeader(day.day)
+                        }
                     }
                     .id(day.day)
                 }
@@ -48,6 +64,18 @@ struct SearchResultsView: View {
             #endif
         }
         .scrollContentBackground(.hidden)
+        .scrollEdgeEffectStyle(.hard, for: .top)
+        #if os(iOS)
+        // iPhone: while searching there is no bar above the results, so they would pass under the status
+        // bar's text. An opaque band of the list's ground fills the status bar's height instead.
+        .overlay(alignment: .top) {
+            if sizeClass == .compact {
+                Color.clear.frame(height: 0)
+                    .background(Theme.rail.ignoresSafeArea(edges: .top))
+                    .allowsHitTesting(false)
+            }
+        }
+        #endif
         .background(Theme.rail)
         .overlay { emptyState }
         .foregroundStyle(Theme.ink)
