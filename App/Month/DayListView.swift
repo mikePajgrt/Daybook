@@ -66,7 +66,7 @@ struct DayListView: View {
     }
 
     private func when(_ event: EventInfo) -> String {
-        if event.isAllDay { return "Celý den" }
+        if event.isAllDay { return String(localized: "Celý den") }
         if model.calendar.isDate(event.start, inSameDayAs: event.end) {
             let start = event.start.formatted(date: .omitted, time: .shortened)
             let end = event.end.formatted(date: .omitted, time: .shortened)

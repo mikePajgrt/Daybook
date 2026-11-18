@@ -94,7 +94,7 @@ private struct FilterToggleRow: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(title)
-        .accessibilityValue(isOn ? "zapnutá" : "vypnutá")
+        .accessibilityValue(isOn ? Text("zapnutá") : Text("vypnutá"))
         .accessibilityAddTraits(.isToggle)
     }
 

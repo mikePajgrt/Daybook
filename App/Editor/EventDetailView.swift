@@ -102,7 +102,8 @@ struct EventDetailView: View {
     }
 
     private var deleteTitle: String {
-        event.isRecurring ? "Smazat opakovanou událost „\(title)“?" : "Smazat událost „\(title)“?"
+        event.isRecurring ? String(localized: "Smazat opakovanou událost „\(title)“?")
+                          : String(localized: "Smazat událost „\(title)“?")
     }
 
     // MARK: Content
@@ -133,10 +134,10 @@ struct EventDetailView: View {
             categorySection
 
             if let location = event.location, !location.isEmpty {
-                detailRow("mappin.and.ellipse", label: "Místo") { Text(location) }
+                detailRow("mappin.and.ellipse", label: String(localized: "Místo")) { Text(location) }
             }
             if let url = event.url {
-                detailRow("link", label: "Odkaz") {
+                detailRow("link", label: String(localized: "Odkaz")) {
                     // Invitations carry other people's URLs: only web and mail links open.
                     if EventLink.isOpenable(url) {
                         Link(url.absoluteString, destination: url)
@@ -151,7 +152,7 @@ struct EventDetailView: View {
                 }
             }
             if event.alert != nil {
-                detailRow("bell", label: "Upozornění") { Text(EventText.alert(event.alert)) }
+                detailRow("bell", label: String(localized: "Upozornění")) { Text(EventText.alert(event.alert)) }
             }
 
             attendees
@@ -183,7 +184,7 @@ struct EventDetailView: View {
                 .frame(height: 22)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
-                Text(calendarInfo?.title ?? "Neznámý kalendář")
+                Text(calendarInfo?.title ?? String(localized: "Neznámý kalendář"))
                 if let source = calendarInfo?.sourceTitle, !source.isEmpty {
                     Text(source).font(.caption).foregroundStyle(Theme.secondaryInk)
                 }
@@ -226,7 +227,7 @@ struct EventDetailView: View {
                                                              set: { new in
                                                                  let old = categories.selection(for: event.key)
                                                                  if let problem = categories.apply(new, from: old, to: event.key) {
-                                                                     model.notice = Notice(title: "Kategorie se nepodařilo změnit",
+                                                                     model.notice = Notice(title: String(localized: "Kategorie se nepodařilo změnit"),
                                                                                            message: problem)
                                                                  }
                                                              }))
@@ -350,8 +351,8 @@ struct AttendeeRow: View {
                 .foregroundStyle(Theme.secondaryInk)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
-                Text(attendee.displayName.isEmpty ? "Bez jména" : attendee.displayName)
-                Text(attendee.isOrganizer ? "Organizátor · \(EventText.status(attendee.status))"
+                Text(attendee.displayName.isEmpty ? String(localized: "Bez jména") : attendee.displayName)
+                Text(attendee.isOrganizer ? String(localized: "Organizátor · \(EventText.status(attendee.status))")
                                           : EventText.status(attendee.status))
                     .font(.caption)
                     .foregroundStyle(Theme.secondaryInk)

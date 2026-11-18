@@ -46,22 +46,29 @@ struct CategoryChecklist: View {
                         .foregroundStyle(on ? Theme.ink : Theme.secondaryInk)
                         .accessibilityHidden(true)
                 }
-                .frame(minHeight: 32)
+                .frame(minHeight: Self.minimumRowHeight)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .foregroundStyle(Theme.ink)
             .disabled(inherited)
             .accessibilityAddTraits(on ? .isSelected : [])
-            .accessibilityHint(inherited ? "Přiřazeno celé sérii. Odeberte ho volbou Celá série." : "")
+            .accessibilityHint(inherited ? Text("Přiřazeno celé sérii. Odeberte ho volbou Celá série.") : Text(verbatim: ""))
         }
     }
+
+    /// Touch screens get 44 pt rows; the Mac keeps them compact.
+    #if os(iOS)
+    private static let minimumRowHeight: CGFloat = 44
+    #else
+    private static let minimumRowHeight: CGFloat = 32
+    #endif
 
     /// What the choice means, under the list.
     static func explanation(isRecurring: Bool, scope: CategoryScope) -> String? {
         guard isRecurring else { return nil }
         return scope == .series
-            ? "Kategorie platí pro všechny výskyty této opakované události."
-            : "Kategorie se přidají jen k této události. Kategorie celé série tu zůstávají."
+            ? String(localized: "Kategorie platí pro všechny výskyty této opakované události.")
+            : String(localized: "Kategorie se přidají jen k této události. Kategorie celé série tu zůstávají.")
     }
 }

@@ -7,7 +7,9 @@ struct CalendarColorPicker: View {
     @Binding var color: RGBA
     @Environment(\.self) private var environment
 
-    private static let names = ["Červená", "Oranžová", "Jantarová", "Zelená", "Tyrkysová", "Modrá", "Fialová", "Růžová"]
+    private static let names = [String(localized: "Červená"), String(localized: "Oranžová"), String(localized: "Jantarová"),
+                                 String(localized: "Zelená"), String(localized: "Tyrkysová"), String(localized: "Modrá"),
+                                 String(localized: "Fialová"), String(localized: "Růžová")]
 
     var body: some View {
         // One row of eight where the card is wide enough (iPad, Mac), otherwise two rows of four;

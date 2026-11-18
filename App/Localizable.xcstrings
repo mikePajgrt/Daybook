@@ -1,0 +1,2804 @@
+{
+  "sourceLanguage": "cs",
+  "strings": {
+    "%@   %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@   %2$@"
+          }
+        }
+      }
+    },
+    "%@ %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ do %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ until %2$@"
+          }
+        }
+      }
+    },
+    "%lld dní předem": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld dny předem"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld dne předem"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 den předem"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld dní předem"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 day before"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days before"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld hodin předem": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld hodiny předem"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld hodiny předem"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 hodinu předem"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld hodin předem"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 hour before"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld hours before"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld minut předem": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minuty předem"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minuty předem"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 minutu předem"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minut předem"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 minute before"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minutes before"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld událostí": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld události"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld události"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 událost"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld událostí"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 event"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld events"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Adresa URL není platná. Zkontrolujte ji, třeba example.com.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The URL is not valid. Check it, for example example.com."
+          }
+        }
+      }
+    },
+    "Aktovka": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Briefcase"
+          }
+        }
+      }
+    },
+    "Auto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Car"
+          }
+        }
+      }
+    },
+    "Bankovka": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Banknote"
+          }
+        }
+      }
+    },
+    "Barva": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Colour"
+          }
+        }
+      }
+    },
+    "Barva kalendáře": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendar Colour"
+          }
+        }
+      }
+    },
+    "Barvu se nepodařilo změnit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The colour could not be changed"
+          }
+        }
+      }
+    },
+    "Bez jména": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No name"
+          }
+        }
+      }
+    },
+    "Bez kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No category"
+          }
+        }
+      }
+    },
+    "Bez názvu": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untitled"
+          }
+        }
+      }
+    },
+    "Bez odpovědi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No response"
+          }
+        }
+      }
+    },
+    "Celodenní události": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All-day events"
+          }
+        }
+      }
+    },
+    "Celá série": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Whole series"
+          }
+        }
+      }
+    },
+    "Celý den": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All day"
+          }
+        }
+      }
+    },
+    "Celý den, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All day, %@"
+          }
+        }
+      }
+    },
+    "Další den": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next day"
+          }
+        }
+      }
+    },
+    "Další měsíc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next month"
+          }
+        }
+      }
+    },
+    "Další týden": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next week"
+          }
+        }
+      }
+    },
+    "Daybook": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daybook"
+          }
+        }
+      }
+    },
+    "Daybook nemá přístup ke kalendářům": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daybook has no access to your calendars"
+          }
+        }
+      }
+    },
+    "Daybook ukazuje události ze všech kalendářů ve vašem zařízení, z iCloudu, Exchange i Googlu, a v měsíci nikdy žádnou neschová. Aby je mohl zobrazit a upravovat, potřebuje přístup ke kalendářům. Události zůstávají ve vašich účtech.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daybook shows the events of every calendar on your device, from iCloud, Exchange and Google, and the month never hides a single one. To show and edit them it needs access to your calendars. Your events stay in your accounts."
+          }
+        }
+      }
+    },
+    "Den": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day"
+          }
+        }
+      }
+    },
+    "Dnes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    },
+    "Dnes (⌘T)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today (⌘T)"
+          }
+        }
+      }
+    },
+    "Dárek": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gift"
+          }
+        }
+      }
+    },
+    "Dům": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "House"
+          }
+        }
+      }
+    },
+    "Editor pozvánek se neotevřel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The invitation editor did not open"
+          }
+        }
+      }
+    },
+    "Fialová": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Violet"
+          }
+        }
+      }
+    },
+    "Fotoaparát": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera"
+          }
+        }
+      }
+    },
+    "Herní ovladač": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game controller"
+          }
+        }
+      }
+    },
+    "Hlava": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Head"
+          }
+        }
+      }
+    },
+    "Hledat i ve vypnutých": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Include switched-off"
+          }
+        }
+      }
+    },
+    "Hledat události": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search Events"
+          }
+        }
+      }
+    },
+    "Hledejte v událostech": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search your events"
+          }
+        }
+      }
+    },
+    "Hledám…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Searching…"
+          }
+        }
+      }
+    },
+    "Hledání": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        }
+      }
+    },
+    "Hotovo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Hvězda": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Star"
+          }
+        }
+      }
+    },
+    "Jantarová": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amber"
+          }
+        }
+      }
+    },
+    "Jen tato událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This event only"
+          }
+        }
+      }
+    },
+    "Kalendář": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendar"
+          }
+        }
+      }
+    },
+    "Kalendář %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendar %@"
+          }
+        }
+      }
+    },
+    "Kalendář je jen pro čtení, změny v něm uložit nejde.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The calendar is read-only, so changes cannot be saved to it."
+          }
+        }
+      }
+    },
+    "Kalendář pro účet Google založte na webu Googlu a zapněte ho pro synchronizaci. Pak se tu objeví sám.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create a calendar for a Google account on Google's website and turn on syncing for it. It will then appear here by itself."
+          }
+        }
+      }
+    },
+    "Kalendář se nepodařilo vytvořit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The calendar could not be created"
+          }
+        }
+      }
+    },
+    "Kalendář „%@“ je jen pro čtení. Událost tu nejde upravit ani smazat, kategorie ano.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The calendar “%@” is read-only. The event cannot be edited or deleted here, but its categories can."
+          }
+        }
+      }
+    },
+    "Kalendáře a kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calendars and Categories"
+          }
+        }
+      }
+    },
+    "Kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories"
+          }
+        }
+      }
+    },
+    "Kategorie celé série": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories of the whole series"
+          }
+        }
+      }
+    },
+    "Kategorie jen této události": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories of this event only"
+          }
+        }
+      }
+    },
+    "Kategorie jsou jen vaše: do události se nezapisují a ostatní účastníci je neuvidí.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories are yours alone: they are not written into the event and other attendees do not see them."
+          }
+        }
+      }
+    },
+    "Kategorie platí pro všechny výskyty této opakované události.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories apply to every occurrence of this repeating event."
+          }
+        }
+      }
+    },
+    "Kategorie s tímto názvem už existuje. Zvolte jiný název.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A category with this name already exists. Choose another name."
+          }
+        }
+      }
+    },
+    "Kategorie se nedaří uložit. Změny vydrží jen do zavření aplikace.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories cannot be saved. Changes last only until the app is closed."
+          }
+        }
+      }
+    },
+    "Kategorie se nepodařilo změnit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The categories could not be changed"
+          }
+        }
+      }
+    },
+    "Kategorie se nepřenesly": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The categories were not carried over"
+          }
+        }
+      }
+    },
+    "Kategorie se přidají jen k této události. Kategorie celé série tu zůstávají.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories are added to this event only. The whole series' categories stay."
+          }
+        }
+      }
+    },
+    "Kategorie se rozlišují symbolem, ne barvou. Barvu mají kalendáře.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories are told apart by symbol, not colour. Colour belongs to calendars."
+          }
+        }
+      }
+    },
+    "Kategorie se synchronizují přes iCloud mezi vašimi zařízeními.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories sync between your devices through iCloud."
+          }
+        }
+      }
+    },
+    "Kategorie se ukládají jen v tomto zařízení.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories are stored on this device only."
+          }
+        }
+      }
+    },
+    "Kategorie už neexistuje. Nejspíš ji mezitím smazalo jiné zařízení.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The category no longer exists. Another device probably deleted it."
+          }
+        }
+      }
+    },
+    "Kategorie vidíte jen vy. Do událostí se nezapisují, ostatní účastníci ani jiné aplikace je neuvidí.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only you see categories. They are not written into events, and neither other attendees nor other apps see them."
+          }
+        }
+      }
+    },
+    "Kategorie založíte v postranním panelu volbou Nová kategorie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create categories in the sidebar with New Category."
+          }
+        }
+      }
+    },
+    "Kategorie zatím není u žádné události. Události samotné zůstanou v kalendáři.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No event has this category yet. The events themselves stay in the calendar."
+          }
+        }
+      }
+    },
+    "Kategorie: zatím žádné": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories: none yet"
+          }
+        }
+      }
+    },
+    "Kategorii se nepodařilo vytvořit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The category could not be created"
+          }
+        }
+      }
+    },
+    "Kategorii se nepodařilo změnit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The category could not be changed"
+          }
+        }
+      }
+    },
+    "Kategorii ztratí %lld událostí. Události samotné zůstanou v kalendáři.": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorii ztratí %lld události. Události samotné zůstanou v kalendáři."
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorii ztratí %lld události. Události samotné zůstanou v kalendáři."
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorii ztratí 1 událost. Události samotné zůstanou v kalendáři."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Kategorii ztratí %lld událostí. Události samotné zůstanou v kalendáři."
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 event will lose the category. The events themselves stay in the calendar."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld events will lose the category. The events themselves stay in the calendar."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Každých %lld dní": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každé %lld dny"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každého %lld dne"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každý den"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každých %lld dní"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every day"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every %lld days"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Každých %lld let": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každé %lld roky"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každého %lld roku"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každý rok"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každých %lld let"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every year"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every %lld years"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Každých %lld měsíců": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každé %lld měsíce"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každého %lld měsíce"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každý měsíc"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každých %lld měsíců"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every month"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every %lld months"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Každých %lld týdnů": {
+      "localizations": {
+        "cs": {
+          "variations": {
+            "plural": {
+              "few": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každé %lld týdny"
+                }
+              },
+              "many": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každého %lld týdne"
+                }
+              },
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každý týden"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Každých %lld týdnů"
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every week"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Every %lld weeks"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Kladivo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hammer"
+          }
+        }
+      }
+    },
+    "Kniha": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Book"
+          }
+        }
+      }
+    },
+    "Konec": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End"
+          }
+        }
+      }
+    },
+    "Konec je dřív než začátek. Posuňte konec.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The end is before the start. Move the end."
+          }
+        }
+      }
+    },
+    "Konec opakování": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End Repeat"
+          }
+        }
+      }
+    },
+    "Letadlo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aeroplane"
+          }
+        }
+      }
+    },
+    "Lidé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "People"
+          }
+        }
+      }
+    },
+    "List": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leaf"
+          }
+        }
+      }
+    },
+    "Modrá": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blue"
+          }
+        }
+      }
+    },
+    "Možná přijde": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maybe"
+          }
+        }
+      }
+    },
+    "Místo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Location"
+          }
+        }
+      }
+    },
+    "Měsíc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Month"
+          }
+        }
+      }
+    },
+    "Na tento den není nic naplánováno.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing is planned for this day."
+          }
+        }
+      }
+    },
+    "Napište slovo z názvu, místa, poznámky nebo jméno účastníka. Hledá se pět let zpět i dopředu.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type a word from a title, location or note, or an attendee's name. Search covers five years back and five years ahead."
+          }
+        }
+      }
+    },
+    "Například Sport": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For example, Sport"
+          }
+        }
+      }
+    },
+    "Například Výlety": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For example, Trips"
+          }
+        }
+      }
+    },
+    "Nepřijde": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Declined"
+          }
+        }
+      }
+    },
+    "Neznámý kalendář": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown calendar"
+          }
+        }
+      }
+    },
+    "Nic nenalezeno": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing found"
+          }
+        }
+      }
+    },
+    "Nikdy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Never"
+          }
+        }
+      }
+    },
+    "Nota": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note"
+          }
+        }
+      }
+    },
+    "Notebook": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laptop"
+          }
+        }
+      }
+    },
+    "Nová kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Category"
+          }
+        }
+      }
+    },
+    "Nová událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Event"
+          }
+        }
+      }
+    },
+    "Nová událost (⌘N)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Event (⌘N)"
+          }
+        }
+      }
+    },
+    "Nová událost se neuloží.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The new event will not be saved."
+          }
+        }
+      }
+    },
+    "Nová událost v tento den": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New event on this day"
+          }
+        }
+      }
+    },
+    "Nový kalendář": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Calendar"
+          }
+        }
+      }
+    },
+    "Nákupní vozík": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shopping cart"
+          }
+        }
+      }
+    },
+    "Název": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Title"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Obálka": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envelope"
+          }
+        }
+      }
+    },
+    "Odkaz": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link"
+          }
+        }
+      }
+    },
+    "Odkaz, třeba example.com": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link, for example example.com"
+          }
+        }
+      }
+    },
+    "Opakovat do": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repeat until"
+          }
+        }
+      }
+    },
+    "Opakování": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repeat"
+          }
+        }
+      }
+    },
+    "Opakování končí dřív, než událost začne. Posuňte konec opakování.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The repeat ends before the event starts. Move the end of the repeat."
+          }
+        }
+      }
+    },
+    "Oranžová": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orange"
+          }
+        }
+      }
+    },
+    "Organizátor · %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Organiser · %@"
+          }
+        }
+      }
+    },
+    "Ostatní": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other"
+          }
+        }
+      }
+    },
+    "Otevře den": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the day"
+          }
+        }
+      }
+    },
+    "Otevře den a podrobnosti události": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the day and the event's details"
+          }
+        }
+      }
+    },
+    "Otevřít Nastavení": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "Otevřít podrobnosti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Details"
+          }
+        }
+      }
+    },
+    "Pokračovat v úpravách": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Editing"
+          }
+        }
+      }
+    },
+    "Ponechat": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep"
+          }
+        }
+      }
+    },
+    "Povolit přístup ke kalendářům": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Access to Calendars"
+          }
+        }
+      }
+    },
+    "Povolte ho v Nastavení systému v části Soukromí a zabezpečení, Kalendáře. Pak se sem vraťte.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow it in System Settings under Privacy & Security, Calendars. Then come back here."
+          }
+        }
+      }
+    },
+    "Povolte ho v Nastavení v části Aplikace, Daybook, Kalendáře. Pak se sem vraťte.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow it in Settings under Apps, Daybook, Calendars. Then come back here."
+          }
+        }
+      }
+    },
+    "Poznámka": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notes"
+          }
+        }
+      }
+    },
+    "Pozvat účastníky": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invite People"
+          }
+        }
+      }
+    },
+    "Pozvánky se posílají z aplikace Kalendář nebo z Outlooku.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invitations are sent from the Calendar app or from Outlook."
+          }
+        }
+      }
+    },
+    "Promoční čepice": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Graduation cap"
+          }
+        }
+      }
+    },
+    "Předchozí den": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous day"
+          }
+        }
+      }
+    },
+    "Předchozí měsíc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous month"
+          }
+        }
+      }
+    },
+    "Předchozí týden": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous week"
+          }
+        }
+      }
+    },
+    "Přejmenovat…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename…"
+          }
+        }
+      }
+    },
+    "Přejít": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go"
+          }
+        }
+      }
+    },
+    "Přidat": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        }
+      }
+    },
+    "Přidejte účet iCloud, Exchange nebo Google v Nastavení systému v části Internetové účty. Jeho kalendáře se tu pak objeví samy.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add an iCloud, Exchange or Google account in System Settings under Internet Accounts. Its calendars will then appear here by themselves."
+          }
+        }
+      }
+    },
+    "Přidejte účet iCloud, Exchange nebo Google v Nastavení v části Aplikace, Kalendář, Účty kalendáře. Jeho kalendáře se tu pak objeví samy.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add an iCloud, Exchange or Google account in Settings under Apps, Calendar, Calendar Accounts. Its calendars will then appear here by themselves."
+          }
+        }
+      }
+    },
+    "Přijde": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accepted"
+          }
+        }
+      }
+    },
+    "Přiřadit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assign"
+          }
+        }
+      }
+    },
+    "Přiřadit kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assign Categories"
+          }
+        }
+      }
+    },
+    "Přiřazeno celé sérii. Odeberte ho volbou Celá série.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assigned to the whole series. Remove it under Whole series."
+          }
+        }
+      }
+    },
+    "Příbor": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cutlery"
+          }
+        }
+      }
+    },
+    "Rodič s dítětem": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parent and child"
+          }
+        }
+      }
+    },
+    "Růžová": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pink"
+          }
+        }
+      }
+    },
+    "Slunce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sun"
+          }
+        }
+      }
+    },
+    "Smazat jen tuto událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete This Event Only"
+          }
+        }
+      }
+    },
+    "Smazat kategorii": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Category"
+          }
+        }
+      }
+    },
+    "Smazat kategorii „%@“?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete the category “%@”?"
+          }
+        }
+      }
+    },
+    "Smazat kategorii…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Category…"
+          }
+        }
+      }
+    },
+    "Smazat opakovanou událost „%@“?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete the repeating event “%@”?"
+          }
+        }
+      }
+    },
+    "Smazat tuto a všechny budoucí": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete This and All Future Events"
+          }
+        }
+      }
+    },
+    "Smazat událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Event"
+          }
+        }
+      }
+    },
+    "Smazat událost „%@“?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete the event “%@”?"
+          }
+        }
+      }
+    },
+    "Srdce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heart"
+          }
+        }
+      }
+    },
+    "Stetoskop": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stethoscope"
+          }
+        }
+      }
+    },
+    "Symbol": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Symbol"
+          }
+        }
+      }
+    },
+    "Telefon": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phone"
+          }
+        }
+      }
+    },
+    "Teď": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Now"
+          }
+        }
+      }
+    },
+    "Tlapka": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paw print"
+          }
+        }
+      }
+    },
+    "Tyrkysová": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teal"
+          }
+        }
+      }
+    },
+    "Týden": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week"
+          }
+        }
+      }
+    },
+    "URL": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL"
+          }
+        }
+      }
+    },
+    "Událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Event"
+          }
+        }
+      }
+    },
+    "Událost není kam uložit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There is nowhere to save the event"
+          }
+        }
+      }
+    },
+    "Událost se nejdřív uloží, pak se otevře systémový editor, ve kterém pozvete lidi.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event is saved first, then the system editor opens, where you invite people."
+          }
+        }
+      }
+    },
+    "Událost se nepodařilo smazat": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event could not be deleted"
+          }
+        }
+      }
+    },
+    "Událost se nepodařilo uložit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event could not be saved"
+          }
+        }
+      }
+    },
+    "Událost se opakuje. Vyberte, které výskyty smazat.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event repeats. Choose which occurrences to delete."
+          }
+        }
+      }
+    },
+    "Událost se opakuje. Vyberte, kterých výskytů se změny týkají.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event repeats. Choose which occurrences the changes apply to."
+          }
+        }
+      }
+    },
+    "Událost se uložila, ale nová část opakování nemá kategorie původní série. %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event was saved, but the new part of the repeat does not have the original series' categories. %@"
+          }
+        }
+      }
+    },
+    "Událost se v systémovém kalendáři nepodařilo najít. Pozvěte účastníky v aplikaci Kalendář nebo zkuste událost otevřít znovu.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event could not be found in the system calendar. Invite people in the Calendar app or try opening the event again."
+          }
+        }
+      }
+    },
+    "Událost už v kalendáři není. Mezitím ji nejspíš někdo smazal nebo přesunul.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event is no longer in the calendar. Someone probably deleted or moved it meanwhile."
+          }
+        }
+      }
+    },
+    "Událost zmizí ze všech zařízení, která tento kalendář používají.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event disappears from every device that uses this calendar."
+          }
+        }
+      }
+    },
+    "Ukládání": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage"
+          }
+        }
+      }
+    },
+    "Uložit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        }
+      }
+    },
+    "Uložit jen pro tuto událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save for This Event Only"
+          }
+        }
+      }
+    },
+    "Uložit pro tuto a všechny budoucí": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save for This and All Future Events"
+          }
+        }
+      }
+    },
+    "Uložit změny opakované události": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save changes to a repeating event"
+          }
+        }
+      }
+    },
+    "Upozornění": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alert"
+          }
+        }
+      }
+    },
+    "Upravit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit"
+          }
+        }
+      }
+    },
+    "Upravit kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Categories"
+          }
+        }
+      }
+    },
+    "Upravit kategorii": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Category"
+          }
+        }
+      }
+    },
+    "Upravit událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Event"
+          }
+        }
+      }
+    },
+    "V tomto účtu kalendář vytvořit nejde. Vyberte iCloud, Exchange nebo kalendáře v zařízení.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A calendar cannot be created in this account. Choose iCloud, Exchange or the calendars on this device."
+          }
+        }
+      }
+    },
+    "V ukázkovém režimu nejsou události v systémovém kalendáři, takže se editor pozvánek neotevře.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In demo mode the events are not in the system calendar, so the invitation editor does not open."
+          }
+        }
+      }
+    },
+    "V zapnutých kalendářích a kategoriích žádná událost neobsahuje „%@“.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No event in the switched-on calendars and categories contains “%@”."
+          }
+        }
+      }
+    },
+    "V zařízení není účet, ve kterém by šel kalendář vytvořit. Přidejte iCloud nebo Exchange v Nastavení.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There is no account on this device that can hold a new calendar. Add iCloud or Exchange in Settings."
+          }
+        }
+      }
+    },
+    "V čase začátku": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At time of event"
+          }
+        }
+      }
+    },
+    "Vlajka": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flag"
+          }
+        }
+      }
+    },
+    "Vlastní barva": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom Colour"
+          }
+        }
+      }
+    },
+    "Vyberte kalendář.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a calendar."
+          }
+        }
+      }
+    },
+    "Vyberte symbol kategorie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a symbol for the category."
+          }
+        }
+      }
+    },
+    "Vyberte účet.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an account."
+          }
+        }
+      }
+    },
+    "Vybraný kalendář už neexistuje. Vyberte jiný.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The chosen calendar no longer exists. Choose another."
+          }
+        }
+      }
+    },
+    "Vytvořit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create"
+          }
+        }
+      }
+    },
+    "Všechno, co máte v plánu, na jedné obrazovce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything you have planned, on one screen"
+          }
+        }
+      }
+    },
+    "Všechny kalendáře v zařízení jsou jen pro čtení. Založte si kalendář volbou Nový kalendář, nebo přidejte účet v Nastavení.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every calendar on this device is read-only. Create one with New Calendar, or add an account in Settings."
+          }
+        }
+      }
+    },
+    "Zadejte název kalendáře.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a name for the calendar."
+          }
+        }
+      }
+    },
+    "Zadejte název kategorie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a name for the category."
+          }
+        }
+      }
+    },
+    "Zahodit změny": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard Changes"
+          }
+        }
+      }
+    },
+    "Zahodit změny?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard changes?"
+          }
+        }
+      }
+    },
+    "Zahrne kalendáře a kategorie, které máte v postranním panelu vypnuté.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Includes the calendars and categories you switched off in the sidebar."
+          }
+        }
+      }
+    },
+    "Zatím nemáte žádné kategorie. Založíte je v postranním panelu volbou Nová kategorie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have no categories yet. Create them in the sidebar with New Category."
+          }
+        }
+      }
+    },
+    "Začátek": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        }
+      }
+    },
+    "Zelená": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Green"
+          }
+        }
+      }
+    },
+    "Změnit barvu…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change Colour…"
+          }
+        }
+      }
+    },
+    "Změnit symbol…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change Symbol…"
+          }
+        }
+      }
+    },
+    "Změněné opakování platí od této události dál.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A changed repeat applies from this event onward."
+          }
+        }
+      }
+    },
+    "Zobrazení": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View"
+          }
+        }
+      }
+    },
+    "Zobrazit jen tento": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Only This"
+          }
+        }
+      }
+    },
+    "Zobrazit jen tuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Only This"
+          }
+        }
+      }
+    },
+    "Zobrazit jen události bez kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Only Events Without a Category"
+          }
+        }
+      }
+    },
+    "Zobrazit všechny": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show All"
+          }
+        }
+      }
+    },
+    "Zrušit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "celý den": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "all day"
+          }
+        }
+      }
+    },
+    "iCloud teď není dostupný. Kategorie se ukládají v tomto zařízení a synchronizují se, až bude.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud is not available right now. Categories are stored on this device and will sync when it is."
+          }
+        }
+      }
+    },
+    "jen pro čtení": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "read-only"
+          }
+        }
+      }
+    },
+    "kalendář %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "calendar %@"
+          }
+        }
+      }
+    },
+    "kategorie %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "categories %@"
+          }
+        }
+      }
+    },
+    "sdílený": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "shared"
+          }
+        }
+      }
+    },
+    "vypnutá": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "off"
+          }
+        }
+      }
+    },
+    "vypnutý": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "off"
+          }
+        }
+      }
+    },
+    "z celé série": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "from the whole series"
+          }
+        }
+      }
+    },
+    "zapnutá": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "on"
+          }
+        }
+      }
+    },
+    "zapnutý": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "on"
+          }
+        }
+      }
+    },
+    "Úpravy této události se neuloží.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your changes to this event will not be saved."
+          }
+        }
+      }
+    },
+    "Účastníci": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attendees"
+          }
+        }
+      }
+    },
+    "Účet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account"
+          }
+        }
+      }
+    },
+    "Účet už v zařízení není. Vyberte jiný.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The account is no longer on this device. Choose another."
+          }
+        }
+      }
+    },
+    "Časové pásmo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time zone"
+          }
+        }
+      }
+    },
+    "Časové pásmo: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time zone: %@"
+          }
+        }
+      }
+    },
+    "Červená": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Red"
+          }
+        }
+      }
+    },
+    "Činka": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dumbbell"
+          }
+        }
+      }
+    },
+    "Štítek": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag"
+          }
+        }
+      }
+    },
+    "Štětec": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paintbrush"
+          }
+        }
+      }
+    },
+    "Žádná událost neobsahuje „%@“. Zkuste jiné slovo.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No event contains “%@”. Try another word."
+          }
+        }
+      }
+    },
+    "Žádné": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
+          }
+        }
+      }
+    },
+    "Žádné kalendáře": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Calendars"
+          }
+        }
+      }
+    },
+    "žádné události": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "no events"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

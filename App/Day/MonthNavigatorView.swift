@@ -31,8 +31,8 @@ struct MonthNavigatorView: View {
                     .foregroundStyle(Theme.ink)
                     .accessibilityAddTraits(.isHeader)
                 Spacer()
-                chevron("Předchozí měsíc", symbol: "chevron.left") { page(by: -1) }
-                chevron("Další měsíc", symbol: "chevron.right") { page(by: 1) }
+                chevron(String(localized: "Předchozí měsíc"), symbol: "chevron.left") { page(by: -1) }
+                chevron(String(localized: "Další měsíc"), symbol: "chevron.right") { page(by: 1) }
             }
             .buttonStyle(.borderless)
             .foregroundStyle(Theme.ink)

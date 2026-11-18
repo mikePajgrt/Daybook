@@ -229,7 +229,7 @@ struct EventEditorView: View {
     private var categorySummary: String {
         let ids = editor.categorySelection.all
         let names = categoryModel.categories.filter { ids.contains($0.id) }.map(\.name)
-        return names.isEmpty ? "Žádné" : names.joined(separator: ", ")
+        return names.isEmpty ? String(localized: "Žádné") : names.formatted(.list(type: .and))
     }
 
     private var dateComponents: DatePickerComponents {

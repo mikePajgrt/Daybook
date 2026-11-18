@@ -151,7 +151,7 @@ final class CategoryModel {
         do {
             try write()
         } catch {
-            onNotice?(Notice(title: "Kategorii se nepodařilo změnit", message: CategoryText.message(for: error)))
+            onNotice?(Notice(title: String(localized: "Kategorii se nepodařilo změnit"), message: CategoryText.message(for: error)))
         }
         changed()
     }

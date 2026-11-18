@@ -16,10 +16,27 @@ import Foundation
 ///   -demo-category-delete  the question before deleting the category "Porady"
 ///   -demo-editor-categories  the event editor on the series' occurrence, its categories page open
 ///   -demo-detail-categories  the detail of the read-only "Odstávka DB", categories open for editing
+///   -demo-search           search open with "ockovani" (finds "Očkování Ema", past and future)
+///   -demo-search-empty     search open, nothing typed
+///   -demo-search-none      search for a word nothing contains (with -demo-category-off the toggle shows)
+///   -demo-scrolled         the month scrolled so December owns the viewport
 enum DemoStaging {
     static let names = ["detail", "detail-readonly", "delete", "editor-new", "editor-edit",
                         "new-calendar", "calendar-color", "categories", "category-editor", "category-delete",
-                        "editor-categories", "detail-categories"]
+                        "editor-categories", "detail-categories", "search", "search-empty", "search-none",
+                        "scrolled"]
+
+    /// `-demo-locale <id>`: runs the app in that language and region for captures. The languages go into
+    /// the arguments domain, which is never written to disk, before anything has read them.
+    static func forceLocale(_ arguments: [String]) {
+        guard let index = arguments.firstIndex(of: "-demo-locale"), index + 1 < arguments.count else { return }
+        let id = arguments[index + 1]
+        let defaults = UserDefaults.standard
+        var domain = defaults.volatileDomain(forName: UserDefaults.argumentDomain)
+        domain["AppleLanguages"] = [id]
+        domain["AppleLocale"] = id == "en" ? "en_GB" : id
+        defaults.setVolatileDomain(domain, forName: UserDefaults.argumentDomain)
+    }
 
     /// The staged screen names among the launch arguments.
     static func screens(in arguments: [String]) -> Set<String> {
@@ -57,10 +74,13 @@ extension AppModel {
     /// Opens the staged editors once the app is on screen.
     func stageDemoScreens() async {
         guard !stagedScreens.isDisjoint(with: ["editor-new", "editor-edit", "editor-categories", "new-calendar",
-                                               "calendar-color"]) else {
+                                               "calendar-color", "search", "search-empty", "search-none"]) else {
             return
         }
         try? await Task.sleep(for: .milliseconds(900))
+        if stagedScreens.contains("search") { search.query = "ockovani" }
+        if stagedScreens.contains("search-none") { search.query = "kokos" }
+        if !stagedScreens.isDisjoint(with: ["search", "search-empty", "search-none"]) { search.wantsFocus = true }
         if stagedScreens.contains("editor-new") { beginNewEvent() }
         if !stagedScreens.isDisjoint(with: ["editor-edit", "editor-categories"]), let key = DemoStaging.seriesKey(today: today, calendar: calendar) {
             let day = DateInterval(start: calendar.startOfDay(for: key.occurrenceStart), duration: 86_400)

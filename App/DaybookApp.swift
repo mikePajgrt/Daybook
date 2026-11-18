@@ -13,6 +13,9 @@ struct DaybookApp: App {
     private let demoWindowSize: CGSize?
 
     init() {
+        #if DEBUG
+        DemoStaging.forceLocale(ProcessInfo.processInfo.arguments)
+        #endif
         let calendar = Calendar.current
         #if DEBUG
         // Debug builds only: synthetic data on a fixed date, with optional staged states for screenshots.
@@ -30,6 +33,11 @@ struct DaybookApp: App {
         //   -demo-categories, -demo-category-editor, -demo-category-delete, -demo-editor-categories,
         //   -demo-detail-categories  category states (see DemoStaging)
         // On the Mac the demo window opens at 1440 x 900.
+        //   -demo-first-run          access not asked yet (the first-run screen)
+        //   -demo-no-accounts        access granted, but the system has no calendars
+        //   -demo-search, -demo-search-empty, -demo-search-none  search states (see DemoStaging)
+        //   -demo-scrolled           the month scrolled across its end into the next month
+        //   -demo-locale <id>        the app in another language, e.g. -demo-locale en
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-demo") {
             let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 17, hour: 10)) ?? Date()
@@ -42,8 +50,11 @@ struct DaybookApp: App {
             let mode: ViewMode = arguments.contains("-demo-week") ? .week
                 : arguments.contains("-demo-day-view") ? .day : .month
             defaults.set(mode.rawValue, forKey: AppModel.viewModeKey)
-            let store = DemoData.store(month: now, calendar: calendar,
-                                       access: arguments.contains("-demo-denied") ? .denied : .granted)
+            let access: CalendarAccess = arguments.contains("-demo-denied") ? .denied
+                : arguments.contains("-demo-first-run") ? .notDetermined : .granted
+            let store = arguments.contains("-demo-no-accounts")
+                ? InMemoryCalendarStore(calendars: [], events: [], access: access, calendar: calendar)
+                : DemoData.store(month: now, calendar: calendar, access: access)
             var staged: Set<String> = []
             if arguments.contains("-demo-day") { staged.insert("day") }
             if arguments.contains("-demo-calendars") { staged.insert("calendars") }

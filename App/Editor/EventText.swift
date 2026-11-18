@@ -14,23 +14,23 @@ enum EventText {
         if event.isAllDay {
             let days = MonthLayout.dayRange(of: event, calendar: calendar)
             if days.lowerBound == days.upperBound {
-                return "Celý den, \(days.lowerBound.formatted(longDay))"
+                return String(localized: "Celý den, \(days.lowerBound.formatted(longDay))")
             }
-            return "Celý den, \(days.lowerBound.formatted(shortDay)) – \(days.upperBound.formatted(shortDay))"
+            return String(localized: "Celý den, \((days.lowerBound..<days.upperBound).formatted(.interval.day().month(.defaultDigits).year()))")
         }
         let time = Date.FormatStyle.dateTime.hour().minute()
         let lastInstant = event.end > event.start ? event.end.addingTimeInterval(-1) : event.end
         if calendar.isDate(event.start, inSameDayAs: lastInstant) {
-            return capitalized("\(event.start.formatted(longDay)), \(event.start.formatted(time))–\(event.end.formatted(time))")
+            return capitalized("\(event.start.formatted(longDay)), \((event.start..<event.end).formatted(.interval.hour().minute()))")
         }
-        return "\(event.start.formatted(shortDay)) \(event.start.formatted(time)) – \(event.end.formatted(shortDay)) \(event.end.formatted(time))"
+        return (event.start..<event.end).formatted(.interval.day().month(.defaultDigits).year().hour().minute())
     }
 
     /// The event's time zone when it differs from the device's, e.g. "Čas: New York".
     static func zoneNote(_ event: EventInfo, calendar: Calendar) -> String? {
         guard !event.isAllDay, let id = event.timeZoneID, id != calendar.timeZone.identifier,
               let zone = TimeZone(identifier: id) else { return nil }
-        return "Časové pásmo: \(zoneName(zone))"
+        return String(localized: "Časové pásmo: \(zoneName(zone))")
     }
 
     // MARK: VoiceOver
@@ -57,17 +57,18 @@ enum EventText {
     static func recurrence(_ rule: RecurrenceRule) -> String {
         let base = every(rule.frequency, interval: rule.interval)
         guard let end = rule.end else { return base }
-        return "\(base) do \(end.formatted(.dateTime.day().month(.defaultDigits).year()))"
+        return String(localized: "\(base) do \(end.formatted(.dateTime.day().month(.defaultDigits).year()))")
     }
 
     /// The editor's label for a frequency at an interval.
     static func every(_ frequency: RecurrenceFrequency, interval: Int) -> String {
         let n = max(1, interval)
         switch frequency {
-        case .daily: return plural(n, one: "Každý den", few: "Každé \(n) dny", many: "Každých \(n) dní")
-        case .weekly: return plural(n, one: "Každý týden", few: "Každé \(n) týdny", many: "Každých \(n) týdnů")
-        case .monthly: return plural(n, one: "Každý měsíc", few: "Každé \(n) měsíce", many: "Každých \(n) měsíců")
-        case .yearly: return plural(n, one: "Každý rok", few: "Každé \(n) roky", many: "Každých \(n) let")
+        // Plural forms (Czech one, few, other) come from the string catalog.
+        case .daily: return String(localized: "Každých \(n) dní")
+        case .weekly: return String(localized: "Každých \(n) týdnů")
+        case .monthly: return String(localized: "Každých \(n) měsíců")
+        case .yearly: return String(localized: "Každých \(n) let")
         }
     }
 
@@ -75,27 +76,27 @@ enum EventText {
 
     /// "V čase začátku", "15 minut předem", "1 hodinu předem", "1 den předem".
     static func alert(_ offset: AlertOffset?) -> String {
-        guard let minutes = offset?.minutesBefore else { return "Žádné" }
-        if minutes == 0 { return "V čase začátku" }
+        guard let minutes = offset?.minutesBefore else { return String(localized: "Žádné") }
+        if minutes == 0 { return String(localized: "V čase začátku") }
         if minutes % 1440 == 0 {
             let n = minutes / 1440
-            return plural(n, one: "1 den předem", few: "\(n) dny předem", many: "\(n) dní předem")
+            return String(localized: "\(n) dní předem")
         }
         if minutes % 60 == 0 {
             let n = minutes / 60
-            return plural(n, one: "1 hodinu předem", few: "\(n) hodiny předem", many: "\(n) hodin předem")
+            return String(localized: "\(n) hodin předem")
         }
-        return plural(minutes, one: "1 minutu předem", few: "\(minutes) minuty předem", many: "\(minutes) minut předem")
+        return String(localized: "\(minutes) minut předem")
     }
 
     // MARK: Attendees
 
     static func status(_ status: AttendeeStatus) -> String {
         switch status {
-        case .accepted: "Přijde"
-        case .declined: "Nepřijde"
-        case .tentative: "Možná přijde"
-        case .pending, .unknown: "Bez odpovědi"
+        case .accepted: String(localized: "Přijde")
+        case .declined: String(localized: "Nepřijde")
+        case .tentative: String(localized: "Možná přijde")
+        case .pending, .unknown: String(localized: "Bez odpovědi")
         }
     }
 
@@ -110,7 +111,7 @@ enum EventText {
 
     // MARK: Time zones
 
-    /// "New York (východoamerický čas)", with the city in Czech ("Praha", not "Prague").
+    /// "New York (východoamerický čas)", with the city in the app's language ("Praha" in Czech).
     static func zoneName(_ zone: TimeZone) -> String {
         let fallback = zone.identifier.split(separator: "/").last.map { $0.replacingOccurrences(of: "_", with: " ") }
             ?? zone.identifier
@@ -119,7 +120,8 @@ enum EventText {
         return name.map { "\(city) (\($0))" } ?? city
     }
 
-    private static let czech = Locale(identifier: "cs_CZ")
+    /// The app's language: Czech city names in Czech, English ones in English.
+    private static var czech: Locale { Locale.current }
 
     /// The zone's exemplar city in Czech (the "VVV" pattern), or `nil` when the formatter has none.
     private static func localizedCity(_ zone: TimeZone) -> String? {
@@ -136,33 +138,33 @@ enum EventText {
 
     // MARK: Invitations
 
-    static let inviteUnavailableTitle = "Editor pozvánek se neotevřel"
+    static let inviteUnavailableTitle = String(localized: "Editor pozvánek se neotevřel")
 
     /// Why the system invitation editor did not open, and what to do instead.
     static func inviteUnavailableMessage(isDemo: Bool) -> String {
         #if DEBUG
         if isDemo {
-            return "V ukázkovém režimu nejsou události v systémovém kalendáři, takže se editor pozvánek neotevře."
+            return String(localized: "V ukázkovém režimu nejsou události v systémovém kalendáři, takže se editor pozvánek neotevře.")
         }
         #endif
-        return "Událost se v systémovém kalendáři nepodařilo najít. Pozvěte účastníky v aplikaci Kalendář nebo zkuste událost otevřít znovu."
+        return String(localized: "Událost se v systémovém kalendáři nepodařilo najít. Pozvěte účastníky v aplikaci Kalendář nebo zkuste událost otevřít znovu.")
     }
 
     // MARK: Problems and errors
 
     static func problem(_ problem: DraftProblem) -> String {
         switch problem {
-        case .endBeforeStart: "Konec je dřív než začátek. Posuňte konec."
-        case .recurrenceEndsBeforeStart: "Opakování končí dřív, než událost začne. Posuňte konec opakování."
-        case .invalidURL: "Adresa URL není platná. Zkontrolujte ji, třeba example.com."
-        case .noCalendar: "Vyberte kalendář."
+        case .endBeforeStart: String(localized: "Konec je dřív než začátek. Posuňte konec.")
+        case .recurrenceEndsBeforeStart: String(localized: "Opakování končí dřív, než událost začne. Posuňte konec opakování.")
+        case .invalidURL: String(localized: "Adresa URL není platná. Zkontrolujte ji, třeba example.com.")
+        case .noCalendar: String(localized: "Vyberte kalendář.")
         }
     }
 
     static func problem(_ problem: CalendarDraftProblem) -> String {
         switch problem {
-        case .emptyName: "Zadejte název kalendáře."
-        case .noSource: "Vyberte účet."
+        case .emptyName: String(localized: "Zadejte název kalendáře.")
+        case .noSource: String(localized: "Vyberte účet.")
         }
     }
 
@@ -171,15 +173,15 @@ enum EventText {
         guard let error = error as? CalendarStoreError else { return error.localizedDescription }
         switch error {
         case .eventNotFound:
-            return "Událost už v kalendáři není. Mezitím ji nejspíš někdo smazal nebo přesunul."
+            return String(localized: "Událost už v kalendáři není. Mezitím ji nejspíš někdo smazal nebo přesunul.")
         case .calendarNotFound:
-            return "Vybraný kalendář už neexistuje. Vyberte jiný."
+            return String(localized: "Vybraný kalendář už neexistuje. Vyberte jiný.")
         case .calendarReadOnly:
-            return "Kalendář je jen pro čtení, změny v něm uložit nejde."
+            return String(localized: "Kalendář je jen pro čtení, změny v něm uložit nejde.")
         case .sourceNotFound:
-            return "Účet už v zařízení není. Vyberte jiný."
+            return String(localized: "Účet už v zařízení není. Vyberte jiný.")
         case .sourceDoesNotAllowCalendars:
-            return "V tomto účtu kalendář vytvořit nejde. Vyberte iCloud, Exchange nebo kalendáře v zařízení."
+            return String(localized: "V tomto účtu kalendář vytvořit nejde. Vyberte iCloud, Exchange nebo kalendáře v zařízení.")
         case .invalidDraft(let problems):
             return problems.map(problem).joined(separator: " ")
         case .invalidCalendar(let problems):
@@ -190,13 +192,6 @@ enum EventText {
     }
 
     // MARK: Helpers
-
-    /// Czech plural: 1, 2 to 4, 5 and more.
-    static func plural(_ n: Int, one: String, few: String, many: String) -> String {
-        if n == 1 { return one }
-        if (2...4).contains(n) { return few }
-        return many
-    }
 
     private static func capitalized(_ text: String) -> String {
         guard let first = text.first else { return text }

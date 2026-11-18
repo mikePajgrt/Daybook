@@ -31,20 +31,16 @@ struct PeriodTitle {
         case .week:
             let start = interval?.start ?? date
             let last = interval.flatMap { calendar.date(byAdding: .day, value: -1, to: $0.end) } ?? date
-            let monthStyle: Date.FormatStyle = numeric
-                ? .dateTime.day().month(.defaultDigits) : .dateTime.day().month(.wide)
+            // The formatter writes the range in the app's language: "16.–22. listopadu", "Nov 16 – 22".
+            let range = start..<max(last, start)
             let sameYear = calendar.component(.year, from: start) == calendar.component(.year, from: last)
-            let sameMonth = sameYear && calendar.component(.month, from: start) == calendar.component(.month, from: last)
-            if sameMonth {
-                // "16.–22. listopadu"
-                name = "\(calendar.component(.day, from: start)).–\(last.formatted(monthStyle))"
-                year = short || numeric ? nil : yearText
-            } else if sameYear {
-                name = "\(start.formatted(monthStyle)) – \(last.formatted(monthStyle))"
+            let month: Date.IntervalFormatStyle = numeric ? .interval.day().month(.defaultDigits)
+                                                          : .interval.day().month(.wide)
+            if sameYear {
+                name = range.formatted(month)
                 year = short || numeric ? nil : yearText
             } else {
-                let withYear = monthStyle.year()
-                name = "\(start.formatted(withYear)) – \(last.formatted(withYear))"
+                name = range.formatted(month.year())
                 year = nil
             }
         }

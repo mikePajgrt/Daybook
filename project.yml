@@ -46,6 +46,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.daybook.Daybook
         SWIFT_VERSION: "5.0"
+        # Czech is the development language; English comes from App/Localizable.xcstrings and
+        # App/InfoPlist.xcstrings. The compiler records every localizable string for the catalogs.
+        SWIFT_EMIT_LOC_STRINGS: YES
+        LOCALIZATION_PREFERS_STRING_CATALOGS: YES
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic
         # iCloud sync for categories is off: this build has no team and no CloudKit container.

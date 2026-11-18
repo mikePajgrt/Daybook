@@ -64,8 +64,8 @@ extension AppModel {
     }
 
     private func explainNoWritableCalendar() {
-        notice = Notice(title: "Událost není kam uložit",
-                        message: "Všechny kalendáře v zařízení jsou jen pro čtení. Založte si kalendář volbou Nový kalendář, nebo přidejte účet v Nastavení.")
+        notice = Notice(title: String(localized: "Událost není kam uložit"),
+                        message: String(localized: "Všechny kalendáře v zařízení jsou jen pro čtení. Založte si kalendář volbou Nový kalendář, nebo přidejte účet v Nastavení."))
     }
 
     // MARK: Event writes

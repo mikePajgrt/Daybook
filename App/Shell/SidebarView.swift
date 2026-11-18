@@ -133,7 +133,7 @@ private struct CalendarToggleRow: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityValue(isOn ? "zapnutý" : "vypnutý")
+        .accessibilityValue(isOn ? Text("zapnutý") : Text("vypnutý"))
         .accessibilityAddTraits(.isToggle)
     }
 

@@ -141,7 +141,7 @@ private struct DayCellTaps: ViewModifier {
         } else if let onCreate {
             content.contentShape(Rectangle())
                 .onTapGesture(count: 2) { onCreate(day) }
-                .accessibilityAction(named: "Nová událost v tento den") { onCreate(day) }
+                .accessibilityAction(named: Text("Nová událost v tento den")) { onCreate(day) }
         } else {
             content
         }
