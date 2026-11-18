@@ -20,6 +20,11 @@ struct MonthView: View {
     /// Opened on today's week (launch, "Dnes", back from the week or day): until the user scrolls, the
     /// title stays on today's month and the next month, which fills the rest of the screen, is in full ink.
     @State private var anchoredOnToday = false
+    /// The week the view opened on, kept apart from `topWeek` (which the scroll view rewrites as rows above
+    /// change height): until the user scrolls, every later layout change scrolls back to it.
+    @State private var anchor = ScrollAnchor<Date>()
+    /// The scroll view's content height, part of the layout the anchor watches.
+    @State private var contentHeight: CGFloat = 0
 
     @ScaledMetric(relativeTo: .caption) private var rowHeight: CGFloat = 17
     @ScaledMetric(relativeTo: .caption) private var numberHeight: CGFloat = 28
@@ -127,12 +132,31 @@ struct MonthView: View {
             realignTopWeek()
         }
         // The rail opening or closing changes the column under the scroll: keep the top week at the top.
-        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { _ in realignTopWeek() }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width.rounded() } action: { _ in realignTopWeek() }
+        // The layout under the scroll: row heights (events arriving, calendars switched in), the viewport,
+        // and the content height as the lazy rows come in. While anchored, each change scrolls back to the
+        // opening week. Scrolling changes none of these, so it cannot set itself off.
+        .onScrollGeometryChange(for: CGFloat.self) { $0.contentSize.height.rounded() } action: { _, height in
+            contentHeight = height
+        }
+        .onChange(of: Self.signature(heights: rowHeights, viewport: viewport, content: contentHeight), initial: true) {
+            _, signature in
+            guard !userScrolls, let week = anchor.layoutChanged(signature) else { return }
+            scroll(to: week)
+        }
+        // The scroll view left the anchor (estimated heights of rows not laid out yet): back, a few times.
+        .onChange(of: topWeek) { _, top in
+            guard !userScrolls, let week = anchor.reported(top: top) else { return }
+            scroll(to: week)
+        }
         .scrollPosition(id: $topWeek, anchor: .top)
         .onScrollPhaseChange { _, phase in
             userScrolls = phase == .interacting || phase == .decelerating
             // The user takes over: the title and the ink follow what they scroll to.
-            if phase == .interacting { anchoredOnToday = false }
+            if phase == .interacting {
+                anchoredOnToday = false
+                anchor.release()
+            }
             // The scroll came to rest: the month on screen settles with it.
             if phase == .idle { followTitle(heights: rowHeights) }
         }
@@ -144,23 +168,12 @@ struct MonthView: View {
         .task(id: model.scrollKey) {
             // The key changes with every "Dnes", so it scrolls back even when the week is already the target.
             let week = openingWeek
-            if topWeek == week {
-                topWeek = nil
-                await Task.yield()
-            }
-            topWeek = week
+            // Kept until the user scrolls: events loading later (real calendars take seconds), calendars
+            // switched in and resizing all scroll back to it (see the layout signature above).
+            anchor.anchor(on: week)
+            if let week { scroll(to: week) }
             anchoredOnToday = week != nil && model.calendar.isDate(model.windowCenter, equalTo: model.today,
                                                                   toGranularity: .month)
-            // On a cold start the lazy rows are not laid out yet: the scroll can stay at the window's first
-            // week, or stop short of the target by the rows' estimated heights. Scroll to the week again as
-            // the rows come in, unless the user has taken over.
-            for _ in 0..<3 {
-                try? await Task.sleep(for: .milliseconds(250))
-                guard !userScrolls, let week, topWeek == week || topWeek == nil else { break }
-                topWeek = nil
-                await Task.yield()
-                topWeek = week
-            }
             #if DEBUG
             if model.stagedScreens.contains("scrolled") { await stageScroll() }
             if model.stagedScreens.contains("scrolled-end") { await stageScrollToEnd() }
@@ -168,10 +181,29 @@ struct MonthView: View {
         }
     }
 
+    /// Scrolls `week` to the top, also when the binding already holds it (after the scroll view drifted).
+    private func scroll(to week: Date) {
+        Task { @MainActor in
+            topWeek = nil
+            await Task.yield()
+            topWeek = week
+        }
+    }
+
+    /// The layout under the scroll view, in whole points: what the anchor re-scrolls on.
+    static func signature(heights: [CGFloat], viewport: CGFloat, content: CGFloat) -> Int {
+        var hasher = Hasher()
+        heights.forEach { hasher.combine(Int($0.rounded())) }
+        hasher.combine(Int(viewport.rounded()))
+        hasher.combine(Int(content.rounded()))
+        return hasher.finalize()
+    }
+
     /// After the column changes size the scroll keeps its offset in points, which leaves the top week
-    /// a few points cut off; scrolling to it again puts its day numbers back at the top.
+    /// a few points cut off; scrolling to it again puts its day numbers back at the top. While anchored,
+    /// the anchor's week; otherwise the week the user left at the top.
     private func realignTopWeek() {
-        guard !userScrolls, let week = topWeek else { return }
+        guard !userScrolls, let week = anchor.target ?? topWeek else { return }
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(50))
             topWeek = nil
@@ -210,6 +242,7 @@ struct MonthView: View {
         // After the events have filled in, so the rows have their real heights.
         try? await Task.sleep(for: .milliseconds(1500))
         anchoredOnToday = false
+        anchor.release()
         guard let next = model.calendar.date(byAdding: .month, value: 1, to: model.windowCenter),
               let nextStart = model.calendar.dateInterval(of: .month, for: next)?.start,
               let index = model.weeks.firstIndex(where: { $0.days.contains { $0.date == nextStart } }) else { return }
@@ -226,6 +259,7 @@ struct MonthView: View {
     private func stageScrollToEnd() async {
         try? await Task.sleep(for: .milliseconds(1500))
         anchoredOnToday = false
+        anchor.release()
         guard let start = model.weeks.firstIndex(where: { $0.id == topWeek }) else { return }
         // A month at a time, as a hand would scroll, so the weeks on screen are reported along the way.
         for index in stride(from: start + 4, through: model.weeks.count - 1 + 4, by: 4) {

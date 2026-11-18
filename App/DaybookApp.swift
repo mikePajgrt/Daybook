@@ -43,6 +43,7 @@ struct DaybookApp: App {
         //   -demo-locale <id>        the app in another language, e.g. -demo-locale en
         //   -demo-theme <id>         a colour theme (nocturne, boss, kiss, slate, graphite); the default otherwise
         //   -demo-settings           the settings open (iPhone: in the calendars sheet; iPad: from the rail)
+        //   -demo-load-delay <s>     events arrive that many seconds late, as real calendars can
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-demo") {
             let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 17, hour: 10)) ?? Date()
@@ -80,6 +81,9 @@ struct DaybookApp: App {
                         : arguments.contains("-demo-not-saved") ? .notSaved : .localOnly)
             let model = AppModel(store: store, categoryStore: categoryStore, defaults: defaults, calendar: calendar,
                                  now: now, clockIsFixed: true, stagedScreens: staged)
+            if let delay = DemoStaging.value(after: "-demo-load-delay", in: arguments).flatMap(Double.init) {
+                model.demoLoadDelay = .milliseconds(Int(delay * 1000))
+            }
             model.detailRequest = DemoStaging.detail(for: staged, today: model.today, calendar: calendar)
                 .map { DetailRequest(key: $0.key, asksDelete: $0.asksDelete) }
             _model = State(initialValue: model)

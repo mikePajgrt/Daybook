@@ -143,6 +143,11 @@ final class AppModel {
     /// Set once `start()` ran: before it, an empty calendar list only means nothing was read yet.
     private(set) var didStart = false
 
+    #if DEBUG
+    /// Debug demo only: how long every read of events waits (`-demo-load-delay <seconds>`).
+    var demoLoadDelay: Duration?
+    #endif
+
     /// Lays out the first period at once, loads its events, and keeps up with the database and the clock.
     func start() {
         reload()
@@ -206,7 +211,14 @@ final class AppModel {
         loadingInterval = interval
         cacheIsStale = false
         let read = store.reader()
+        #if DEBUG
+        let delay = demoLoadDelay
+        #endif
         loading = Task { [weak self] in
+            #if DEBUG
+            // Debug demo only (-demo-load-delay): events arrive late, as real calendars do.
+            if let delay { try? await Task.sleep(for: delay) }
+            #endif
             let events = await Task.detached(priority: .userInitiated) { read(interval) }.value
             guard !Task.isCancelled, let self else { return }
             self.cached = (interval, events)
