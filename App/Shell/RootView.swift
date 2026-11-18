@@ -8,8 +8,12 @@ struct RootView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showsCalendars = false
     @State private var calendarsDetent: PresentationDetent = .medium
-    /// Width of the detail column (regular width), to pick a period title that fits beside the controls.
+    /// Width of the detail column, to pick a period title that fits beside the controls.
     @State private var detailWidth: CGFloat = 0
+    #if os(iOS)
+    /// iPad: what the bar really has, measured, to choose the widest title and switcher that fit.
+    @State private var bar = RegularBarMetrics()
+    #endif
     /// Regular width: whether the rail shows. The filter chip opens it.
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @FocusState private var searchFocused: Bool
@@ -77,7 +81,7 @@ struct RootView: View {
                         navigationGroup
                         #if os(iOS)
                         // The top bar already holds the calendars, the title and back / Today / forward.
-                        ToolbarItem(placement: .bottomBar) { modePicker }
+                        ToolbarItem(placement: .bottomBar) { modePicker(asMenu: false) }
                         ToolbarSpacer(.flexible, placement: .bottomBar)
                         DefaultToolbarItem(kind: .search, placement: .bottomBar)
                         ToolbarItem(placement: .bottomBar) { newEventButton(iconOnly: true) }
@@ -120,30 +124,102 @@ struct RootView: View {
                 SidebarView()
                     .navigationTitle("Daybook")
                     .navigationSplitViewColumnWidth(min: 220, ideal: 248, max: 320)
+                    #if os(iOS)
+                    // An opaque bar at accessibility sizes, as on the sheets: large rows would blur
+                    // through "Daybook" under the soft scroll edge.
+                    .toolbarBackground(Theme.rail, for: .navigationBar)
+                    .toolbarBackgroundVisibility(dynamicTypeSize.isAccessibilitySize ? .visible : .automatic,
+                                                 for: .navigationBar)
+                    .toolbar {
+                        // With the rail on screen, what the filters hide is said at its top, beside the
+                        // switches; the detail bar keeps its room for the period and the controls.
+                        if !model.hiddenNames.isEmpty {
+                            ToolbarItem(placement: .topBarLeading) { railFilterStatus }
+                                .sharedBackgroundVisibility(.hidden)
+                        }
+                    }
+                    #endif
             } detail: {
                 current
                     .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { detailWidth = $0 }
+                    #if os(iOS)
+                    .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { bar.detail = $0 }
+                    .background {
+                        RegularBarProbes(titles: regularTitles, modeName: modeName, hiddenCount: model.hiddenNames.count) {
+                            bar.texts[$0] = $1
+                        }
+                    }
+                    #endif
                     .searchable(text: $search.query, isPresented: $search.isPresented, placement: .toolbar,
                                 prompt: Text("Hledat události"))
                     .searchFocused($searchFocused)
+                    #if os(iOS)
+                    // The bar's own title gives way to anything beside it; this one stays.
+                    .toolbar(removing: .title)
+                    #endif
                     // Back / Today / forward, the switcher, search, and the new event at the far right.
+                    // While search results are shown, the period controls would do nothing, so they go.
                     .toolbar {
+                        #if os(iOS)
+                        let choice = regularBar
+                        // One leading item: a second glass button beside the title would cost the bar the
+                        // room it needs for the switcher and the plus.
+                        ToolbarItem(placement: .topBarLeading) {
+                            HStack(spacing: RegularBarLayout.indicatorSpacing) {
+                                BarTitleText(text: isSearching ? String(localized: "Hledání") : choice.title)
+                                    .foregroundStyle(Theme.ink)
+                                    .accessibilityAddTraits(.isHeader)
+                                if choice.indicator != .none {
+                                    filterIndicator(showsCount: choice.indicator == .symbolAndCount)
+                                }
+                            }
+                            // A fresh item for each form, so the bar sizes it anew.
+                            .id(choice)
+                        }
+                        .sharedBackgroundVisibility(.hidden)
+                        if !isSearching {
+                            navigationGroup
+                            ToolbarItem(placement: .primaryAction) {
+                                modePicker(asMenu: choice.pickerIsMenu)
+                            }
+                        }
+                        DefaultToolbarItem(kind: .search, placement: .primaryAction)
+                        ToolbarItem(placement: .primaryAction) { newEventButton(iconOnly: !choice.newEventWord) }
+                        #else
                         if !model.hiddenNames.isEmpty {
                             ToolbarItem(placement: .navigation) { filterChip }
                         }
-                        navigationGroup
-                        ToolbarItem(placement: .primaryAction) { modePicker }
+                        if !isSearching {
+                            navigationGroup
+                            ToolbarItem(placement: .primaryAction) { modePicker(asMenu: false) }
+                        }
                         DefaultToolbarItem(kind: .search, placement: .primaryAction)
-                        ToolbarItem(placement: .primaryAction) { newEventButton(iconOnly: newEventIsIconOnly) }
+                        ToolbarItem(placement: .primaryAction) { newEventButton(iconOnly: false) }
+                        #endif
                     }
             }
+            #if os(iOS)
+            // The bar's items change size with the text; measure them again.
+            .onChange(of: dynamicTypeSize) { bar = RegularBarMetrics() }
+            #endif
+            #if DEBUG
+            .task {
+                if model.stagedScreens.contains("rail-collapsed") {
+                    try? await Task.sleep(for: .milliseconds(300))
+                    columnVisibility = .detailOnly
+                }
+            }
+            #endif
             .modifier(SearchFocus(focused: $searchFocused))
         }
     }
 
+    /// Search results are on screen instead of the calendar.
+    private var isSearching: Bool { model.search.isPresented || model.search.hasQuery }
+
     /// The calendar, or the search results while a search is open.
     @ViewBuilder private var main: some View {
-        if model.search.isPresented || model.search.hasQuery {
+        if isSearching {
             SearchResultsView()
                 .transition(.opacity)
         } else if model.didStart && model.calendars.isEmpty {
@@ -165,7 +241,7 @@ struct RootView: View {
         .animation(.default, value: model.mode)
     }
 
-    /// "Skryto: Porady", or "Skryto: 3" when several things are hidden. Opens the rail with the switches.
+    /// Mac: "Skryto: Porady", or "Skryto: 3" when several things are hidden. Opens the rail with the switches.
     private var filterChip: some View {
         let hidden = model.hiddenNames
         let text = hidden.count == 1 ? String(localized: "Skryto: \(hidden[0])")
@@ -182,6 +258,41 @@ struct RootView: View {
         .accessibilityLabel(Text(hiddenSummarySpoken ?? text))
         .help(Text(hiddenSummarySpoken ?? text))
     }
+
+    #if os(iOS)
+    /// iPad: the filter symbol beside the title, with the count when the bar has room. It says what is
+    /// hidden to VoiceOver and the pointer, and opens the rail with the switches.
+    private func filterIndicator(showsCount: Bool) -> some View {
+        // A tappable label rather than a bar button: the bar gives a button a wider slot than the
+        // symbol needs, and that slot would push the switcher into the overflow menu.
+        FilterIndicatorLabel(count: showsCount ? model.hiddenNames.count : nil)
+            .foregroundStyle(Theme.ink)
+            .padding(.horizontal, RegularBarLayout.indicatorInset)
+            .contentShape(Rectangle().inset(by: -10))
+            .onTapGesture(perform: showRail)
+            .hoverEffect(.highlight)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(hiddenSummarySpoken ?? ""))
+            .accessibilityHint(Text("Otevře kalendáře a kategorie"))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction(.default, showRail)
+            .help(Text(hiddenSummarySpoken ?? ""))
+    }
+
+    /// iPad, rail on screen: the filter symbol and how many things are hidden, at the rail's top.
+    private var railFilterStatus: some View {
+        FilterIndicatorLabel(count: model.hiddenNames.count)
+            .foregroundStyle(Theme.ink)
+            .dynamicTypeSize(...BarTitleText.largestSize)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(hiddenSummarySpoken ?? ""))
+            .help(Text(hiddenSummarySpoken ?? ""))
+    }
+
+    private func showRail() {
+        withAnimation { columnVisibility = .all }
+    }
+    #endif
 
     /// "Skryté: Práce, Porady a Bez kategorie", for VoiceOver and the pointer's help.
     private var hiddenSummarySpoken: String? {
@@ -200,15 +311,6 @@ struct RootView: View {
         .help(Text("Nová událost (⌘N)"))
     }
 
-    /// iPad portrait and narrow windows: the switcher and search leave no room for the word.
-    private var newEventIsIconOnly: Bool {
-        #if os(iOS)
-        detailWidth < 900
-        #else
-        false
-        #endif
-    }
-
     private var navigationGroup: some ToolbarContent {
         ToolbarItemGroup(placement: .primaryAction) {
             Button(previousLabel, systemImage: "chevron.left") { model.step(by: -1) }
@@ -220,24 +322,24 @@ struct RootView: View {
         }
     }
 
-    private var modePicker: some View {
+    /// Day / Week / Month. Segmented; on an iPad bar too narrow for it, the system's pull-down menu
+    /// showing the current view.
+    private func modePicker(asMenu: Bool) -> some View {
         Picker("Zobrazení", selection: Binding(get: { model.mode }, set: { model.setMode($0) })) {
             Text("Den").tag(ViewMode.day)
             Text("Týden").tag(ViewMode.week)
             Text("Měsíc").tag(ViewMode.month)
         }
-        .modifier(ModePickerStyle(asMenu: modePickerIsMenu))
+        .modifier(ModePickerStyle(asMenu: asMenu))
         .fixedSize()
     }
 
-    /// iPad with the sidebar beside a narrow detail: the segmented switcher would push the period title
-    /// out of the bar, so it becomes the system's pull-down menu showing the current view.
-    private var modePickerIsMenu: Bool {
-        #if os(iOS)
-        sizeClass != .compact && detailWidth > 0 && detailWidth < 760
-        #else
-        false
-        #endif
+    private var modeName: LocalizedStringKey {
+        switch model.mode {
+        case .day: "Den"
+        case .week: "Týden"
+        case .month: "Měsíc"
+        }
     }
 
     private func title(short: Bool, numeric: Bool, abbreviatedWeekday: Bool = false) -> PeriodTitle {
@@ -249,10 +351,11 @@ struct RootView: View {
     /// The iPhone gets short titles; at accessibility sizes months become numbers so the title survives
     /// next to the toolbar buttons. The iPad toolbar also holds the switcher, so its weekday is abbreviated.
     private var navigationTitleText: String {
-        if model.search.isPresented || model.search.hasQuery { return String(localized: "Hledání") }
+        if isSearching { return String(localized: "Hledání") }
         let compact = sizeClass == .compact
         #if os(iOS)
-        if !compact { return regularTitle }
+        // iPad: the bar shows its own title item; this names the window.
+        if !compact { return regularTitles.first ?? "" }
         if !dynamicTypeSize.isAccessibilitySize { return compactTitle }
         #endif
         return title(short: compact, numeric: compact && dynamicTypeSize.isAccessibilitySize,
@@ -260,22 +363,39 @@ struct RootView: View {
     }
 
     #if os(iOS)
-    /// iPad: the longest form that fits beside the toolbar's controls ("16.–22. listopadu 2026"),
-    /// else months as numbers with the year ("16.–22. 11. 2026"), else without the year.
-    /// The bar truncates its title instead of offering a width, so the forms are measured here.
-    private var regularTitle: String {
-        let long = title(short: false, numeric: false, abbreviatedWeekday: true).joined
+    /// iPad title forms: "Úterý 17. listopadu 2026", "Út 17. listopadu 2026", "Út 17. 11. 2026",
+    /// "Út 17. 11.", "17. 11."; for a week, the full range down to "16.–22. 11."; "Listopad 2026",
+    /// "Lis 2026", "11/2026". The bar shows the longest that fits (`regularBar`).
+    private var regularTitles: [String] {
+        let full = title(short: false, numeric: false).joined
+        let weekday = title(short: false, numeric: false, abbreviatedWeekday: true).joined
         let numeric = title(short: false, numeric: true, abbreviatedWeekday: true)
         let year = model.focusedDate.formatted(.dateTime.year())
-        let numericWithYear = model.mode == .month ? numeric.joined : "\(numeric.name) \(year)"
-        let room = detailWidth - trailingControlsWidth
-        // The bar's title grows a little at accessibility sizes.
-        let font = UIFont.systemFont(ofSize: dynamicTypeSize.isAccessibilitySize ? 21 : 17, weight: .semibold)
-        for candidate in [long, numericWithYear] {
-            let width = (candidate as NSString).size(withAttributes: [.font: font]).width
-            if width <= room { return candidate }
+        var forms = [full, weekday]
+        switch model.mode {
+        case .month:
+            forms += [numeric.joined, model.focusedDate.formatted(.dateTime.month(.defaultDigits).year())]
+        case .week:
+            // "16.–22. 11.", "16 – 22 Nov": the shortest the formatter writes.
+            let start = model.loadedInterval?.start ?? model.focusedDate
+            let last = model.loadedInterval.flatMap { model.calendar.date(byAdding: .day, value: -1, to: $0.end) } ?? start
+            forms += ["\(numeric.name) \(year)", numeric.name,
+                      (start..<max(last, start)).formatted(.interval.day().month(.abbreviated))]
+        case .day:
+            forms += ["\(numeric.name) \(year)", numeric.name,
+                      model.focusedDate.formatted(.dateTime.day().month(.defaultDigits))]
         }
-        return numeric.joined
+        var result: [String] = []
+        for form in forms where !result.contains(form) { result.append(form) }
+        return result
+    }
+
+    /// The widest title, switcher, filter indicator and new-event button that fit in the bar together.
+    /// The filter symbol joins the title only while the rail is hidden; otherwise the rail says it.
+    private var regularBar: RegularBarChoice {
+        RegularBarLayout.choose(titles: regularTitles,
+                                filtering: !model.hiddenNames.isEmpty && columnVisibility == .detailOnly,
+                                railHidden: columnVisibility == .detailOnly, metrics: bar)
     }
 
     /// iPhone: the short title ("Út 17. listopadu", "Tue 17 November") when it fits between the calendars
@@ -291,9 +411,6 @@ struct RootView: View {
     /// The calendars button, back / Today / forward and the bar's margins on an iPhone, measured on iOS 26.
     private static let compactControlsWidth: CGFloat = 270
 
-    /// What the iPad toolbar's trailing controls (back, Today, forward, switcher, search, new event) and
-    /// the bar's margins take from the detail column's width, measured on iPadOS 26.
-    private var trailingControlsWidth: CGFloat { modePickerIsMenu ? 470 : newEventIsIconOnly ? 600 : 680 }
     #endif
 
     private var previousLabel: LocalizedStringKey {
@@ -325,7 +442,7 @@ struct RootView: View {
                 ToolbarItem(placement: .navigation) {
                     let parts = title(short: false, numeric: false)
                     Group {
-                        if model.search.isPresented || model.search.hasQuery {
+                        if isSearching {
                             Text("Hledání").fontWeight(.bold)
                         } else if let year = parts.year {
                             Text("\(Text(parts.name).fontWeight(.bold)) \(Text(year).fontWeight(.regular).foregroundStyle(Theme.secondaryInk))")

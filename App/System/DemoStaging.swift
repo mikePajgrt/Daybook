@@ -24,7 +24,7 @@ enum DemoStaging {
     static let names = ["detail", "detail-readonly", "delete", "editor-new", "editor-edit",
                         "new-calendar", "calendar-color", "categories", "category-editor", "category-delete",
                         "editor-categories", "detail-categories", "search", "search-empty", "search-none",
-                        "scrolled"]
+                        "scrolled", "rail-collapsed"]
 
     /// `-demo-locale <id>`: runs the app in that language and region for captures. The languages go into
     /// the arguments domain, which is never written to disk, before anything has read them.
