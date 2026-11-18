@@ -170,7 +170,7 @@ struct RootView: View {
                                     .foregroundStyle(Theme.ink)
                                     .accessibilityAddTraits(.isHeader)
                                 if choice.indicator != .none {
-                                    filterIndicator(showsCount: choice.indicator == .symbolAndCount)
+                                    filterIndicator(choice.indicator)
                                 }
                             }
                             // A fresh item for each form, so the bar sizes it anew.
@@ -262,10 +262,10 @@ struct RootView: View {
     #if os(iOS)
     /// iPad: the filter symbol beside the title, with the count when the bar has room. It says what is
     /// hidden to VoiceOver and the pointer, and opens the rail with the switches.
-    private func filterIndicator(showsCount: Bool) -> some View {
+    private func filterIndicator(_ form: RegularBarChoice.Indicator) -> some View {
         // A tappable label rather than a bar button: the bar gives a button a wider slot than the
         // symbol needs, and that slot would push the switcher into the overflow menu.
-        FilterIndicatorLabel(count: showsCount ? model.hiddenNames.count : nil)
+        FilterIndicatorLabel(count: form == .symbol ? nil : model.hiddenNames.count, labelled: form == .labelled)
             .foregroundStyle(Theme.ink)
             .padding(.horizontal, RegularBarLayout.indicatorInset)
             .contentShape(Rectangle().inset(by: -10))
@@ -302,13 +302,19 @@ struct RootView: View {
     }
 
     /// The far-right primary action. Icon-only where the bar is tight; the label stays for VoiceOver.
-    private func newEventButton(iconOnly: Bool) -> some View {
+    @ViewBuilder private func newEventButton(iconOnly: Bool) -> some View {
+        #if os(iOS)
+        // iOS bars draw the plus alone, as a plain bar button.
+        Button("Nová událost", systemImage: "plus") { model.beginNewEvent() }
+            .help(Text("Nová událost (⌘N)"))
+        #else
         Button { model.beginNewEvent() } label: {
             Label("Událost", systemImage: "plus")
                 .labelStyle(NewEventLabelStyle(iconOnly: iconOnly))
         }
         .accessibilityLabel(Text("Nová událost"))
         .help(Text("Nová událost (⌘N)"))
+        #endif
     }
 
     private var navigationGroup: some ToolbarContent {
@@ -324,14 +330,25 @@ struct RootView: View {
 
     /// Day / Week / Month. Segmented; on an iPad bar too narrow for it, the system's pull-down menu
     /// showing the current view.
-    private func modePicker(asMenu: Bool) -> some View {
-        Picker("Zobrazení", selection: Binding(get: { model.mode }, set: { model.setMode($0) })) {
+    @ViewBuilder private func modePicker(asMenu: Bool) -> some View {
+        let picker = Picker("Zobrazení", selection: Binding(get: { model.mode }, set: { model.setMode($0) })) {
             Text("Den").tag(ViewMode.day)
             Text("Týden").tag(ViewMode.week)
             Text("Měsíc").tag(ViewMode.month)
         }
-        .modifier(ModePickerStyle(asMenu: asMenu))
-        .fixedSize()
+        if asMenu {
+            // A bar button titled with the current view: the bar sizes it to its title, where a menu-style
+            // picker would keep a wide slot with empty space beside the name.
+            Menu {
+                picker.pickerStyle(.inline)
+            } label: {
+                Text(modeName)
+            }
+            .accessibilityLabel(Text("Zobrazení"))
+            .accessibilityValue(Text(modeName))
+        } else {
+            picker.pickerStyle(.segmented).fixedSize()
+        }
     }
 
     private var modeName: LocalizedStringKey {
@@ -460,18 +477,6 @@ struct RootView: View {
             .toolbarBackground(Theme.ground, for: .windowToolbar)
             .toolbarBackgroundVisibility(.visible, for: .windowToolbar)
             #endif
-    }
-}
-
-private struct ModePickerStyle: ViewModifier {
-    let asMenu: Bool
-
-    func body(content: Content) -> some View {
-        if asMenu {
-            content.pickerStyle(.menu).tint(Theme.ink)
-        } else {
-            content.pickerStyle(.segmented)
-        }
     }
 }
 
