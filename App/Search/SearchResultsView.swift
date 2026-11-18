@@ -8,30 +8,44 @@ struct SearchResultsView: View {
 
     var body: some View {
         @Bindable var search = model.search
-        List {
-            // When nothing was found, the empty state offers the same switch as its one action.
-            if (search.filterHidesSomething || search.includesHidden) && !offersSearchInHidden {
-                Section {
-                    Toggle("Hledat i ve vypnutých", isOn: $search.includesHidden)
-                        .tint(Theme.ink)
-                        .listRowBackground(Theme.ground)
-                } footer: {
-                    Text("Zahrne i kalendáře a kategorie, které máte vypnuté.")
-                }
-            }
-            ForEach(search.results) { day in
-                Section {
-                    ForEach(day.events) { event in
-                        Button { choose(event) } label: {
-                            SearchResultRow(event: event, query: search.resultQuery)
-                        }
-                        .buttonStyle(.plain)
-                        .listRowBackground(Theme.ground)
+        ScrollViewReader { reader in
+            List {
+                // When nothing was found, the empty state offers the same switch as its one action.
+                if (search.filterHidesSomething || search.includesHidden) && !offersSearchInHidden {
+                    Section {
+                        Toggle("Hledat i ve vypnutých", isOn: $search.includesHidden)
+                            .tint(Theme.ink)
+                            .listRowBackground(Theme.ground)
+                    } footer: {
+                        Text("Zahrne i kalendáře a kategorie, které máte vypnuté.")
                     }
-                } header: {
-                    dayHeader(day.day)
+                }
+                ForEach(search.results) { day in
+                    Section {
+                        ForEach(day.events) { event in
+                            Button { choose(event) } label: {
+                                SearchResultRow(event: event, query: search.resultQuery)
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(Theme.ground)
+                        }
+                    } header: {
+                        dayHeader(day.day)
+                    }
+                    .id(day.day)
                 }
             }
+            #if DEBUG
+            // Debug staging: the first day before today mid-screen, below the last upcoming one.
+            .onChange(of: search.results) {
+                guard model.stagedScreens.contains("search-past"),
+                      let past = search.results.first(where: { $0.day < model.today }) else { return }
+                Task {
+                    try? await Task.sleep(for: .milliseconds(400))
+                    withAnimation { reader.scrollTo(past.day, anchor: .center) }
+                }
+            }
+            #endif
         }
         .scrollContentBackground(.hidden)
         .background(Theme.rail)

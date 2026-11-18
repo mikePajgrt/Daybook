@@ -86,9 +86,18 @@ struct EventEditorView: View {
         #endif
         .task {
             #if DEBUG
-            if model.stagedScreens.contains("editor-categories") {
+            if !model.stagedScreens.isDisjoint(with: ["editor-categories", "occurrence-categories"]) {
                 try? await Task.sleep(for: .milliseconds(700))
                 path = [.categories]
+            }
+            if model.stagedScreens.contains("discard") {
+                try? await Task.sleep(for: .milliseconds(700))
+                editor.draft.title += " a priority"
+                cancel()
+            }
+            if model.stagedScreens.contains("invite") {
+                try? await Task.sleep(for: .milliseconds(700))
+                startSave(inviting: true)
             }
             #endif
         }

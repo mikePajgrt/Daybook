@@ -29,7 +29,7 @@ struct DaybookApp: App {
         //   -demo-new-calendar, -demo-calendar-color  editing states (see DemoStaging)
         //   -demo-category-off       the category Porady switched off
         //   -demo-uncategorized-off  "Bez kategorie" switched off
-        //   -demo-icloud-unavailable the sync line's iCloud-unavailable state
+        //   -demo-icloud-unavailable, -demo-icloud-syncing, -demo-not-saved  the sync line's other states
         //   -demo-categories, -demo-category-editor, -demo-category-delete, -demo-editor-categories,
         //   -demo-detail-categories  category states (see DemoStaging)
         // On the Mac the demo window opens at 1440 x 900.
@@ -66,7 +66,9 @@ struct DaybookApp: App {
                 ? InMemoryCategoryStore()
                 : DemoData.categoryStore(
                     month: now, calendar: calendar,
-                    syncState: arguments.contains("-demo-icloud-unavailable") ? .iCloudUnavailable : .localOnly)
+                    syncState: arguments.contains("-demo-icloud-unavailable") ? .iCloudUnavailable
+                        : arguments.contains("-demo-icloud-syncing") ? .syncing
+                        : arguments.contains("-demo-not-saved") ? .notSaved : .localOnly)
             let model = AppModel(store: store, categoryStore: categoryStore, defaults: defaults, calendar: calendar,
                                  now: now, clockIsFixed: true, stagedScreens: staged)
             model.detailRequest = DemoStaging.detail(for: staged, today: model.today, calendar: calendar)

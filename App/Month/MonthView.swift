@@ -134,6 +134,7 @@ struct MonthView: View {
             topWeek = openingWeek
             #if DEBUG
             if model.stagedScreens.contains("scrolled") { await stageScroll() }
+            if model.stagedScreens.contains("scrolled-end") { await stageScrollToEnd() }
             #endif
         }
     }
@@ -170,6 +171,22 @@ struct MonthView: View {
               let index = model.weeks.firstIndex(where: { $0.days.contains { $0.date == nextStart } }) else { return }
         // The week before the one holding the 1st at the top: the old month's last week, then the new month.
         withAnimation { topWeek = model.weeks[max(0, index - 1)].id }
+        try? await Task.sleep(for: .milliseconds(900))
+        let metrics = WeekMetrics(rowHeight: rowHeight, numberHeight: numberHeight)
+        followTitle(heights: heights(viewport: viewport, metrics: metrics))
+    }
+    #endif
+
+    #if DEBUG
+    /// Debug staging: scrolls to the last week of the window, as far as a user can go.
+    private func stageScrollToEnd() async {
+        try? await Task.sleep(for: .milliseconds(1500))
+        guard let start = model.weeks.firstIndex(where: { $0.id == topWeek }) else { return }
+        // A month at a time, as a hand would scroll, so the weeks on screen are reported along the way.
+        for index in stride(from: start + 4, through: model.weeks.count - 1 + 4, by: 4) {
+            withAnimation { topWeek = model.weeks[min(index, model.weeks.count - 1)].id }
+            try? await Task.sleep(for: .milliseconds(450))
+        }
         try? await Task.sleep(for: .milliseconds(900))
         let metrics = WeekMetrics(rowHeight: rowHeight, numberHeight: numberHeight)
         followTitle(heights: heights(viewport: viewport, metrics: metrics))

@@ -38,7 +38,10 @@ struct EventDetailView: View {
             switch style {
             case .popover:
                 VStack(spacing: 0) {
-                    ScrollView { content.padding(16) }
+                    ScrollViewReader { reader in
+                        ScrollView { content.padding(16) }
+                            .task { await stageAttendees(reader) }
+                    }
                     if event.isEditable {
                         Rectangle().fill(Theme.rule).frame(height: 1)
                         actions.padding(12)
@@ -49,17 +52,20 @@ struct EventDetailView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .background(Theme.ground)
             case .sheet:
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        content
-                        // Editing is in the bar; deleting stays at the end, away from the reading.
-                        if event.isEditable {
-                            deleteButton
-                                .controlSize(.large)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                ScrollViewReader { reader in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) {
+                            content
+                            // Editing is in the bar; deleting stays at the end, away from the reading.
+                            if event.isEditable {
+                                deleteButton
+                                    .controlSize(.large)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
+                        .padding(20)
                     }
-                    .padding(20)
+                    .task { await stageAttendees(reader) }
                 }
                 .background(Theme.ground)
                 .navigationTitle("Událost")
@@ -103,6 +109,17 @@ struct EventDetailView: View {
             }
         }
     }
+
+    /// Debug staging: scrolls to the attendees, as a reader would.
+    private func stageAttendees(_ reader: ScrollViewProxy) async {
+        #if DEBUG
+        guard model.stagedScreens.contains("detail-attendees") else { return }
+        try? await Task.sleep(for: .milliseconds(900))
+        withAnimation { reader.scrollTo(Self.attendeesID, anchor: .top) }
+        #endif
+    }
+
+    private static let attendeesID = "attendees"
 
     private var deleteTitle: String {
         event.isRecurring ? String(localized: "Smazat opakovanou událost „\(title)“?")
@@ -279,6 +296,7 @@ struct EventDetailView: View {
         if !event.attendees.isEmpty || (event.isEditable && model.canOpenSystemEditor) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Účastníci").font(.caption.weight(.semibold)).foregroundStyle(Theme.secondaryInk)
+                    .id(Self.attendeesID)
                 ForEach(Array(event.attendees.enumerated()), id: \.offset) { _, person in
                     AttendeeRow(attendee: person)
                 }
