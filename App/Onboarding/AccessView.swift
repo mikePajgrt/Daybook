@@ -19,21 +19,39 @@ struct AccessView: View {
     @ScaledMetric(relativeTo: .title2) private var markSize: CGFloat = 76
 
     var body: some View {
-        // Centred when it fits; at large text sizes it scrolls from the top, inside the safe area,
-        // with the gate's margin below the button.
-        GeometryReader { proxy in
+        // Centred, button under the text, when it all fits. At large text sizes the text scrolls inside
+        // the safe area and the button stays pinned above the bottom edge on the ground.
+        ViewThatFits(in: .vertical) {
+            VStack(spacing: 16) {
+                message
+                action
+            }
+            .frame(maxWidth: 440)
+            .padding(32)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
             ScrollView {
-                content
+                message
+                    .frame(maxWidth: 440)
+                    .padding([.horizontal, .top], 32)
+                    .padding(.bottom, 16)
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: proxy.size.height)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                action
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: .infinity)
+                    .background(Theme.ground)
+                    .overlay(alignment: .top) { Rectangle().fill(Theme.rule).frame(height: 1) }
+            }
         }
         .foregroundStyle(Theme.ink)
         .background(Theme.ground)
     }
 
-    private var content: some View {
+    private var message: some View {
         VStack(spacing: 16) {
             InterchangeMark()
                 .frame(width: min(markSize, 120), height: min(markSize, 120))
@@ -42,28 +60,30 @@ struct AccessView: View {
                                    : "Všechno, co máte v plánu, na jedné obrazovce")
                 .font(.title2.bold())
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .accessibilityAddTraits(.isHeader)
             Text(access == .denied ? Self.deniedText : Self.introText)
                 .foregroundStyle(Theme.secondaryInk)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            Group {
-                if access == .denied {
-                    Button("Otevřít Nastavení") {
-                        if let settingsURL { openURL(settingsURL) }
-                    }
-                } else {
-                    Button("Povolit přístup ke kalendářům", action: request)
-                }
-            }
-            // The world's ink, not system blue: a blue control would read like a calendar line.
-            .buttonStyle(.borderedProminent)
-            .tint(Theme.ink)
-            .foregroundStyle(Theme.ground)
-            .controlSize(.large)
         }
-        .frame(maxWidth: 440)
-        .padding(32)
+    }
+
+    private var action: some View {
+        Group {
+            if access == .denied {
+                Button("Otevřít Nastavení") {
+                    if let settingsURL { openURL(settingsURL) }
+                }
+            } else {
+                Button("Povolit přístup ke kalendářům", action: request)
+            }
+        }
+        // The world's ink, not system blue: a blue control would read like a calendar line.
+        .buttonStyle(.borderedProminent)
+        .tint(Theme.ink)
+        .foregroundStyle(Theme.ground)
+        .controlSize(.large)
     }
 
     private static let introText: LocalizedStringKey = "Daybook ukazuje události ze všech kalendářů ve vašem zařízení, z iCloudu, Exchange i Googlu, a v měsíci nikdy žádnou neschová. Aby je mohl zobrazit a upravovat, potřebuje přístup ke kalendářům. Události zůstávají ve vašich účtech."
