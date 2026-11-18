@@ -12,21 +12,30 @@ struct AgendaView: View {
     /// Diameter of the interchange circle around today's number.
     @ScaledMetric(relativeTo: .title3) private var numberSize: CGFloat = 34
 
+    /// The day at the top; setting it scrolls there.
+    @State private var topDay: Date?
+
     var body: some View {
-        ScrollViewReader { reader in
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 0) {
-                    ForEach(days, id: \.self) { day in
-                        row(day)
-                            .id(day)
-                    }
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(days, id: \.self) { day in
+                    row(day)
+                        .id(day)
                 }
             }
-            .task(id: model.scrollKey) {
-                if let target = days.contains(model.today) ? model.today : days.first {
-                    reader.scrollTo(target, anchor: .top)
-                }
-            }
+            .scrollTargetLayout()
+        }
+        .scrollPosition(id: $topDay, anchor: .top)
+        // Also when the days arrive: the month's are laid out after the view first appears.
+        .task(id: "\(model.scrollKey)-\(days.count)") {
+            // Today at the top, as the month opens; another period opens on its first day. Set again
+            // once the rows have their heights, which come with the events.
+            let target = days.contains(model.today) ? model.today : days.first
+            topDay = target
+            try? await Task.sleep(for: .milliseconds(400))
+            topDay = nil
+            await Task.yield()
+            topDay = target
         }
         #if os(iOS)
         // An opaque bar on the ground: with the soft scroll edge, large digits blurred through the title.
