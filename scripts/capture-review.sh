@@ -122,6 +122,8 @@ for device in "$PHONE" "$TABLET"; do
   xcrun simctl install "$device" "$SIMAPP"
   xcrun simctl ui "$device" content_size large
   xcrun simctl ui "$device" appearance dark
+  # A fixed clock in the status bar, so identical screens give identical files.
+  xcrun simctl status_bar "$device" override --time 9:41
 done
 sleep 4
 
@@ -192,6 +194,14 @@ shot "$PHONE" phone-delete-single.png -demo-day-view -demo-delete-single
 shot "$PHONE" phone-invite.png -demo-invite
 shot "$PHONE" phone-category-error.png -demo-categories -demo-category-error
 shot "$PHONE" phone-scrolled-end.png -demo-scrolled-end
+shot "$PHONE" phone-settings.png -demo-settings
+# The colour themes other than the default (-demo-theme), each in both appearances.
+for theme in boss kiss slate graphite; do
+  shot "$PHONE" "phone-theme-$theme.png" -demo-theme "$theme"
+  shot "$PHONE" "phone-theme-$theme-light.png" -demo-theme "$theme" -demo-light
+  shot "$PHONE" "phone-theme-$theme-week.png" -demo-theme "$theme" -demo-week
+  shot "$PHONE" "phone-theme-$theme-editor.png" -demo-theme "$theme" -demo-editor-edit
+done
 xcrun simctl ui "$PHONE" increase_contrast enabled
 shot "$PHONE" phone-contrast.png
 shot "$PHONE" phone-contrast-light.png -demo-light
@@ -246,6 +256,11 @@ shot "$TABLET" tablet-detail-attendees.png -demo-detail-attendees
 shot "$TABLET" tablet-categories-syncing.png -demo-icloud-syncing
 shot "$TABLET" tablet-category-error.png -demo-category-error
 shot "$TABLET" tablet-scrolled-end.png -demo-scrolled-end
+shot "$TABLET" tablet-settings.png -demo-settings
+for theme in boss kiss slate graphite; do
+  shot "$TABLET" "tablet-theme-$theme.png" -demo-theme "$theme"
+  shot "$TABLET" "tablet-theme-$theme-light.png" -demo-theme "$theme" -demo-light
+done
 xcrun simctl ui "$TABLET" increase_contrast enabled
 shot "$TABLET" tablet-contrast-light.png -demo-light
 shot "$TABLET" tablet-contrast.png
@@ -258,5 +273,9 @@ shot "$TABLET" tablet-first-run-large-type.png -demo-first-run
 xcrun simctl ui "$TABLET" content_size large
 # iPad landscape is not captured: simctl cannot rotate a device, and iPadOS 26 refuses an app's
 # own request for landscape in its windowing mode.
+
+for device in "$PHONE" "$TABLET"; do
+  xcrun simctl status_bar "$device" clear
+done
 
 shasum "$OUT"/*.png
