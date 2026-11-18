@@ -16,44 +16,54 @@ struct AccessView: View {
         #endif
     }
 
+    @ScaledMetric(relativeTo: .title2) private var markSize: CGFloat = 76
+
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                Image(systemName: "calendar")
-                    .font(.system(size: 44, weight: .semibold))
-                    .accessibilityHidden(true)
-                Text(access == .denied ? "Daybook nemá přístup ke kalendářům"
-                                       : "Všechno, co máte v plánu, na jedné obrazovce")
-                    .font(.title2.bold())
-                    .multilineTextAlignment(.center)
-                    .accessibilityAddTraits(.isHeader)
-                Text(access == .denied ? Self.deniedText : Self.introText)
-                    .foregroundStyle(Theme.secondaryInk)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                Group {
-                    if access == .denied {
-                        Button("Otevřít Nastavení") {
-                            if let settingsURL { openURL(settingsURL) }
-                        }
-                    } else {
-                        Button("Povolit přístup ke kalendářům", action: request)
-                    }
-                }
-                // The world's ink, not system blue: a blue control would read like a calendar line.
-                .buttonStyle(.borderedProminent)
-                .tint(Theme.ink)
-                .foregroundStyle(Theme.ground)
-                .controlSize(.large)
+        // Centred when it fits; at large text sizes it scrolls from the top, inside the safe area,
+        // with the gate's margin below the button.
+        GeometryReader { proxy in
+            ScrollView {
+                content
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: proxy.size.height)
             }
-            .frame(maxWidth: 440)
-            .padding(32)
-            .frame(maxWidth: .infinity)
+            .scrollBounceBehavior(.basedOnSize)
         }
-        .defaultScrollAnchor(.center)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .foregroundStyle(Theme.ink)
         .background(Theme.ground)
+    }
+
+    private var content: some View {
+        VStack(spacing: 16) {
+            InterchangeMark()
+                .frame(width: min(markSize, 120), height: min(markSize, 120))
+                .padding(.bottom, 8)
+            Text(access == .denied ? "Daybook nemá přístup ke kalendářům"
+                                   : "Všechno, co máte v plánu, na jedné obrazovce")
+                .font(.title2.bold())
+                .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
+            Text(access == .denied ? Self.deniedText : Self.introText)
+                .foregroundStyle(Theme.secondaryInk)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Group {
+                if access == .denied {
+                    Button("Otevřít Nastavení") {
+                        if let settingsURL { openURL(settingsURL) }
+                    }
+                } else {
+                    Button("Povolit přístup ke kalendářům", action: request)
+                }
+            }
+            // The world's ink, not system blue: a blue control would read like a calendar line.
+            .buttonStyle(.borderedProminent)
+            .tint(Theme.ink)
+            .foregroundStyle(Theme.ground)
+            .controlSize(.large)
+        }
+        .frame(maxWidth: 440)
+        .padding(32)
     }
 
     private static let introText: LocalizedStringKey = "Daybook ukazuje události ze všech kalendářů ve vašem zařízení, z iCloudu, Exchange i Googlu, a v měsíci nikdy žádnou neschová. Aby je mohl zobrazit a upravovat, potřebuje přístup ke kalendářům. Události zůstávají ve vašich účtech."
