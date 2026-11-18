@@ -154,6 +154,8 @@ private struct CalendarToggleRow: View {
         Image(systemName: "lock.fill")
             .font(.caption)
             .foregroundStyle(Theme.secondaryInk)
+            // On the same line as the category menu buttons below.
+            .frame(width: large ? nil : FilterRowMetrics.lockWidth)
             .accessibilityLabel("jen pro čtení")
     }
 }

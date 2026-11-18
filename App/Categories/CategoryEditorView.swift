@@ -43,8 +43,11 @@ struct CategoryEditorView: View {
                 .listRowBackground(Theme.ground)
 
                 Section {
-                    Label(CategoryText.sync(categories.syncState), systemImage: CategoryText.syncSymbol(categories.syncState))
-                        .foregroundStyle(Theme.ink)
+                    // Not being saved is said at the top instead.
+                    if categories.syncState != .notSaved {
+                        Label(CategoryText.sync(categories.syncState), systemImage: CategoryText.syncSymbol(categories.syncState))
+                            .foregroundStyle(Theme.ink)
+                    }
                 } header: {
                     Text("Ukládání")
                 } footer: {

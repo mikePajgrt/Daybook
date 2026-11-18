@@ -24,10 +24,13 @@ struct CategorySidebarSection: View {
                     Menu {
                         manageItems(category)
                     } label: {
+                        // Drawn in a column as narrow as the calendars' lock column, centred on the same line;
+                        // the tap target stays 44 pt wide.
                         Image(systemName: "ellipsis.circle")
+                            .font(.subheadline)
                             .foregroundStyle(Theme.secondaryInk)
-                            .frame(width: 44, height: 44)
-                            .contentShape(Rectangle())
+                            .frame(width: FilterRowMetrics.menuWidth, height: 44)
+                            .contentShape(Rectangle().inset(by: -(44 - FilterRowMetrics.menuWidth) / 2))
                     }
                     .menuStyle(.button)
                     .buttonStyle(.borderless)
@@ -121,7 +124,7 @@ private struct FilterToggleRow<MenuButton: View>: View {
     @ScaledMetric(relativeTo: .body) private var symbolWidth: CGFloat = 22
     /// The menu button reaches this far into the row's trailing inset, so its 44 pt target costs the
     /// name less of the rail's width: at 248 pt the column then holds "Soustředěná" at standard width.
-    private let menuOverhang: CGFloat = 26
+    private let menuOverhang = FilterRowMetrics.menuOverhang
 
     var body: some View {
         Button(action: action) {
@@ -140,7 +143,7 @@ private struct FilterToggleRow<MenuButton: View>: View {
                         checkbox
                         symbolImage.frame(width: symbolWidth)
                         name
-                        if hasMenu { Color.clear.frame(width: 44 - menuOverhang, height: 1) }
+                        if hasMenu { Color.clear.frame(width: FilterRowMetrics.menuWidth - menuOverhang, height: 1) }
                     }
                 }
             }
@@ -191,4 +194,15 @@ extension View {
             Text(CategoryText.deleteMessage(categories.eventCount(of: category)))
         }
     }
+}
+
+/// The rail's trailing column: calendar locks and category menu buttons centre on one line, 6 pt in
+/// from the row's content edge. The menu button's drawing is 32 pt wide and reaches 10 pt into the
+/// row's trailing inset, which leaves a category name column wide enough for "Soustředěná" at
+/// standard width in the 248 pt rail.
+enum FilterRowMetrics {
+    static let menuWidth: CGFloat = 32
+    static let menuOverhang: CGFloat = 10
+    /// The lock's column: its centre is where the menu symbol's centre is.
+    static let lockWidth: CGFloat = 2 * (menuWidth / 2 - menuOverhang)
 }
