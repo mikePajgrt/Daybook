@@ -54,7 +54,8 @@ struct DayListView: View {
         // The world's colours instead of system grey: rows on the ground, set in the deeper rail.
         .scrollContentBackground(.hidden)
         .background(Theme.rail)
-        .navigationTitle(day.formatted(.dateTime.weekday(.wide).day().month(.wide)))
+        // Capitalised as every other date heading: "Úterý 17. listopadu".
+        .navigationTitle(day.formatted(.dateTime.weekday(.wide).day().month(.wide)).localizedCapitalizedFirst)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -67,13 +68,6 @@ struct DayListView: View {
 
     private func when(_ event: EventInfo) -> String {
         if event.isAllDay { return String(localized: "Celý den") }
-        if model.calendar.isDate(event.start, inSameDayAs: event.end) {
-            let start = event.start.formatted(date: .omitted, time: .shortened)
-            let end = event.end.formatted(date: .omitted, time: .shortened)
-            return "\(start) – \(end)"
-        }
-        let start = event.start.formatted(date: .abbreviated, time: .shortened)
-        let end = event.end.formatted(date: .abbreviated, time: .shortened)
-        return "\(start) – \(end)"
+        return TimeText.span(event, calendar: model.calendar, dateStyle: .dateTime.day().month(.abbreviated))
     }
 }

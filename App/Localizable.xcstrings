@@ -294,7 +294,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Calendar Colour"
+            "value": "Calendar colour"
           }
         }
       }
@@ -554,7 +554,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Search Events"
+            "value": "Search events"
           }
         }
       }
@@ -694,7 +694,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Calendars and Categories"
+            "value": "Calendars and categories"
           }
         }
       }
@@ -906,7 +906,17 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Create categories in the sidebar with New Category."
+            "value": "Create categories in the sidebar with New category."
+          }
+        }
+      }
+    },
+    "Kategorie založíte v seznamu Kalendáře a kategorie volbou Nová kategorie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create categories in the Calendars and categories list with New category."
           }
         }
       }
@@ -1204,7 +1214,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "End Repeat"
+            "value": "End repeat"
           }
         }
       }
@@ -1384,7 +1394,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "New Category"
+            "value": "New category"
           }
         }
       }
@@ -1394,7 +1404,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "New Event"
+            "value": "New event"
           }
         }
       }
@@ -1404,7 +1414,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "New Event (⌘N)"
+            "value": "New event (⌘N)"
           }
         }
       }
@@ -1434,7 +1444,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "New Calendar"
+            "value": "New calendar"
           }
         }
       }
@@ -1579,6 +1589,16 @@
         }
       }
     },
+    "Otevře kalendáře a kategorie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the calendars and categories"
+          }
+        }
+      }
+    },
     "Otevřít Nastavení": {
       "localizations": {
         "en": {
@@ -1594,7 +1614,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Details"
+            "value": "Open details"
           }
         }
       }
@@ -1604,7 +1624,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keep Editing"
+            "value": "Keep editing"
           }
         }
       }
@@ -1624,7 +1644,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allow Access to Calendars"
+            "value": "Allow access to calendars"
           }
         }
       }
@@ -1664,7 +1684,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Invite People"
+            "value": "Invite people"
           }
         }
       }
@@ -1794,7 +1814,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Assign Categories"
+            "value": "Assign categories"
           }
         }
       }
@@ -1884,7 +1904,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete This Event Only"
+            "value": "Delete this event only"
           }
         }
       }
@@ -1894,7 +1914,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete Category"
+            "value": "Delete category"
           }
         }
       }
@@ -1914,7 +1934,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete Category…"
+            "value": "Delete category…"
           }
         }
       }
@@ -1934,7 +1954,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete This and All Future Events"
+            "value": "Delete this and all future events"
           }
         }
       }
@@ -1944,7 +1964,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete Event"
+            "value": "Delete event"
           }
         }
       }
@@ -2129,6 +2149,16 @@
         }
       }
     },
+    "Událost se uložila, ale kategorie ne. %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event was saved, but its categories were not. %@"
+          }
+        }
+      }
+    },
     "Událost se uložila, ale nová část opakování nemá kategorie původní série. %@": {
       "localizations": {
         "en": {
@@ -2194,7 +2224,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save for This Event Only"
+            "value": "Save for this event only"
           }
         }
       }
@@ -2204,7 +2234,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save for This and All Future Events"
+            "value": "Save for this and all future events"
           }
         }
       }
@@ -2244,7 +2274,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Edit Categories"
+            "value": "Edit categories"
           }
         }
       }
@@ -2254,7 +2284,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Edit Category"
+            "value": "Edit category"
           }
         }
       }
@@ -2274,7 +2304,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Edit Event"
+            "value": "Edit event"
           }
         }
       }
@@ -2344,7 +2374,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Custom Colour"
+            "value": "Custom colour"
           }
         }
       }
@@ -2414,7 +2444,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Every calendar on this device is read-only. Create one with New Calendar, or add an account in Settings."
+            "value": "Every calendar on this device is read-only. Create one with New calendar, or add an account in Settings."
           }
         }
       }
@@ -2444,7 +2474,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Discard Changes"
+            "value": "Discard changes"
           }
         }
       }
@@ -2459,12 +2489,12 @@
         }
       }
     },
-    "Zahrne kalendáře a kategorie, které máte v postranním panelu vypnuté.": {
+    "Zahrne i kalendáře a kategorie, které máte vypnuté.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Includes the calendars and categories you switched off in the sidebar."
+            "value": "Also includes the calendars and categories you have switched off."
           }
         }
       }
@@ -2504,7 +2534,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Change Colour…"
+            "value": "Change colour…"
           }
         }
       }
@@ -2514,7 +2544,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Change Symbol…"
+            "value": "Change symbol…"
           }
         }
       }
@@ -2544,7 +2574,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show Only This"
+            "value": "Show only this"
           }
         }
       }
@@ -2554,7 +2584,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show Only This"
+            "value": "Show only this"
           }
         }
       }
@@ -2564,7 +2594,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show Only Events Without a Category"
+            "value": "Show only events without a category"
           }
         }
       }
@@ -2574,7 +2604,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show All"
+            "value": "Show all"
           }
         }
       }
@@ -2824,7 +2854,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No Calendars"
+            "value": "No calendars"
           }
         }
       }

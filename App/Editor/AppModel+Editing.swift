@@ -108,7 +108,7 @@ extension AppModel {
                 // Categories are Daybook's own data, written after the event so a new event has its key.
                 if let problem = categoryModel.apply(editor.categorySelection, from: editor.savedCategorySelection,
                                                      to: saved.key) {
-                    editor.errorMessage = "Událost se uložila, ale kategorie ne. \(problem)"
+                    editor.errorMessage = String(localized: "Událost se uložila, ale kategorie ne. \(problem)")
                     reload()
                     return nil
                 }
