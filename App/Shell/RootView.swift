@@ -75,9 +75,6 @@ struct RootView: View {
             }
             .searchable(text: $search.query, isPresented: $search.isPresented, prompt: Text("Hledat události"))
             .searchFocused($searchFocused)
-            #if os(iOS)
-            .searchToolbarBehavior(.minimize)
-            #endif
             .sheet(isPresented: $showsCalendars) {
                 NavigationStack {
                     SidebarView(rowBackground: Theme.ground)

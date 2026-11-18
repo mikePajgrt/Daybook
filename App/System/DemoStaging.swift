@@ -34,7 +34,8 @@ enum DemoStaging {
         let defaults = UserDefaults.standard
         var domain = defaults.volatileDomain(forName: UserDefaults.argumentDomain)
         domain["AppleLanguages"] = [id]
-        domain["AppleLocale"] = id == "en" ? "en_GB" : id
+        // A language alone leaves the region to the device; captures pin it so weeks start on Monday.
+        domain["AppleLocale"] = ["en": "en_GB", "cs": "cs_CZ"][id] ?? id
         defaults.setVolatileDomain(domain, forName: UserDefaults.argumentDomain)
     }
 

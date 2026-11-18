@@ -49,6 +49,8 @@ targets:
         # Czech is the development language; English comes from App/Localizable.xcstrings and
         # App/InfoPlist.xcstrings. The compiler records every localizable string for the catalogs.
         SWIFT_EMIT_LOC_STRINGS: YES
+        # Drawn by scripts/make-app-icon.swift.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         LOCALIZATION_PREFERS_STRING_CATALOGS: YES
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic
