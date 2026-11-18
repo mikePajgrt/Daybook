@@ -14,7 +14,10 @@ MACAPP=.build/xcode/Build/Products/Debug/Daybook.app
 mkdir -p "$OUT"
 
 xcodegen generate > /dev/null || exit 1
-xcodebuild -project Daybook.xcodeproj -scheme Daybook -destination 'platform=macOS' -derivedDataPath .build/xcode -quiet build || exit 1
+# SKIP_MAC=1 also skips the Mac build, which needs a signing account in Xcode.
+if [ "$SKIP_MAC" != 1 ]; then
+  xcodebuild -project Daybook.xcodeproj -scheme Daybook -destination 'platform=macOS' -derivedDataPath .build/xcode -quiet build || exit 1
+fi
 xcodebuild -project Daybook.xcodeproj -scheme Daybook -destination "platform=iOS Simulator,id=$PHONE" -derivedDataPath .build/xcode -quiet build || exit 1
 
 # Mac first: quitting the Mac app by name would also kill a simulator process of the same name.
@@ -54,7 +57,7 @@ macregion() {
   pkill -x Daybook 2> /dev/null
 }
 rm -f "$OUT/mac-screen.png"
-# SKIP_MAC=1 leaves the Mac app alone (someone is working on the Mac); it is still built above.
+# SKIP_MAC=1 leaves the Mac app alone (someone is working on the Mac).
 if [ "$SKIP_MAC" = 1 ]; then
   echo "SKIP_MAC=1: no Mac captures"
   MAC=no
