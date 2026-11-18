@@ -29,7 +29,7 @@ enum DemoStaging {
     /// `-demo-locale <id>`: runs the app in that language and region for captures. The languages go into
     /// the arguments domain, which is never written to disk, before anything has read them.
     static func forceLocale(_ arguments: [String]) {
-        guard let index = arguments.firstIndex(of: "-demo-locale"), index + 1 < arguments.count else { return }
+        guard let index = arguments.lastIndex(of: "-demo-locale"), index + 1 < arguments.count else { return }
         let id = arguments[index + 1]
         let defaults = UserDefaults.standard
         var domain = defaults.volatileDomain(forName: UserDefaults.argumentDomain)

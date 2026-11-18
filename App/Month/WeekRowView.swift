@@ -81,7 +81,11 @@ struct WeekRowView: View {
 
     @ViewBuilder private func dayNumber(_ day: DayLayout, inMonth: Bool) -> some View {
         if let onOpenDay {
-            Button { onOpenDay(day.date) } label: { numberLabel(day, inMonth: inMonth) }
+            Button { onOpenDay(day.date) } label: {
+                numberLabel(day, inMonth: inMonth)
+                    // iPad: the number is small; its target reaches 44 pt around it without moving anything.
+                    .contentShape(Rectangle().inset(by: Self.targetOutset))
+            }
                 .buttonStyle(.plain)
                 .accessibilityLabel(DayText.spoken(day.date, isToday: day.date == today, count: nil))
                 .accessibilityHint(Text("Otevře den"))
@@ -93,6 +97,12 @@ struct WeekRowView: View {
                 .accessibilityHidden(true)
         }
     }
+
+    #if os(iOS)
+    private static let targetOutset: CGFloat = -8
+    #else
+    private static let targetOutset: CGFloat = 0
+    #endif
 
     private func numberLabel(_ day: DayLayout, inMonth: Bool) -> some View {
         let isToday = day.date == today

@@ -9,7 +9,6 @@ struct MonthView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selectedDay: SelectedDay?
     /// The week at the top of the viewport; setting it scrolls there.
     @State private var topWeek: Date?
@@ -111,8 +110,7 @@ struct MonthView: View {
             }
             .scrollTargetLayout()
             // Reduce Motion: a calendar switched off crossfades the month instead of closing rows up.
-            .id(reduceMotion ? model.filterRevision : 0)
-            .transition(.opacity)
+            .modifier(CrossfadeOnFilter())
         }
         .scrollPosition(id: $topWeek, anchor: .top)
         .onScrollPhaseChange { _, phase in

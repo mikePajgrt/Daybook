@@ -73,7 +73,10 @@ struct AgendaView: View {
                             }
                         }
                     }
-                    .accessibilityElement(children: .combine)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(EventText.spoken(event, calendar: model.calendar,
+                                                         calendarTitle: model.calendarInfo(event.calendarID)?.title,
+                                                         categories: categoryModel.categories(for: event.key)))
                     .opensEventDetail(event)
                 }
             }
@@ -84,7 +87,7 @@ struct AgendaView: View {
         .background(model.calendar.isDateInWeekend(day) ? Theme.weekend : Color.clear)
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.rule).frame(height: 1) }
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(day.formatted(date: .complete, time: .omitted))
+        .accessibilityLabel(DayText.spoken(day, isToday: isToday, count: events.count))
     }
 
     /// "Celý den" for all-day events; the start time, or the span for events that cross midnight.

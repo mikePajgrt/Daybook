@@ -54,6 +54,7 @@ struct TimeGridView: View {
                         AllDayStripView(segments: model.allDaySegments, dayCount: days.count,
                                         columnWidth: column, laneHeight: laneHeight,
                                         pinnedOffset: pages ? offsetX : nil, color: color(for:))
+                            .modifier(CrossfadeOnFilter())
                     }
                     .frame(width: column * CGFloat(days.count), alignment: .leading)
                     .offset(x: pages ? -offsetX : 0)
@@ -70,6 +71,7 @@ struct TimeGridView: View {
                                 ScrollView(.horizontal) {
                                     columns(days, metrics: metrics, column: column)
                                         .scrollTargetLayout()
+                                        .modifier(CrossfadeOnFilter())
                                 }
                                 .scrollTargetBehavior(.viewAligned)
                                 .scrollPosition(id: $leadingDay, anchor: .leading)
@@ -80,6 +82,7 @@ struct TimeGridView: View {
                                 .frame(width: area)
                             } else {
                                 columns(days, metrics: metrics, column: column)
+                                    .modifier(CrossfadeOnFilter())
                             }
                         }
                     }
@@ -129,7 +132,7 @@ struct TimeGridView: View {
                                                                                    calendar: model.calendar))
                               })
                     .id(day)
-                    .accessibilityLabel(day.formatted(date: .complete, time: .omitted))
+                    .accessibilityLabel(DayText.spoken(day, isToday: day == model.today, count: model.events(on: day).count))
             }
         }
     }
@@ -143,4 +146,17 @@ struct TimeGridView: View {
     private func rgba(for calendarID: String) -> RGBA { model.color(of: calendarID) }
 
     private func color(for calendarID: String) -> Color { Theme.line(rgba(for: calendarID)) }
+}
+
+/// Under Reduce Motion a calendar or category switch crossfades the content instead of moving blocks:
+/// the content is replaced (new identity) inside an opacity transition. Otherwise nothing changes.
+struct CrossfadeOnFilter: ViewModifier {
+    @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        content
+            .id(reduceMotion ? model.filterRevision : 0)
+            .transition(.opacity)
+    }
 }

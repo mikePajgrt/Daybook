@@ -3,6 +3,8 @@
 # Run from the repo root. Needs iOS 26 simulators and Screen Recording permission for the Mac shots,
 # which capture only the Daybook window (scripts/window-id.swift finds it).
 # Override the devices with PHONE=<udid> TABLET=<udid>.
+# Every shot is pinned to Czech (-demo-locale cs) whatever the device's language; a later
+# -demo-locale en in a shot's arguments wins, for the English captures.
 PHONE=${PHONE:-B60E068A-347B-4B91-AFCF-005F31FD355C}
 TABLET=${TABLET:-0D46D1E7-BB64-4249-8520-77328AD92B02}
 BUNDLE=app.daybook.Daybook
@@ -24,7 +26,7 @@ macshot() {
   pkill -x Daybook 2> /dev/null
   sleep 1
   # Ignore saved window state: a session that was killed can restore to no window at all.
-  open -n "$MACAPP" --args -demo "$@" -ApplePersistenceIgnoreState YES
+  open -n "$MACAPP" --args -demo -demo-locale cs "$@" -ApplePersistenceIgnoreState YES
   sleep 6
   window=$(swift scripts/window-id.swift Daybook)
   if [ -n "$window" ]; then
@@ -41,7 +43,7 @@ macregion() {
   shift
   pkill -x Daybook 2> /dev/null
   sleep 1
-  open -n "$MACAPP" --args -demo "$@" -ApplePersistenceIgnoreState YES
+  open -n "$MACAPP" --args -demo -demo-locale cs "$@" -ApplePersistenceIgnoreState YES
   sleep 7
   bounds=$(swift scripts/window-id.swift Daybook --bounds)
   if [ -n "$bounds" ]; then
@@ -70,6 +72,15 @@ macregion mac-category-editor.png -demo-dark -demo-category-editor
 macregion mac-category-delete.png -demo-dark -demo-category-delete
 macregion mac-editor-categories.png -demo-dark -demo-editor-categories
 macregion mac-detail-categories.png -demo-light -demo-detail-categories
+macshot mac-search.png -demo-dark -demo-search
+macshot mac-search-empty.png -demo-light -demo-search-empty
+macshot mac-search-none.png -demo-dark -demo-search-none -demo-category-off
+macshot mac-search-en.png -demo-dark -demo-search -demo-locale en
+macshot mac-scrolled.png -demo-dark -demo-scrolled
+macshot mac-first-run.png -demo-light -demo-first-run
+macshot mac-no-accounts.png -demo-dark -demo-no-accounts
+macshot mac-en.png -demo-dark -demo-locale en
+macshot mac-week-en.png -demo-light -demo-week -demo-locale en
 
 # shot DEVICE FILE [launch arguments...]
 shot() {
@@ -77,7 +88,7 @@ shot() {
   file=$2
   shift 2
   xcrun simctl terminate "$device" "$BUNDLE" 2> /dev/null
-  xcrun simctl launch "$device" "$BUNDLE" -demo "$@" > /dev/null
+  xcrun simctl launch "$device" "$BUNDLE" -demo -demo-locale cs "$@" > /dev/null
   sleep 6
   xcrun simctl io "$device" screenshot "$OUT/$file" 2> /dev/null
 }
@@ -126,6 +137,26 @@ shot "$PHONE" phone-category-editor-icloud-light.png -demo-categories -demo-cate
 shot "$PHONE" phone-category-delete.png -demo-categories -demo-category-delete
 shot "$PHONE" phone-editor-categories.png -demo-editor-categories
 shot "$PHONE" phone-detail-categories.png -demo-day-view -demo-detail-categories
+shot "$PHONE" phone-search.png -demo-search
+shot "$PHONE" phone-search-empty.png -demo-search-empty
+shot "$PHONE" phone-search-none.png -demo-search-none -demo-category-off
+shot "$PHONE" phone-search-en.png -demo-search -demo-locale en
+shot "$PHONE" phone-scrolled.png -demo-scrolled
+shot "$PHONE" phone-first-run.png -demo-first-run
+shot "$PHONE" phone-first-run-light.png -demo-first-run -demo-light
+shot "$PHONE" phone-no-accounts.png -demo-no-accounts
+shot "$PHONE" phone-en.png -demo-locale en
+shot "$PHONE" phone-week-en.png -demo-week -demo-locale en
+shot "$PHONE" phone-detail-en.png -demo-day-view -demo-detail -demo-locale en
+shot "$PHONE" phone-editor-en.png -demo-editor-edit -demo-locale en
+xcrun simctl ui "$PHONE" increase_contrast enabled
+shot "$PHONE" phone-contrast.png
+shot "$PHONE" phone-contrast-light.png -demo-light
+xcrun simctl ui "$PHONE" increase_contrast disabled
+xcrun simctl ui "$PHONE" content_size accessibility-large
+shot "$PHONE" phone-search-large-type.png -demo-search
+shot "$PHONE" phone-first-run-large-type.png -demo-first-run
+xcrun simctl ui "$PHONE" content_size large
 
 shot "$TABLET" tablet.png
 shot "$TABLET" tablet-off.png -demo-off
@@ -143,6 +174,17 @@ shot "$TABLET" tablet-category-editor.png -demo-category-editor
 shot "$TABLET" tablet-category-delete.png -demo-category-delete
 shot "$TABLET" tablet-editor-categories.png -demo-editor-categories
 shot "$TABLET" tablet-detail-categories.png -demo-detail-categories
+shot "$TABLET" tablet-search.png -demo-search
+shot "$TABLET" tablet-search-none.png -demo-search-none -demo-category-off
+shot "$TABLET" tablet-search-en.png -demo-search -demo-locale en
+shot "$TABLET" tablet-scrolled.png -demo-scrolled
+shot "$TABLET" tablet-first-run.png -demo-first-run
+shot "$TABLET" tablet-no-accounts.png -demo-no-accounts
+shot "$TABLET" tablet-en.png -demo-locale en
+shot "$TABLET" tablet-week-en.png -demo-week -demo-light -demo-locale en
+xcrun simctl ui "$TABLET" increase_contrast enabled
+shot "$TABLET" tablet-contrast-light.png -demo-light
+xcrun simctl ui "$TABLET" increase_contrast disabled
 xcrun simctl ui "$TABLET" content_size accessibility-large
 shot "$TABLET" tablet-week-large-type.png -demo-week
 shot "$TABLET" tablet-categories-large-type.png -demo-categories
