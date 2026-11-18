@@ -10,7 +10,7 @@ import SwiftData
 /// If the synced store does not open, the device-only one is used and the sync line says so.
 enum CategoryContainer {
     static let infoKey = "DaybookCloudKitContainer"
-    private static let log = Logger(subsystem: "app.daybook.Daybook", category: "categories")
+    private static let log = Logger(subsystem: "app.trim.daybook", category: "categories")
 
     static var schema: Schema { Schema([CategoryRecord.self, CategoryAssignmentRecord.self]) }
 

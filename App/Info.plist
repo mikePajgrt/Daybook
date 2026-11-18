@@ -22,10 +22,16 @@
 	<string>1</string>
 	<key>DaybookCloudKitContainer</key>
 	<string>$(DAYBOOK_CLOUDKIT_CONTAINER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Daybook zobrazuje a upravuje události z kalendářů, které máte v zařízení.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

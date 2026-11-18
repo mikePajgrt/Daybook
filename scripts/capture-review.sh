@@ -7,7 +7,7 @@
 # -demo-locale en in a shot's arguments wins, for the English captures.
 PHONE=${PHONE:-B60E068A-347B-4B91-AFCF-005F31FD355C}
 TABLET=${TABLET:-0D46D1E7-BB64-4249-8520-77328AD92B02}
-BUNDLE=app.daybook.Daybook
+BUNDLE=app.trim.daybook
 OUT=.impeccable/review
 SIMAPP=.build/xcode/Build/Products/Debug-iphonesimulator/Daybook.app
 MACAPP=.build/xcode/Build/Products/Debug/Daybook.app
