@@ -489,6 +489,16 @@
         }
       }
     },
+    "Dříve": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earlier"
+          }
+        }
+      }
+    },
     "Dům": {
       "localizations": {
         "en": {
@@ -867,6 +877,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Categories sync between your devices through iCloud."
+          }
+        }
+      }
+    },
+    "Kategorie se teď neukládají": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Categories are not being saved"
           }
         }
       }
@@ -2179,6 +2199,16 @@
         }
       }
     },
+    "Událost už v kalendáři není, nejspíš ji mezitím někdo smazal nebo přesunul. Úpravy zůstávají ve formuláři: zkopírujte si, co potřebujete, zrušte úpravy a událost vyhledejte nebo vytvořte znovu.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The event is no longer in the calendar; someone probably deleted or moved it meanwhile. Your changes stay in the form: copy what you need, cancel the changes, then find the event or create it again."
+          }
+        }
+      }
+    },
     "Událost už v kalendáři není. Mezitím ji nejspíš někdo smazal nebo přesunul.": {
       "localizations": {
         "en": {
@@ -2545,6 +2575,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Change symbol…"
+          }
+        }
+      }
+    },
+    "Změny kategorií vydrží jen do zavření aplikace. Při dalším spuštění se Daybook pokusí uložení obnovit. Když se to opakuje, uvolněte místo v zařízení.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changes to categories last only until the app is closed. Daybook tries to restore saving the next time it starts. If this keeps happening, free up space on this device."
           }
         }
       }
