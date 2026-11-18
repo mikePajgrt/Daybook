@@ -165,6 +165,14 @@ enum EventText {
         }
     }
 
+    /// Why a save failed and what to do next. The form stays open with everything typed.
+    static func saveMessage(for error: Error) -> String {
+        if case .eventNotFound = error as? CalendarStoreError {
+            return String(localized: "Událost už v kalendáři není, nejspíš ji mezitím někdo smazal nebo přesunul. Úpravy zůstávají ve formuláři: zkopírujte si, co potřebujete, zrušte úpravy a událost vyhledejte nebo vytvořte znovu.")
+        }
+        return message(for: error)
+    }
+
     /// What failed and what to do, for any error a write can throw.
     static func message(for error: Error) -> String {
         guard let error = error as? CalendarStoreError else { return error.localizedDescription }

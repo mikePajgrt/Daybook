@@ -117,7 +117,7 @@ extension AppModel {
             reload()
             return saved
         } catch {
-            editor.errorMessage = EventText.message(for: error)
+            editor.errorMessage = EventText.saveMessage(for: error)
             return nil
         }
     }

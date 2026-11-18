@@ -76,6 +76,9 @@ struct EventDetailView: View {
                 .navigationTitle("Událost")
                 #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
+                // An opaque bar on the sheet's ground, as the other sheets have: no text blurs behind it.
+                .toolbarBackground(Theme.ground, for: .navigationBar)
+                .toolbarBackgroundVisibility(.visible, for: .navigationBar)
                 #endif
                 .toolbar {
                     if event.isEditable {
