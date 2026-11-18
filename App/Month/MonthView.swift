@@ -118,7 +118,12 @@ struct MonthView: View {
             .modifier(CrossfadeOnFilter())
         }
         .onAppear { self.viewport = viewport }
-        .onChange(of: viewport) { self.viewport = viewport }
+        .onChange(of: viewport) {
+            self.viewport = viewport
+            realignTopWeek()
+        }
+        // The rail opening or closing changes the column under the scroll: keep the top week at the top.
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { _ in realignTopWeek() }
         .scrollPosition(id: $topWeek, anchor: .top)
         .onScrollPhaseChange { _, phase in
             userScrolls = phase == .interacting || phase == .decelerating
@@ -136,6 +141,18 @@ struct MonthView: View {
             if model.stagedScreens.contains("scrolled") { await stageScroll() }
             if model.stagedScreens.contains("scrolled-end") { await stageScrollToEnd() }
             #endif
+        }
+    }
+
+    /// After the column changes size the scroll keeps its offset in points, which leaves the top week
+    /// a few points cut off; scrolling to it again puts its day numbers back at the top.
+    private func realignTopWeek() {
+        guard !userScrolls, let week = topWeek else { return }
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(50))
+            topWeek = nil
+            await Task.yield()
+            topWeek = week
         }
     }
 
