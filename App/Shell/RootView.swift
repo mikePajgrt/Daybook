@@ -163,6 +163,8 @@ struct RootView: View {
                                 }
                         }
                         .presentationBackground(Theme.rail)
+                        // Page-sized, as the editor: the whole form, version included, without scrolling.
+                        .presentationSizing(.page)
                     }
                     #endif
             } detail: {

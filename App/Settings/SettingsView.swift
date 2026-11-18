@@ -32,6 +32,15 @@ struct SettingsView: View {
             } footer: {
                 Text("Kalendáře si nechávají své barvy. Na každém pozadí se upraví jen jejich jas, aby čáry zůstaly čitelné.")
             }
+            Section {
+                LabeledContent("Verze") {
+                    Text(verbatim: AppVersion.text(info: Bundle.main.infoDictionary ?? [:]))
+                        .monospacedDigit()
+                        .foregroundStyle(Theme.secondaryInk)
+                        .textSelection(.enabled)
+                }
+                .listRowBackground(Theme.ground)
+            }
         }
         .formStyle(.grouped)
         .themeTint(Theme.controlInk)

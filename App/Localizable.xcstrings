@@ -1539,6 +1539,16 @@
         }
       }
     },
+    "O aplikaci Daybook": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About Daybook"
+          }
+        }
+      }
+    },
     "OK": {
       "localizations": {
         "en": {
@@ -2445,6 +2455,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "At time of event"
+          }
+        }
+      }
+    },
+    "Verze": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
           }
         }
       }

@@ -17,6 +17,13 @@ targets:
       - path: App
     dependencies:
       - package: DaybookCore
+    postBuildScripts:
+      - name: Stamp build number
+        script: '"$SRCROOT/scripts/stamp-build-number.sh"'
+        # Input only: runs after the Info.plist is written; no output, so it runs on every build.
+        inputFiles:
+          - $(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)
+        basedOnDependencyAnalysis: false
     scheme:
       testTargets:
         - DaybookAppTests
@@ -24,8 +31,10 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: Daybook
-        CFBundleShortVersionString: "0.1.0"
-        CFBundleVersion: "1"
+        # From the build settings below (MARKETING_VERSION, CURRENT_PROJECT_VERSION, DAYBOOK_COMMIT).
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        DaybookCommit: $(DAYBOOK_COMMIT)
         LSApplicationCategoryType: public.app-category.productivity
         NSCalendarsFullAccessUsageDescription: "Daybook zobrazuje a upravuje události z kalendářů, které máte v zařízení."
         UILaunchScreen: {}
@@ -47,6 +56,14 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.trim.daybook
+        # The version: set MARKETING_VERSION here by hand for a new release (tag v<version>, see
+        # scripts/release.sh). Development builds are build 1 with no commit; release.sh and
+        # build-local-mac.sh put in the UTC date and time of the build (scripts/build-number.sh) and the
+        # short commit hash, and a Release build from Xcode still at 1 gets them from the build phase
+        # "Stamp build number", so every archive has a new build number for App Store Connect.
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        DAYBOOK_COMMIT: ""
         SWIFT_VERSION: "5.0"
         # Czech is the development language; English comes from App/Localizable.xcstrings and
         # App/InfoPlist.xcstrings. The compiler records every localizable string for the catalogs.

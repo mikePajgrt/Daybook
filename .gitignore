@@ -6,6 +6,8 @@ xcuserdata/
 DerivedData/
 .build/
 .swiftpm/
+# Archives and exports from scripts/release.sh
+dist/
 
 # Tooling runtime state
 .superpowers/

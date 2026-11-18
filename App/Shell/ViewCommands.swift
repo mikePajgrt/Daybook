@@ -1,5 +1,8 @@
 import DaybookCore
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 /// Menu commands, with their shortcuts shown in the menus (and offered to a hardware keyboard on iPad):
 /// ⌘N new event (replacing New Window), ⌘F search, ⌘1 day, ⌘2 week, ⌘3 month, ⌘T today,
@@ -10,6 +13,18 @@ struct ViewCommands: Commands {
     private var granted: Bool { model.access == .granted }
 
     var body: some Commands {
+        #if os(macOS)
+        // The standard About panel, with the build's number and commit in the version's parentheses
+        // ("0.1.0 (20261118.1045, 1d21270)"), as Settings shows it.
+        CommandGroup(replacing: .appInfo) {
+            Button("O aplikaci Daybook") {
+                NSApp.orderFrontStandardAboutPanel(options: [
+                    .applicationVersion: AppVersion.detail(info: Bundle.main.infoDictionary ?? [:])
+                ])
+                NSApp.activate()
+            }
+        }
+        #endif
         CommandGroup(replacing: .newItem) {
             Button("Nová událost") { model.beginNewEvent() }
                 .keyboardShortcut("n", modifiers: .command)
