@@ -2,7 +2,7 @@
 # Builds the app and captures the demo states into .impeccable/review/ for visual review.
 # Run from the repo root. Needs iOS 26 simulators and Screen Recording permission for the Mac shots,
 # which capture only the Daybook window (scripts/window-id.swift finds it).
-# Override the devices with PHONE=<udid> TABLET=<udid>.
+# Override the devices with PHONE=<udid> TABLET=<udid>; SKIP_MAC=1 captures iPhone and iPad only.
 # Every shot is pinned to Czech (-demo-locale cs) whatever the device's language; a later
 # -demo-locale en in a shot's arguments wins, for the English captures.
 PHONE=${PHONE:-B60E068A-347B-4B91-AFCF-005F31FD355C}
@@ -54,8 +54,13 @@ macregion() {
   pkill -x Daybook 2> /dev/null
 }
 rm -f "$OUT/mac-screen.png"
+# SKIP_MAC=1 leaves the Mac app alone (someone is working on the Mac); it is still built above.
+if [ "$SKIP_MAC" = 1 ]; then
+  echo "SKIP_MAC=1: no Mac captures"
+  MAC=no
+fi
 # A locked screen captures as black: skip the Mac rather than write images that show nothing.
-if ioreg -n Root -d1 | grep -q '"CGSSessionScreenIsLocked"=Yes'; then
+if [ "$MAC" != no ] && ioreg -n Root -d1 | grep -q '"CGSSessionScreenIsLocked"=Yes'; then
   echo "the Mac's screen is locked: no Mac captures"
   MAC=no
 fi
