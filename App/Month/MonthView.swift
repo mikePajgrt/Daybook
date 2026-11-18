@@ -17,6 +17,9 @@ struct MonthView: View {
     /// The weeks on screen, as the scroll view reports them; the title follows the month owning most of them.
     @State private var visibleWeeks: [Date] = []
     @State private var viewport: CGFloat = 0
+    /// Opened on today's week (launch, "Dnes", back from the week or day): until the user scrolls, the
+    /// title stays on today's month and the next month, which fills the rest of the screen, is in full ink.
+    @State private var anchoredOnToday = false
 
     @ScaledMetric(relativeTo: .caption) private var rowHeight: CGFloat = 17
     @ScaledMetric(relativeTo: .caption) private var numberHeight: CGFloat = 28
@@ -29,8 +32,13 @@ struct MonthView: View {
         return Array(symbols[first...] + symbols[..<first])
     }
 
-    /// The month on screen, whose days are drawn in full ink.
-    private var shownMonth: DateInterval? { model.calendar.dateInterval(of: .month, for: model.focusedDate) }
+    /// The days drawn in full ink: the month on screen; while anchored on today, also the month after it,
+    /// since the weeks ahead are what the view opened to show.
+    private var shownMonth: DateInterval? {
+        guard let month = model.calendar.dateInterval(of: .month, for: model.focusedDate) else { return nil }
+        guard anchoredOnToday, let next = model.calendar.dateInterval(of: .month, for: month.end) else { return month }
+        return DateInterval(start: month.start, end: next.end)
+    }
 
     var body: some View {
         GeometryReader { outer in
@@ -83,14 +91,10 @@ struct MonthView: View {
         return needed.map { $0 * scale }
     }
 
-    /// The week the month opens on: today's week on iPhone when the centred month holds today, where the
-    /// month does not fit; the month's first week where the whole month is meant to be scanned at once.
+    /// The week the month opens on, on every platform: today's week at the top when the centred month is
+    /// today's, so the weeks ahead fill the screen; another month's first week otherwise.
     private var openingWeek: Date? {
-        let first = MonthLayout.weeks(containing: model.windowCenter, calendar: model.calendar).first?.first
-        guard compact else { return first }
-        let today = model.weeks.first { $0.days.contains { $0.date == model.today } }?.id
-        if let today, centreWeekIDs.contains(today) { return today }
-        return first
+        MonthLayout.openingWeek(month: model.windowCenter, today: model.today, calendar: model.calendar)
     }
 
     private func grid(viewport: CGFloat, dense: Bool) -> some View {
@@ -127,6 +131,8 @@ struct MonthView: View {
         .scrollPosition(id: $topWeek, anchor: .top)
         .onScrollPhaseChange { _, phase in
             userScrolls = phase == .interacting || phase == .decelerating
+            // The user takes over: the title and the ink follow what they scroll to.
+            if phase == .interacting { anchoredOnToday = false }
             // The scroll came to rest: the month on screen settles with it.
             if phase == .idle { followTitle(heights: rowHeights) }
         }
@@ -136,7 +142,15 @@ struct MonthView: View {
             if userScrolls { followTitle(heights: rowHeights) }
         }
         .task(id: model.scrollKey) {
-            topWeek = openingWeek
+            // The key changes with every "Dnes", so it scrolls back even when the week is already the target.
+            let week = openingWeek
+            if topWeek == week {
+                topWeek = nil
+                await Task.yield()
+            }
+            topWeek = week
+            anchoredOnToday = week != nil && model.calendar.isDate(model.windowCenter, equalTo: model.today,
+                                                                  toGranularity: .month)
             #if DEBUG
             if model.stagedScreens.contains("scrolled") { await stageScroll() }
             if model.stagedScreens.contains("scrolled-end") { await stageScrollToEnd() }
@@ -157,7 +171,9 @@ struct MonthView: View {
     }
 
     /// Makes the month that owns most of the visible weeks the month on screen.
+    /// While anchored on today the title stays on today's month.
     private func followTitle(heights: [CGFloat]) {
+        guard !anchoredOnToday else { return }
         let visible = Set(visibleWeeks)
         guard let owner = Self.owner(weeks: model.weeks.filter { visible.contains($0.id) },
                                      heights: zip(model.weeks, heights).filter { visible.contains($0.0.id) }.map(\.1),
@@ -183,6 +199,7 @@ struct MonthView: View {
     private func stageScroll() async {
         // After the events have filled in, so the rows have their real heights.
         try? await Task.sleep(for: .milliseconds(1500))
+        anchoredOnToday = false
         guard let next = model.calendar.date(byAdding: .month, value: 1, to: model.windowCenter),
               let nextStart = model.calendar.dateInterval(of: .month, for: next)?.start,
               let index = model.weeks.firstIndex(where: { $0.days.contains { $0.date == nextStart } }) else { return }
@@ -198,6 +215,7 @@ struct MonthView: View {
     /// Debug staging: scrolls to the last week of the window, as far as a user can go.
     private func stageScrollToEnd() async {
         try? await Task.sleep(for: .milliseconds(1500))
+        anchoredOnToday = false
         guard let start = model.weeks.firstIndex(where: { $0.id == topWeek }) else { return }
         // A month at a time, as a hand would scroll, so the weeks on screen are reported along the way.
         for index in stride(from: start + 4, through: model.weeks.count - 1 + 4, by: 4) {

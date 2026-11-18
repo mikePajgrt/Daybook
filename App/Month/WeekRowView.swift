@@ -107,15 +107,29 @@ struct WeekRowView: View {
     private func numberLabel(_ day: DayLayout, inMonth: Bool) -> some View {
         let isToday = day.date == today
         let ink = inMonth ? Theme.ink : Theme.outsideInk(contrast)
-        return Text(verbatim: String(calendar.component(.day, from: day.date)))
-            .font((compact ? Font.footnote : Font.callout).weight(.semibold))
-            .monospacedDigit()
-            .foregroundStyle(isToday ? Theme.ground : ink)
-            .frame(minWidth: metrics.numberHeight - 6, minHeight: metrics.numberHeight - 6)
-            .background { if isToday { Circle().fill(Theme.ink) } }
-            .padding(.leading, isToday ? (compact ? 1 : 3) : (compact ? 3 : 6))
-            .frame(height: metrics.numberHeight, alignment: .leading)
-            .animation(.default, value: inMonth)
+        let font = (compact ? Font.footnote : Font.callout).weight(.semibold)
+        let dayOfMonth = calendar.component(.day, from: day.date)
+        return HStack(spacing: compact ? 2 : 4) {
+            Text(verbatim: String(dayOfMonth))
+                .font(font)
+                .monospacedDigit()
+                .foregroundStyle(isToday ? Theme.ground : ink)
+                .frame(minWidth: metrics.numberHeight - 6, minHeight: metrics.numberHeight - 6)
+                .background { if isToday { Circle().fill(Theme.ink) } }
+            // The 1st carries its month's name, so where one month ends and the next begins stays findable
+            // in the continuous column, also when both months are in full ink.
+            if dayOfMonth == 1 {
+                Text(day.date, format: .dateTime.month(.abbreviated))
+                    .font(font)
+                    .foregroundStyle(ink)
+                    .lineLimit(1)
+                    .fixedSize()
+                    .accessibilityHidden(true)
+            }
+        }
+        .padding(.leading, isToday ? (compact ? 1 : 3) : (compact ? 3 : 6))
+        .frame(height: metrics.numberHeight, alignment: .leading)
+        .animation(.default, value: inMonth)
     }
 
     private var spans: some View {
