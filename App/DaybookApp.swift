@@ -39,6 +39,8 @@ struct DaybookApp: App {
         //   -demo-scrolled           the month scrolled across its end into the next month
         //   -demo-no-categories      no categories yet (the empty categories page)
         //   -demo-locale <id>        the app in another language, e.g. -demo-locale en
+        //   -demo-theme <id>         a colour theme (nocturne, boss, kiss, slate, graphite); the default otherwise
+        //   -demo-settings           the settings open (iPhone: in the calendars sheet; iPad: from the rail)
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-demo") {
             let now = calendar.date(from: DateComponents(year: 2026, month: 11, day: 17, hour: 10)) ?? Date()
@@ -51,6 +53,11 @@ struct DaybookApp: App {
             let mode: ViewMode = arguments.contains("-demo-week") ? .week
                 : arguments.contains("-demo-day-view") ? .day : .month
             defaults.set(mode.rawValue, forKey: AppModel.viewModeKey)
+            // The theme and appearance come from the demo suite, never from the user's own choice.
+            AppearanceSettings.store = defaults
+            defaults.set(DemoStaging.value(after: "-demo-theme", in: arguments) ?? ColorTheme.default.rawValue,
+                         forKey: AppearanceSettings.themeKey)
+            defaults.set(AppearanceChoice.system.rawValue, forKey: AppearanceSettings.appearanceKey)
             let access: CalendarAccess = arguments.contains("-demo-denied") ? .denied
                 : arguments.contains("-demo-first-run") ? .notDetermined : .granted
             let store = arguments.contains("-demo-no-accounts")
@@ -91,6 +98,13 @@ struct DaybookApp: App {
         WindowGroup { content }
             .defaultSize(width: 1280, height: 860)
             .commands { ViewCommands(model: model) }
+        // App menu, Settings… (⌘,).
+        Settings {
+            SettingsView()
+                .frame(width: 460)
+                .frame(minHeight: 520)
+                .modifier(ThemedRoot(forcedScheme: demoColorScheme))
+        }
         #else
         WindowGroup { content }
             .commands { ViewCommands(model: model) }
@@ -101,7 +115,7 @@ struct DaybookApp: App {
         RootView()
             .environment(model)
             .environment(model.categoryModel)
-            .preferredColorScheme(demoColorScheme)
+            .modifier(ThemedRoot(forcedScheme: demoColorScheme))
             #if DEBUG && os(macOS)
             .background { if let demoWindowSize { DemoWindowFrame(size: demoWindowSize) } }
             #endif

@@ -21,7 +21,7 @@ struct WeekRowView: View {
     let calendar: Calendar
     let metrics: WeekMetrics
     let compact: Bool
-    let color: (String) -> Color
+    let color: (String) -> ThemeColor
     /// The month on screen: its days are in full ink, the others in outside ink.
     let month: DateInterval?
     /// Called when a day is tapped. `nil` where tapping a day does nothing.
@@ -68,7 +68,7 @@ struct WeekRowView: View {
             Spacer(minLength: WeekMetrics.bottomInset)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(calendar.isDateInWeekend(day.date) ? Theme.weekend : Color.clear)
+        .background(calendar.isDateInWeekend(day.date) ? AnyShapeStyle(Theme.weekend) : AnyShapeStyle(Color.clear))
         .clipped()
         .overlay(alignment: .trailing) {
             if !isLast { Rectangle().fill(Theme.rule).frame(width: 1) }
@@ -176,7 +176,7 @@ private struct DayCellTaps: ViewModifier {
 /// within one day it is a short lozenge followed by the title.
 struct SpanView: View {
     let span: SpanSegment
-    let color: Color
+    let color: ThemeColor
     /// Narrow columns: tighter insets and condensed type.
     let compact: Bool
     /// Moves the label along the line (paged columns keep it at the visible edge).

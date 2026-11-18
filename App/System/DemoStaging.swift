@@ -34,13 +34,14 @@ import Foundation
 ///   -demo-search-query <q>   search open with that query (instead of "ockovani")
 ///   -demo-search-hidden      search with "Hledat i ve vypnutých" on
 ///   -demo-search-past        search results scrolled to the first past day
+///   -demo-settings           the settings: iPhone in the calendars sheet, iPad from the rail, Mac its window
 enum DemoStaging {
     static let names = ["detail", "detail-readonly", "delete", "editor-new", "editor-edit",
                         "new-calendar", "calendar-color", "categories", "category-editor", "category-delete",
                         "editor-categories", "detail-categories", "search", "search-empty", "search-none",
                         "scrolled", "rail-collapsed", "scrolled-end", "editor-allday", "occurrence-categories",
                         "detail-attendees", "delete-single", "discard", "invite", "save-failure",
-                        "category-error", "search-hidden", "search-past"]
+                        "category-error", "search-hidden", "search-past", "settings"]
 
     /// The value after `flag` among the launch arguments, e.g. `-demo-search-query retro`.
     static func value(after flag: String, in arguments: [String] = ProcessInfo.processInfo.arguments) -> String? {

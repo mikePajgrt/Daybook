@@ -171,7 +171,7 @@ struct EventDetailView: View {
                     if EventLink.isOpenable(url) {
                         Link(url.absoluteString, destination: url)
                             .lineLimit(2)
-                            .tint(Theme.ink)
+                            .tint(Theme.controlInk)
                             .underline()
                     } else {
                         Text(url.absoluteString)
@@ -272,7 +272,7 @@ struct EventDetailView: View {
                     Text(assigned.isEmpty ? "Přiřadit kategorie" : "Upravit kategorie")
                         .foregroundStyle(Theme.ink)
                 }
-                .tint(Theme.ink)
+                .tint(Theme.controlInk)
             }
         }
         .onAppear {
@@ -313,7 +313,7 @@ struct EventDetailView: View {
                 if event.isEditable {
                     Button("Pozvat účastníky", systemImage: "person.badge.plus", action: openInvite)
                         .buttonStyle(.bordered)
-                        .tint(Theme.ink)
+                        .tint(Theme.controlInk)
                 }
                 #else
                 Text("Pozvánky se posílají z aplikace Kalendář nebo z Outlooku.")
@@ -329,7 +329,7 @@ struct EventDetailView: View {
         HStack(spacing: 12) {
             Button("Upravit", systemImage: "pencil", action: onEdit)
                 .buttonStyle(.bordered)
-                .tint(Theme.ink)
+                .tint(Theme.controlInk)
                 .keyboardShortcut("e", modifiers: .command)
             Spacer()
             deleteButton

@@ -17,7 +17,7 @@ struct CalendarEditorView: View {
             }
             .formStyle(.grouped)
             // Picker values and switches in the world's ink instead of system grey and green.
-            .tint(Theme.ink)
+            .tint(Theme.controlInk)
             .scrollContentBackground(.hidden)
             .background(Theme.rail)
             .foregroundStyle(Theme.ink)

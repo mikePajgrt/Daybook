@@ -8,6 +8,8 @@ struct RootView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showsCalendars = false
     @State private var calendarsDetent: PresentationDetent = .medium
+    /// iPhone: Settings pushed in the calendars sheet. iPad: Settings in a sheet over the window.
+    @State private var showsSettings = false
     /// Width of the detail column, to pick a period title that fits beside the controls.
     @State private var detailWidth: CGFloat = 0
     #if os(iOS)
@@ -17,6 +19,9 @@ struct RootView: View {
     /// Regular width: whether the rail shows. The filter chip opens it.
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @FocusState private var searchFocused: Bool
+    #if os(macOS)
+    @Environment(\.openSettings) private var openSettings
+    #endif
 
     var body: some View {
         if model.access == .granted {
@@ -101,10 +106,18 @@ struct RootView: View {
                                                      for: .navigationBar)
                         #endif
                         .toolbar {
+                            #if os(iOS)
+                            ToolbarItem(placement: .cancellationAction) { settingsButton }
+                            #endif
                             ToolbarItem(placement: .confirmationAction) {
                                 Button("Hotovo") { showsCalendars = false }
                             }
                         }
+                        #if os(iOS)
+                        .navigationDestination(isPresented: $showsSettings) {
+                            settingsPage
+                        }
+                        #endif
                 }
                 .presentationDetents([.medium, .large], selection: $calendarsDetent)
                 .presentationBackground(Theme.rail)
@@ -115,6 +128,11 @@ struct RootView: View {
                 if model.stagedScreens.contains("categories") {
                     calendarsDetent = .large
                     showsCalendars = true
+                }
+                if model.stagedScreens.contains("settings") {
+                    calendarsDetent = .large
+                    showsCalendars = true
+                    showsSettings = true
                 }
             }
             #endif
@@ -130,6 +148,22 @@ struct RootView: View {
                     .toolbarBackground(Theme.rail, for: .navigationBar)
                     .toolbarBackgroundVisibility(dynamicTypeSize.isAccessibilitySize ? .visible : .automatic,
                                                  for: .navigationBar)
+                    // Settings at the foot of the rail, out of the way of the calendars.
+                    .toolbar {
+                        ToolbarItem(placement: .bottomBar) { settingsButton }
+                        ToolbarSpacer(.flexible, placement: .bottomBar)
+                    }
+                    .sheet(isPresented: $showsSettings) {
+                        NavigationStack {
+                            settingsPage
+                                .toolbar {
+                                    ToolbarItem(placement: .confirmationAction) {
+                                        Button("Hotovo") { showsSettings = false }
+                                    }
+                                }
+                        }
+                        .presentationBackground(Theme.rail)
+                    }
                     #endif
             } detail: {
                 current
@@ -210,6 +244,13 @@ struct RootView: View {
             #endif
             #if DEBUG
             .task {
+                if model.stagedScreens.contains("settings") {
+                    #if os(iOS)
+                    showsSettings = true
+                    #else
+                    openSettings()
+                    #endif
+                }
                 if model.stagedScreens.contains("rail-collapsed") {
                     try? await Task.sleep(for: .milliseconds(300))
                     columnVisibility = .detailOnly
@@ -219,6 +260,22 @@ struct RootView: View {
             .modifier(SearchFocus(focused: $searchFocused))
         }
     }
+
+    #if os(iOS)
+    /// The gear that opens Settings (iPhone: in the calendars sheet; iPad: at the foot of the rail).
+    private var settingsButton: some View {
+        Button { showsSettings = true } label: {
+            Label("Nastavení", systemImage: "gearshape")
+        }
+        .help(Text("Nastavení"))
+    }
+
+    private var settingsPage: some View {
+        SettingsView()
+            .navigationTitle("Nastavení")
+            .navigationBarTitleDisplayMode(.inline)
+    }
+    #endif
 
     /// Search results are on screen instead of the calendar.
     private var isSearching: Bool { model.search.isPresented || model.search.hasQuery }

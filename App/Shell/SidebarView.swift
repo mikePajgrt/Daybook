@@ -6,7 +6,7 @@ struct SidebarView: View {
     @Environment(AppModel.self) private var model
     @Environment(CategoryModel.self) private var categories
     /// Row fill when the list is shown as an inset list (the iPhone sheet); `nil` keeps the sidebar style.
-    var rowBackground: Color? = nil
+    var rowBackground: ThemeColor? = nil
 
     var body: some View {
         ScrollViewReader { reader in

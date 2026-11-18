@@ -7,74 +7,101 @@ import UIKit
 import AppKit
 #endif
 
+extension EnvironmentValues {
+    /// The colour theme chosen in Settings; every `Theme` colour resolves against it.
+    @Entry var colorTheme: ColorTheme = .default
+}
+
+/// A colour of the world: resolved from the environment's theme, appearance and Increased Contrast, so a
+/// change of any of them redraws every view, sheet and window that shows it.
+struct ThemeColor: ShapeStyle {
+    let rgba: @Sendable (_ palette: ThemePalette, _ increasedContrast: Bool) -> RGBA
+
+    init(_ rgba: @escaping @Sendable (_ palette: ThemePalette, _ increasedContrast: Bool) -> RGBA) {
+        self.rgba = rgba
+    }
+
+    func resolve(in environment: EnvironmentValues) -> Color {
+        Color(components(in: environment))
+    }
+
+    /// The colour as plain components in `environment`, for drawing outside SwiftUI and for `Color` APIs.
+    func components(in environment: EnvironmentValues) -> RGBA {
+        rgba(environment.themePalette, environment.colorSchemeContrast == .increased)
+    }
+
+    /// This colour at a further opacity.
+    func opacity(_ opacity: Double) -> ThemeColor {
+        let rgba = rgba
+        return ThemeColor { palette, increased in
+            let c = rgba(palette, increased)
+            return RGBA(r: c.r, g: c.g, b: c.b, a: c.a * opacity)
+        }
+    }
+}
+
+/// As a view, like `Color`: for list row backgrounds and other places that take a view.
+extension ThemeColor: View {
+    var body: some View { Rectangle().fill(self) }
+}
+
+extension EnvironmentValues {
+    /// The palette on screen: the chosen theme in the current appearance.
+    var themePalette: ThemePalette { colorTheme.palette(dark: colorScheme == .dark) }
+}
+
+/// The world's colours. Each is a `ThemeColor`, taken from the theme chosen in Settings (`ColorTheme`,
+/// DaybookCore) in the appearance on screen; the default theme draws exactly the original world.
 enum Theme {
-    private static let midnight = Palette.midnight
-    private static let porcelain = Palette.porcelain
-
     /// The surface the month is drawn on.
-    static let ground = Color.adaptive(light: porcelain, dark: midnight)
+    static let ground = ThemeColor { p, _ in p.ground }
     /// The sidebar, one step deeper than the ground.
-    static let rail = Color.adaptive(light: RGBA(r: 0.918, g: 0.902, b: 0.867),
-                                     dark: RGBA(r: 0.039, g: 0.078, b: 0.188))
+    static let rail = ThemeColor { p, _ in p.rail }
     /// Text, and the fill of the interchange circle that marks today.
-    static let ink = Color.adaptive(light: midnight, dark: porcelain)
-    /// Times and other secondary text: ink at 62%, 80% under Increased Contrast.
-    static let secondaryInk = inkAt(0.62, increased: 0.8)
-    /// Text of days that belong to the neighbouring month. Holds 4.5:1 on the ground in both appearances.
-    private static let outsideInk = Color.adaptive(light: RGBA(r: 0.357, g: 0.384, b: 0.471),
-                                                   dark: RGBA(r: 0.561, g: 0.592, b: 0.678))
+    static let ink = ThemeColor { p, _ in p.ink }
+    /// Tint of menus, form controls and bordered buttons: the ink, leaning toward the theme's hue in
+    /// themes that have one, never a line colour.
+    static let controlInk = ThemeColor { p, _ in p.controlInk }
+    /// Times and other secondary text: ink at 62% (more in some light themes), 80% under Increased Contrast.
+    static let secondaryInk = ThemeColor { p, increased in p.secondaryInk(increased: increased) }
 
-    static func outsideInk(_ contrast: ColorSchemeContrast) -> Color {
-        contrast == .increased ? ink.opacity(0.85) : outsideInk
+    /// Text of days that belong to the neighbouring month. Holds 4.5:1 on the ground; ink at 85% under
+    /// Increased Contrast.
+    static func outsideInk(_ contrast: ColorSchemeContrast) -> ThemeColor {
+        ThemeColor { p, increased in p.outsideInk(increased: increased) }
     }
 
     /// The dot that marks an event on its calendar's line.
-    static let station = Color.adaptive(light: RGBA(r: 1, g: 1, b: 1), dark: porcelain)
+    static let station = ThemeColor { p, _ in p.station }
     /// Hairlines between days and weeks: ink at 16%, 32% under Increased Contrast.
-    static let rule = inkAt(0.16, increased: 0.32)
+    static let rule = ThemeColor { p, increased in p.rule(increased: increased) }
     /// Fill of an event block in the week and day views: the calendar's line colour mixed into the ground
-    /// in OKLab, so ink stays legible and warm colours do not turn brown on midnight.
-    static func blockFill(_ color: RGBA) -> Color {
-        .adaptive { dark, increased in
-            let ground = dark ? midnight : porcelain
-            return Palette.blockFill(Palette.lineColor(color, on: ground, minimumContrast: lineContrast(increased)), on: ground)
-        }
+    /// in OKLab, so ink stays legible and warm colours do not turn brown on a dark ground.
+    static func blockFill(_ color: RGBA) -> ThemeColor {
+        ThemeColor { p, increased in p.blockFill(color, increased: increased) }
     }
     /// Time and place inside an event block. Darker than `secondaryInk`, because the block's tint
-    /// lowers contrast; holds 4.5:1 on a tinted block in both appearances.
-    static let blockSecondaryInk = inkAt(0.8, increased: 0.9)
+    /// lowers contrast; holds 4.5:1 on a tinted block in every theme and appearance.
+    static let blockSecondaryInk = ThemeColor { p, increased in p.blockSecondaryInk(increased: increased) }
     /// Tint laid over weekend columns.
-    static let weekend = Color.adaptive(light: RGBA(r: 0.055, g: 0.102, b: 0.227, a: 0.05),
-                                        dark: RGBA(r: 0, g: 0, b: 0, a: 0.18))
+    static let weekend = ThemeColor { p, _ in p.weekend }
 
     /// Drawn when an event's calendar cannot be resolved.
     static let fallbackLine = RGBA(r: 0.56, g: 0.56, b: 0.58)
 
     /// A calendar's colour as a line on the ground: lightness adjusted, hue kept, until it holds 3:1
-    /// (4.5:1 under Increased Contrast) in the appearance on screen. Colours that already hold stay as chosen.
-    static func line(_ color: RGBA) -> Color {
-        .adaptive { dark, increased in
-            Palette.lineColor(color, on: dark ? midnight : porcelain, minimumContrast: lineContrast(increased))
-        }
+    /// (4.5:1 under Increased Contrast) on the ground on screen. Colours that already hold stay as chosen.
+    static func line(_ color: RGBA) -> ThemeColor {
+        ThemeColor { p, increased in p.line(color, increased: increased) }
     }
 
-    /// A switch's "on" track. Ink in the light appearance (the white knob reads on midnight). In the dark
-    /// appearance ink thinned to 55% over midnight, mixed opaque: porcelain itself would leave the white
-    /// knob at 1.13:1. This holds the knob at 3.2:1 and stays 3.5:1 from the switch's own "off" track.
-    static let switchOn = Color.adaptive(light: midnight, dark: RGBA(r: 0.551, g: 0.566, b: 0.607))
+    /// A switch's "on" track: the white knob holds 3:1 on it in every theme. In the default theme's dark
+    /// appearance ink thinned to 55% over midnight, mixed opaque: porcelain itself would leave the knob at 1.13:1.
+    static let switchOn = ThemeColor { p, _ in p.switchOn }
 
     /// The line colour as plain components, for drawing outside SwiftUI (menu swatches).
-    static func lineRGBA(_ color: RGBA, dark: Bool) -> RGBA {
-        Palette.lineColor(color, on: dark ? midnight : porcelain)
-    }
-
-    private static func lineContrast(_ increased: Bool) -> Double { increased ? 4.5 : Palette.lineContrast }
-
-    private static func inkAt(_ opacity: Double, increased: Double) -> Color {
-        .adaptive { dark, high in
-            let ink = dark ? porcelain : midnight
-            return RGBA(r: ink.r, g: ink.g, b: ink.b, a: high ? increased : opacity)
-        }
+    static func lineRGBA(_ color: RGBA, palette: ThemePalette) -> RGBA {
+        palette.line(color)
     }
 }
 
@@ -99,30 +126,6 @@ enum Motion {
 extension Color {
     init(_ rgba: RGBA) {
         self.init(.sRGB, red: rgba.r, green: rgba.g, blue: rgba.b, opacity: rgba.a)
-    }
-
-    /// A colour that follows the system appearance.
-    static func adaptive(light: RGBA, dark: RGBA) -> Color {
-        adaptive { isDark, _ in isDark ? dark : light }
-    }
-
-    /// A colour that follows the system appearance and Increased Contrast.
-    static func adaptive(_ resolve: @escaping @Sendable (_ dark: Bool, _ increasedContrast: Bool) -> RGBA) -> Color {
-        #if canImport(UIKit)
-        return Color(UIColor { traits in
-            let c = resolve(traits.userInterfaceStyle == .dark, traits.accessibilityContrast == .high)
-            return UIColor(red: c.r, green: c.g, blue: c.b, alpha: c.a)
-        })
-        #else
-        return Color(NSColor(name: nil) { appearance in
-            let match = appearance.bestMatch(from: [.darkAqua, .aqua, .accessibilityHighContrastDarkAqua,
-                                                    .accessibilityHighContrastAqua])
-            let isDark = match == .darkAqua || match == .accessibilityHighContrastDarkAqua
-            let high = match == .accessibilityHighContrastAqua || match == .accessibilityHighContrastDarkAqua
-            let c = resolve(isDark, high)
-            return NSColor(srgbRed: c.r, green: c.g, blue: c.b, alpha: c.a)
-        })
-        #endif
     }
 }
 

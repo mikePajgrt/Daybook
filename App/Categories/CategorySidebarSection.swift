@@ -6,7 +6,7 @@ import SwiftUI
 /// categories are kept. Categories carry no colour: the checkbox is ink, the symbol tells them apart.
 struct CategorySidebarSection: View {
     @Environment(CategoryModel.self) private var categories
-    var rowBackground: Color?
+    var rowBackground: ThemeColor?
 
     var body: some View {
         Section {

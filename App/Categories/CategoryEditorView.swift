@@ -75,7 +75,7 @@ struct CategoryEditorView: View {
                 }
             }
             .formStyle(.grouped)
-            .tint(Theme.ink)
+            .tint(Theme.controlInk)
             .scrollContentBackground(.hidden)
             .background(Theme.rail)
             .foregroundStyle(Theme.ink)

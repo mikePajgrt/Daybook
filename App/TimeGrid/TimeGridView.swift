@@ -145,7 +145,7 @@ struct TimeGridView: View {
 
     private func rgba(for calendarID: String) -> RGBA { model.color(of: calendarID) }
 
-    private func color(for calendarID: String) -> Color { Theme.line(rgba(for: calendarID)) }
+    private func color(for calendarID: String) -> ThemeColor { Theme.line(rgba(for: calendarID)) }
 }
 
 /// Under Reduce Motion a calendar or category switch crossfades the content instead of moving blocks:

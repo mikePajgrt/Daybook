@@ -81,7 +81,7 @@ struct AccessView: View {
         }
         // The world's ink, not system blue: a blue control would read like a calendar line.
         .buttonStyle(.borderedProminent)
-        .tint(Theme.ink)
+        .tint(Theme.controlInk)
         .foregroundStyle(Theme.ground)
         .controlSize(.large)
     }

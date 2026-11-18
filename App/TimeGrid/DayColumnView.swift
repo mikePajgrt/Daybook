@@ -45,7 +45,7 @@ struct DayColumnView: View {
             }
         }
         .frame(width: width, height: metrics.gridHeight, alignment: .topLeading)
-        .background(isWeekend ? Theme.weekend : Color.clear)
+        .background(isWeekend ? AnyShapeStyle(Theme.weekend) : AnyShapeStyle(Color.clear))
         .overlay(alignment: .trailing) {
             if !isLast { Rectangle().fill(Theme.rule).frame(width: 1) }
         }

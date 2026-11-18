@@ -4,7 +4,7 @@ import SwiftUI
 /// One timed event in a day cell: a piece of its calendar's line, a station dot, time and title.
 struct EventRowView: View {
     let event: EventInfo
-    let color: Color
+    let color: ThemeColor
     /// Narrow columns (iPhone, iPad beside the sidebar): no time, condensed type.
     let compact: Bool
     /// The event's day belongs to the neighbouring month.
@@ -62,7 +62,7 @@ struct EventRowView: View {
 
 /// A piece of a calendar's line with the station dot that marks one event on it.
 struct StationMark: View {
-    let color: Color
+    let color: ThemeColor
 
     var body: some View {
         Rectangle()

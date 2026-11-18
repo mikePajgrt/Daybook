@@ -11,7 +11,7 @@ struct AllDayStripView: View {
     /// to stay at the visible leading edge, so one label per event is always readable.
     /// `nil` when every day is on screen.
     let pinnedOffset: CGFloat?
-    let color: (String) -> Color
+    let color: (String) -> ThemeColor
 
     static let padding: CGFloat = 4
 

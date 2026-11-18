@@ -8,7 +8,7 @@ struct AgendaView: View {
     @Environment(AppModel.self) private var model
     @Environment(CategoryModel.self) private var categoryModel
     let days: [Date]
-    let color: (String) -> Color
+    let color: (String) -> ThemeColor
     /// Diameter of the interchange circle around today's number.
     @ScaledMetric(relativeTo: .title3) private var numberSize: CGFloat = 34
 
@@ -93,7 +93,7 @@ struct AgendaView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(model.calendar.isDateInWeekend(day) ? Theme.weekend : Color.clear)
+        .background(model.calendar.isDateInWeekend(day) ? AnyShapeStyle(Theme.weekend) : AnyShapeStyle(Color.clear))
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.rule).frame(height: 1) }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(DayText.spoken(day, isToday: isToday, count: events.count))
