@@ -40,6 +40,8 @@ struct InterchangeMark: View {
         .aspectRatio(1, contentMode: .fit)
         // The platform's icon shape: a continuous corner of about 22% of the side.
         .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+        // A hairline keeps the tile's edge where the ground is midnight too.
+        .overlay { RoundedRectangle(cornerRadius: 17, style: .continuous).strokeBorder(Theme.rule, lineWidth: 1) }
         .accessibilityHidden(true)
     }
 }
