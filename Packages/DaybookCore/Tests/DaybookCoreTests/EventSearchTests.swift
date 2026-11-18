@@ -100,4 +100,22 @@ import Testing
         let range = DateInterval(start: TestCalendar.date(2026, 3, 1), end: TestCalendar.date(2026, 11, 1))
         #expect(EventSearch.chunks(of: range, maxYears: 4, calendar: cal) == [range])
     }
+
+    @Test func snippetSaysWhyAResultMatched() {
+        let notes = "Projít návrh endpointů pro synchronizaci kategorií a rozhodnout o stránkování."
+        let people = [Attendee(name: "Petra Svobodová", email: "petra@example.com", status: .accepted)]
+        let item = event("a", "Návrh API", day: 17, location: "Zasedačka Vltava", notes: notes, attendees: people)
+        // The title shows the match: nothing to add.
+        #expect(EventSearch.snippet(for: item, query: "navrh") == nil)
+        #expect(EventSearch.snippet(for: item, query: "vltava") == nil)
+        // A note: a few whole words before the match, marked as cut.
+        #expect(EventSearch.snippet(for: item, query: "strankovani")
+                == .init(field: .notes, text: "…a rozhodnout o stránkování."))
+        // Near the start of the note: the whole line.
+        #expect(EventSearch.snippet(for: item, query: "endpointu")
+                == .init(field: .notes, text: notes))
+        // An attendee: the name or the address that matched.
+        #expect(EventSearch.snippet(for: item, query: "svobodova") == .init(field: .attendee, text: "Petra Svobodová"))
+        #expect(EventSearch.snippet(for: item, query: "petra@") == .init(field: .attendee, text: "petra@example.com"))
+    }
 }

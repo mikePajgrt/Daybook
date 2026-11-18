@@ -9,13 +9,14 @@ struct SearchResultsView: View {
     var body: some View {
         @Bindable var search = model.search
         List {
-            if search.filterHidesSomething || search.includesHidden {
+            // When nothing was found, the empty state offers the same switch as its one action.
+            if (search.filterHidesSomething || search.includesHidden) && !offersSearchInHidden {
                 Section {
                     Toggle("Hledat i ve vypnutých", isOn: $search.includesHidden)
                         .tint(Theme.ink)
                         .listRowBackground(Theme.ground)
                 } footer: {
-                    Text("Zahrne kalendáře a kategorie, které máte v postranním panelu vypnuté.")
+                    Text("Zahrne i kalendáře a kategorie, které máte vypnuté.")
                 }
             }
             ForEach(search.results) { day in
@@ -70,7 +71,7 @@ struct SearchResultsView: View {
                     Text("V zapnutých kalendářích a kategoriích žádná událost neobsahuje „\(search.resultQuery)“.")
                 }
             } actions: {
-                if !search.includesHidden && search.filterHidesSomething {
+                if offersSearchInHidden {
                     Button("Hledat i ve vypnutých") { model.search.includesHidden = true }
                         .buttonStyle(.bordered)
                         .tint(Theme.ink)
@@ -83,6 +84,14 @@ struct SearchResultsView: View {
             }
             .tint(Theme.ink)
         }
+    }
+
+    /// No results while switched-off calendars or categories are left out: the empty state's button
+    /// takes over from the switch above the results.
+    private var offersSearchInHidden: Bool {
+        let search = model.search
+        return search.hasQuery && search.phase == .done && search.results.isEmpty
+            && !search.includesHidden && search.filterHidesSomething
     }
 
     private func choose(_ event: EventInfo) {

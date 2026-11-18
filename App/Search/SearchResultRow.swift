@@ -32,6 +32,19 @@ struct SearchResultRow: View {
                         .foregroundStyle(Theme.secondaryInk)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+                // Found in a note or an attendee: the words that matched, so the row says why it is here.
+                if let snippet = EventSearch.snippet(for: event, query: query) {
+                    Label {
+                        Text(emphasised(snippet.text))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    } icon: {
+                        Image(systemName: snippet.field == .notes ? "note.text" : "person")
+                    }
+                    .labelStyle(SnippetLabelStyle())
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.secondaryInk)
+                }
                 HStack(spacing: 6) {
                     if let info { Text(info.title) }
                     if !categories.isEmpty {
@@ -49,23 +62,20 @@ struct SearchResultRow: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel([EventText.spoken(event, calendar: model.calendar, calendarTitle: info?.title,
                                               categories: categories),
-                             event.start.formatted(date: .complete, time: .omitted)].joined(separator: ", "))
+                             event.start.formatted(date: .complete, time: .omitted),
+                             EventSearch.snippet(for: event, query: query)?.text].compactMap { $0 }.joined(separator: ", "))
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(Text("Otevře den a podrobnosti události"))
     }
 
-    /// "Celý den", or the time range; across days, both dates.
+    /// "Celý den", or the time range in the app's one time format; across days, both dates.
     private var when: String {
         if event.isAllDay {
             let days = MonthLayout.dayRange(of: event, calendar: model.calendar)
             if days.lowerBound == days.upperBound { return String(localized: "Celý den") }
             return (days.lowerBound..<days.upperBound).formatted(.interval.day().month(.abbreviated))
         }
-        let lastInstant = event.end > event.start ? event.end.addingTimeInterval(-1) : event.end
-        if model.calendar.isDate(event.start, inSameDayAs: lastInstant) {
-            return (event.start..<max(event.end, event.start)).formatted(.interval.hour().minute())
-        }
-        return (event.start..<event.end).formatted(.interval.day().month(.abbreviated).hour().minute())
+        return TimeText.span(event, calendar: model.calendar, dateStyle: .dateTime.day().month(.abbreviated))
     }
 
     /// The text with every match of the query in semibold.
@@ -77,5 +87,15 @@ struct SearchResultRow: View {
             result[lower..<upper].inlinePresentationIntent = .stronglyEmphasized
         }
         return result
+    }
+}
+
+/// The snippet's symbol beside its first line, small and in the line's colour.
+private struct SnippetLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            configuration.icon.imageScale(.small).accessibilityHidden(true)
+            configuration.title
+        }
     }
 }

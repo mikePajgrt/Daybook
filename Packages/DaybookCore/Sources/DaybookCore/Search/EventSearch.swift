@@ -88,6 +88,45 @@ public enum EventSearch {
         return ranges
     }
 
+    // MARK: Why it matched
+
+    /// Where a result matched when its title and place do not show it: a note or an attendee.
+    public struct Snippet: Hashable, Sendable {
+        public enum Field: Hashable, Sendable { case notes, attendee }
+        public let field: Field
+        /// One line of the field around the match; "…" marks text left out before it.
+        public let text: String
+    }
+
+    /// The note or attendee that holds a word of `query` missing from the title and the place, so a
+    /// result can say why it was found. `nil` when the title and place already show every word.
+    public static func snippet(for event: EventInfo, query: String) -> Snippet? {
+        let terms = terms(query)
+        let shown = fold(event.title + " " + (event.location ?? ""))
+        guard let term = terms.first(where: { !shown.contains($0) }) else { return nil }
+        if let notes = event.notes, fold(notes).contains(term) {
+            let line = notes.split(whereSeparator: \.isNewline).map(String.init)
+                .first { fold($0).contains(term) } ?? notes
+            return Snippet(field: .notes, text: excerpt(line, around: term, wordsBefore: 3))
+        }
+        for person in event.attendees {
+            for text in [person.name, person.email].compactMap({ $0 }) where fold(text).contains(term) {
+                return Snippet(field: .attendee, text: text)
+            }
+        }
+        return nil
+    }
+
+    /// `line` from a few whole words before the first occurrence of the folded `term`.
+    private static func excerpt(_ line: String, around term: String, wordsBefore: Int) -> String {
+        guard let match = highlights(in: line, query: term).first else { return line }
+        let words = line[..<match.lowerBound].split(whereSeparator: \.isWhitespace)
+        guard words.count > wordsBefore, let first = words.suffix(wordsBefore).first else {
+            return line.trimmingCharacters(in: .whitespaces)
+        }
+        return "…" + line[first.startIndex...].trimmingCharacters(in: .whitespaces)
+    }
+
     // MARK: Range
 
     /// From local midnight `years` years before today to the end of the day `years` years after it.

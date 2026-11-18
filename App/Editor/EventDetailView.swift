@@ -8,6 +8,9 @@ struct EventDetailView: View {
 
     @Environment(AppModel.self) private var model
     @Environment(CategoryModel.self) private var categories
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    #endif
     let event: EventInfo
     let style: Style
     /// Closes the popover or sheet.
@@ -214,7 +217,7 @@ struct EventDetailView: View {
                 }
             }
             if categories.categories.isEmpty {
-                Text("Kategorie založíte v postranním panelu volbou Nová kategorie.")
+                Text(whereToCreateCategories)
                     .font(.caption)
                     .foregroundStyle(Theme.secondaryInk)
                     .fixedSize(horizontal: false, vertical: true)
@@ -251,6 +254,14 @@ struct EventDetailView: View {
             if model.stagedScreens.contains("detail-categories") { editsCategories = true }
             #endif
         }
+    }
+
+    /// Where "Nová kategorie" is: the iPhone has no sidebar, only the list that rises from the bar.
+    private var whereToCreateCategories: LocalizedStringKey {
+        #if os(iOS)
+        if sizeClass == .compact { return "Kategorie založíte v seznamu Kalendáře a kategorie volbou Nová kategorie." }
+        #endif
+        return "Kategorie založíte v postranním panelu volbou Nová kategorie."
     }
 
     private func detailRow<Value: View>(_ symbol: String, label: String,
