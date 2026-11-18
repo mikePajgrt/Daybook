@@ -181,7 +181,7 @@ shot "$PHONE" phone-save-failure.png -demo-save-failure
 shot "$PHONE" phone-discard.png -demo-discard
 shot "$PHONE" phone-delete-single.png -demo-day-view -demo-delete-single
 shot "$PHONE" phone-invite.png -demo-invite
-shot "$PHONE" phone-category-error.png -demo-category-error
+shot "$PHONE" phone-category-error.png -demo-categories -demo-category-error
 shot "$PHONE" phone-scrolled-end.png -demo-scrolled-end
 xcrun simctl ui "$PHONE" increase_contrast enabled
 shot "$PHONE" phone-contrast.png

@@ -61,11 +61,16 @@ struct EventDetailView: View {
                                 deleteButton
                                     .controlSize(.large)
                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                    .id(Self.deleteID)
                             }
                         }
                         .padding(20)
                     }
-                    .task { await stageAttendees(reader) }
+                    .task {
+                        await stageAttendees(reader)
+                        // Opened asking to delete: the button the question hangs on comes into view first.
+                        if asksDeleteAtStart { withAnimation { reader.scrollTo(Self.deleteID, anchor: .bottom) } }
+                    }
                 }
                 .background(Theme.ground)
                 .navigationTitle("Událost")
@@ -120,6 +125,7 @@ struct EventDetailView: View {
     }
 
     private static let attendeesID = "attendees"
+    private static let deleteID = "delete"
 
     private var deleteTitle: String {
         event.isRecurring ? String(localized: "Smazat opakovanou událost „\(title)“?")
