@@ -172,6 +172,7 @@ shot "$PHONE" phone-editor-allday.png -demo-editor-allday
 shot "$PHONE" phone-editor-allday-light.png -demo-editor-allday -demo-light
 shot "$PHONE" phone-categories-syncing.png -demo-categories -demo-icloud-syncing
 shot "$PHONE" phone-categories-not-saved.png -demo-categories -demo-not-saved
+shot "$PHONE" phone-category-editor-not-saved.png -demo-categories -demo-category-editor -demo-not-saved
 shot "$PHONE" phone-search-hidden.png -demo-search -demo-search-query retro -demo-category-off -demo-search-hidden
 shot "$PHONE" phone-search-past.png -demo-search -demo-search-past
 shot "$PHONE" phone-search-note.png -demo-search -demo-search-query strankovani
@@ -230,6 +231,7 @@ shot "$TABLET" tablet-collapsed.png -demo-rail-collapsed
 shot "$TABLET" tablet-week-collapsed.png -demo-week -demo-rail-collapsed
 shot "$TABLET" tablet-week-off-collapsed.png -demo-week -demo-off -demo-rail-collapsed
 shot "$TABLET" tablet-day-view-off-collapsed.png -demo-day-view -demo-category-off -demo-uncategorized-off -demo-rail-collapsed
+shot "$TABLET" tablet-search-light.png -demo-search -demo-light
 shot "$TABLET" tablet-search-hidden.png -demo-search -demo-search-query retro -demo-category-off -demo-search-hidden
 shot "$TABLET" tablet-search-note.png -demo-search -demo-search-query strankovani
 shot "$TABLET" tablet-detail-attendees.png -demo-detail-attendees
