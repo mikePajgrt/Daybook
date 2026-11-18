@@ -151,6 +151,16 @@ struct MonthView: View {
             topWeek = week
             anchoredOnToday = week != nil && model.calendar.isDate(model.windowCenter, equalTo: model.today,
                                                                   toGranularity: .month)
+            // On a cold start the lazy rows are not laid out yet: the scroll can stay at the window's first
+            // week, or stop short of the target by the rows' estimated heights. Scroll to the week again as
+            // the rows come in, unless the user has taken over.
+            for _ in 0..<3 {
+                try? await Task.sleep(for: .milliseconds(250))
+                guard !userScrolls, let week, topWeek == week || topWeek == nil else { break }
+                topWeek = nil
+                await Task.yield()
+                topWeek = week
+            }
             #if DEBUG
             if model.stagedScreens.contains("scrolled") { await stageScroll() }
             if model.stagedScreens.contains("scrolled-end") { await stageScrollToEnd() }
@@ -243,7 +253,7 @@ struct MonthView: View {
         .accessibilityHidden(true)
     }
 
-    private func color(for calendarID: String) -> Color {
+    private func color(for calendarID: String) -> ThemeColor {
         Theme.line(model.color(of: calendarID))
     }
 }
