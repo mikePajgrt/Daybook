@@ -14,6 +14,8 @@ struct DaybookApp: App {
 
     init() {
         #if DEBUG
+        // Before anything else (EventKit, the category store, any window): create the CloudKit schema and quit.
+        CloudKitSchemaInitializer.runIfRequested()
         DemoStaging.forceLocale(ProcessInfo.processInfo.arguments)
         #endif
         let calendar = Calendar.current
