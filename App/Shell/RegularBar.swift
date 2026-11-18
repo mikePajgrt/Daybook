@@ -44,8 +44,8 @@ enum RegularBarLayout {
     static let groupLeadingWithoutToday: CGFloat = 136
     static let menuPadding: CGFloat = 33
     static let rightOfPicker: CGFloat = 175
-    /// "Dnes" at the default text size, against which the bar's growth is measured.
-    static let todayAtDefaultSize: CGFloat = 39.5
+    /// The fixed word "Dnes" at the default text size, against which the bar's growth is measured.
+    static let referenceAtDefaultSize: CGFloat = 39.5
     static let groupGap: CGFloat = 18
     static let wordGap: CGFloat = 6
     /// With the filter symbol in the title's item the bar wants more room before the group
@@ -68,10 +68,12 @@ enum RegularBarLayout {
               let today = m.width(RegularBarProbes.todayKey), let word = m.width(RegularBarProbes.wordKey),
               let segmented = m.width(RegularBarProbes.segmentedKey),
               let menuLabel = m.width(RegularBarProbes.modeNameKey),
+              let reference = m.width(RegularBarProbes.referenceKey),
               let symbol = m.width(RegularBarProbes.symbolKey), let count = m.width(RegularBarProbes.countKey)
         else { return fallback }
         // The bar's buttons grow with the text a little (up to its own limit); its spacing grows with them.
-        let scale = max(1, today / todayAtDefaultSize)
+        // Measured on one fixed word, so a longer word in another language is not taken for larger text.
+        let scale = max(1, reference / referenceAtDefaultSize)
         let menu = menuLabel + menuPadding * scale
         let start = m.detail.minX + (railHidden ? titleInsetAfterSidebarButton : titleInsetBesideRail)
         let indicators: [RegularBarChoice.Indicator] = filtering ? [.symbolAndCount, .symbol] : [.none]
@@ -105,6 +107,7 @@ enum RegularBarLayout {
 /// Invisible copies of the bar's texts and switcher, measured in the bar's type at the current size.
 struct RegularBarProbes: View {
     static let todayKey = "\u{1}today"
+    static let referenceKey = "\u{1}reference"
     static let wordKey = "\u{1}word"
     static let segmentedKey = "\u{1}segmented"
     static let modeNameKey = "\u{1}mode"
@@ -122,6 +125,7 @@ struct RegularBarProbes: View {
                 measured(title) { BarTitleText(text: title) }
             }
             measured(Self.todayKey) { Text("Dnes").font(.body) }
+            measured(Self.referenceKey) { Text(verbatim: "Dnes").font(.body) }
             measured(Self.wordKey) { Text("Událost").font(.body) }
             measured(Self.modeNameKey) { Text(modeName).font(.body) }
             measured(Self.symbolKey) { FilterIndicatorLabel(count: nil) }
