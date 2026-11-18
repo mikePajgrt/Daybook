@@ -135,6 +135,7 @@ struct EventEditorView: View {
 
             Section {
                 Toggle("Celý den", isOn: $editor.isAllDay)
+                    .switchTint()
                 DatePicker("Začátek", selection: $editor.start, displayedComponents: dateComponents)
                 DatePicker("Konec", selection: $editor.draft.end, in: editor.draft.start...,
                            displayedComponents: dateComponents)
@@ -162,6 +163,7 @@ struct EventEditorView: View {
                 }
                 if editor.draft.recurrence != nil {
                     Toggle("Konec opakování", isOn: recurrenceHasEnd)
+                        .switchTint()
                     if let end = editor.draft.recurrence?.end {
                         DatePicker("Opakovat do", selection: Binding(get: { end }, set: { setRecurrenceEnd($0) }),
                                    in: model.calendar.startOfDay(for: editor.draft.start)...,

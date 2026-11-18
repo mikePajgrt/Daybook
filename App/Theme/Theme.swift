@@ -58,6 +58,11 @@ enum Theme {
         }
     }
 
+    /// A switch's "on" track. Ink in the light appearance (the white knob reads on midnight). In the dark
+    /// appearance ink thinned to 55% over midnight, mixed opaque: porcelain itself would leave the white
+    /// knob at 1.13:1. This holds the knob at 3.2:1 and stays 3.5:1 from the switch's own "off" track.
+    static let switchOn = Color.adaptive(light: midnight, dark: RGBA(r: 0.551, g: 0.566, b: 0.607))
+
     /// The line colour as plain components, for drawing outside SwiftUI (menu swatches).
     static func lineRGBA(_ color: RGBA, dark: Bool) -> RGBA {
         Palette.lineColor(color, on: dark ? midnight : porcelain)
@@ -119,4 +124,9 @@ extension Color {
         })
         #endif
     }
+}
+
+extension View {
+    /// Every switch in the app: the world's ink, with a dark-appearance track the knob stays visible on.
+    func switchTint() -> some View { tint(Theme.switchOn) }
 }
