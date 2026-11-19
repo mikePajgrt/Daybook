@@ -32,6 +32,10 @@
 	<string>public.app-category.productivity</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Daybook zobrazuje a upravuje události z kalendářů, které máte v zařízení.</string>
+	<key>NSSupportsAutomaticTermination</key>
+	<false/>
+	<key>NSSupportsSuddenTermination</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

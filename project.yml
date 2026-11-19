@@ -44,6 +44,9 @@ targets:
         DaybookCloudKitEnvironment: $(DAYBOOK_CLOUDKIT_ENVIRONMENT)
         # The app uses no encryption of its own (only the system's HTTPS through CloudKit).
         ITSAppUsesNonExemptEncryption: false
+        # Mac: closing the window does not quit the app (see MacAppDelegate).
+        NSSupportsAutomaticTermination: false
+        NSSupportsSuddenTermination: false
         # iCloud sync, step 4 of 4 (see docs/superpowers/plans/2026-11-17-m4-categories.md):
         UIBackgroundModes: [remote-notification]
         UISupportedInterfaceOrientations:

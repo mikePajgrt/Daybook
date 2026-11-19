@@ -6,6 +6,9 @@ import AppKit
 
 @main
 struct DaybookApp: App {
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
+    #endif
     @State private var model: AppModel
     /// Debug demo only: forces one appearance so screenshots do not touch the system setting.
     private let demoColorScheme: ColorScheme?
@@ -128,6 +131,19 @@ struct DaybookApp: App {
             .task { model.start() }
     }
 }
+
+#if os(macOS)
+/// Closing the last window leaves Daybook running, as Calendar does: the Dock icon (or ⌘-Tab) opens the
+/// window again. Without this, macOS quits a windowless SwiftUI app through automatic termination (also
+/// switched off in Info.plist, `NSSupportsAutomaticTermination`).
+final class MacAppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        ProcessInfo.processInfo.disableAutomaticTermination("Daybook stays open without a window")
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+}
+#endif
 
 #if DEBUG && os(macOS)
 /// Debug demo only: puts the window at a fixed size, whatever size was restored, so Mac captures compare.
