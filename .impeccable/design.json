@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-18T00:00:00Z",
+  "generatedAt": "2026-11-19T11:38:22Z",
   "title": "Design System: Daybook",
   "extensions": {
     "colorMeta": {
@@ -458,39 +458,39 @@
       "name": "Event Row with Station Mark",
       "kind": "custom",
       "refersTo": "event-row",
-      "description": "One timed event in a month cell: a piece of its calendar's line, a station dot, the time and the title.",
-      "html": "<div class=\"ds-cell\"><div class=\"ds-event-row\" style=\"--line:#3b82ff\"><span class=\"ds-station\"></span><span class=\"ds-time\">8:30</span><span class=\"ds-row-title\">Retro</span></div><div class=\"ds-event-row\" style=\"--line:#1f9959\"><span class=\"ds-station\"></span><span class=\"ds-time\">13:30</span><span class=\"ds-row-title\">Ema: plavání</span></div><div class=\"ds-event-row\" style=\"--line:#ed4545\"><span class=\"ds-station\"></span><span class=\"ds-time\">16:00</span><span class=\"ds-row-title\">Běh Stromovka</span></div></div>",
-      "css": ".ds-cell { background: #0e1a3a; padding: 6px 0; width: 200px; font-family: -apple-system, system-ui, sans-serif; } .ds-event-row { display: flex; align-items: stretch; gap: 6px; height: 17px; padding-left: 8px; font-size: 12px; line-height: 17px; color: #f4f1ea; white-space: nowrap; } .ds-station { position: relative; flex: none; width: 3px; background: var(--line); } .ds-station::after { content: \"\"; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -5px 0 0 -5px; border-radius: 50%; background: #f4f1ea; border: 1.5px solid var(--line); } .ds-time { flex: none; width: 5ch; text-align: right; color: rgba(244,241,234,0.62); font-variant-numeric: tabular-nums; } .ds-row-title { overflow: hidden; text-overflow: ellipsis; }"
+      "description": "One timed event in a month cell: a piece of its calendar's line, a station dot, the time and the title. The first row has passed: hollow station (ring and line at full strength, centre showing the ground) and the title in secondary ink; time unchanged.",
+      "html": "<div class=\"ds-cell\"><div class=\"ds-event-row ds-event-row-passed\" style=\"--line:#3b82ff\"><span class=\"ds-station\"></span><span class=\"ds-time\">8:30</span><span class=\"ds-row-title\">Retro</span></div><div class=\"ds-event-row\" style=\"--line:#1f9959\"><span class=\"ds-station\"></span><span class=\"ds-time\">13:30</span><span class=\"ds-row-title\">Ema: plavání</span></div><div class=\"ds-event-row\" style=\"--line:#ed4545\"><span class=\"ds-station\"></span><span class=\"ds-time\">16:00</span><span class=\"ds-row-title\">Běh Stromovka</span></div></div>",
+      "css": ".ds-cell { background: #0e1a3a; padding: 6px 0; width: 200px; font-family: -apple-system, system-ui, sans-serif; } .ds-event-row { display: flex; align-items: stretch; gap: 6px; height: 17px; padding-left: 8px; font-size: 12px; line-height: 17px; color: #f4f1ea; white-space: nowrap; } .ds-station { position: relative; flex: none; width: 3px; background: var(--line); } .ds-station::after { content: \"\"; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -5px 0 0 -5px; border-radius: 50%; background: #f4f1ea; border: 1.5px solid var(--line); } .ds-time { flex: none; width: 5ch; text-align: right; color: rgba(244,241,234,0.62); font-variant-numeric: tabular-nums; } .ds-row-title { overflow: hidden; text-overflow: ellipsis; } .ds-event-row-passed .ds-station::after { background: #0e1a3a; } .ds-event-row-passed .ds-row-title { color: rgba(244,241,234,0.62); }"
     },
     {
       "name": "Span Line",
       "kind": "custom",
       "refersTo": "span-line",
-      "description": "An all-day or multi-day event: a horizontal line with rounded ends and the title set into it.",
-      "html": "<div class=\"ds-span-wrap\"><div class=\"ds-span\" style=\"--line:#1f9959\"><span class=\"ds-span-stub\"></span><span class=\"ds-span-label\">Hlídání Emy</span><span class=\"ds-span-run\"></span></div><div class=\"ds-span ds-span-continues\" style=\"--line:#ed4545\"><span class=\"ds-span-stub\"></span><span class=\"ds-span-label\">Lisabon</span><span class=\"ds-span-run\"></span></div></div>",
-      "css": ".ds-span-wrap { background: #0e1a3a; padding: 6px 0; width: 320px; font-family: -apple-system, system-ui, sans-serif; } .ds-span { display: flex; align-items: center; gap: 5px; height: 17px; padding: 0 6px; color: #f4f1ea; font-size: 11px; font-weight: 600; white-space: nowrap; } .ds-span-stub { flex: none; width: 10px; height: 8px; background: var(--line); border-radius: 4px 0 0 4px; } .ds-span-run { flex: 1; height: 8px; background: var(--line); border-radius: 0 4px 4px 0; } .ds-span-continues { padding-right: 0; } .ds-span-continues .ds-span-run { border-radius: 0; }"
+      "description": "An all-day or multi-day event: a horizontal line with rounded ends and the title set into it. The third has wholly passed: the line mixed 50% into the ground in OKLab, the title in secondary ink.",
+      "html": "<div class=\"ds-span-wrap\"><div class=\"ds-span\" style=\"--line:#1f9959\"><span class=\"ds-span-stub\"></span><span class=\"ds-span-label\">Hlídání Emy</span><span class=\"ds-span-run\"></span></div><div class=\"ds-span ds-span-continues\" style=\"--line:#ed4545\"><span class=\"ds-span-stub\"></span><span class=\"ds-span-label\">Lisabon</span><span class=\"ds-span-run\"></span></div><div class=\"ds-span ds-span-passed\" style=\"--line:#3b82ff\"><span class=\"ds-span-stub\"></span><span class=\"ds-span-label\">Konference</span><span class=\"ds-span-run\"></span></div></div>",
+      "css": ".ds-span-wrap { background: #0e1a3a; padding: 6px 0; width: 320px; font-family: -apple-system, system-ui, sans-serif; } .ds-span { display: flex; align-items: center; gap: 5px; height: 17px; padding: 0 6px; color: #f4f1ea; font-size: 11px; font-weight: 600; white-space: nowrap; } .ds-span-stub { flex: none; width: 10px; height: 8px; background: var(--line); border-radius: 4px 0 0 4px; } .ds-span-run { flex: 1; height: 8px; background: var(--line); border-radius: 0 4px 4px 0; } .ds-span-continues { padding-right: 0; } .ds-span-continues .ds-span-run { border-radius: 0; } .ds-span-passed { color: rgba(244,241,234,0.62); } .ds-span-passed .ds-span-stub, .ds-span-passed .ds-span-run { background: color-mix(in oklab, #0e1a3a, var(--line) 50%); }"
     },
     {
       "name": "Interchange Circle",
       "kind": "custom",
       "refersTo": "interchange-circle",
-      "description": "Today's day number in a filled ink circle, beside an ordinary day and a day of the neighbouring month.",
-      "html": "<div class=\"ds-days\"><span class=\"ds-day\">16</span><span class=\"ds-day ds-day-today\">17</span><span class=\"ds-day\">18</span><span class=\"ds-day ds-day-outside\">1</span></div>",
-      "css": ".ds-days { display: flex; gap: 24px; align-items: center; background: #0e1a3a; padding: 10px 12px; font-family: -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: #f4f1ea; } .ds-day { min-width: 22px; height: 22px; line-height: 22px; text-align: center; } .ds-day-today { background: #f4f1ea; color: #0e1a3a; border-radius: 50%; } .ds-day-outside { color: #8f97ad; }"
+      "description": "Today's day number in a filled ink circle, 3 pt inside the top-leading corner of today's month cell, which is outlined in a square-cut 1.5 pt ink line; beside an ordinary day and a day of the neighbouring month.",
+      "html": "<div class=\"ds-days\"><span class=\"ds-day-cell\"><span class=\"ds-day\">16</span></span><span class=\"ds-day-cell ds-day-cell-today\"><span class=\"ds-day ds-day-today\">17</span></span><span class=\"ds-day-cell\"><span class=\"ds-day\">18</span></span><span class=\"ds-day-cell\"><span class=\"ds-day ds-day-outside\">1</span></span></div>",
+      "css": ".ds-days { display: flex; background: #0e1a3a; width: max-content; border-top: 1px solid rgba(244,241,234,0.16); font-family: -apple-system, system-ui, sans-serif; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: #f4f1ea; } .ds-day-cell { position: relative; width: 64px; height: 56px; padding: 3px; box-sizing: border-box; border-right: 1px solid rgba(244,241,234,0.16); border-bottom: 1px solid rgba(244,241,234,0.16); } .ds-day-cell-today::after { content: \"\"; position: absolute; inset: 0; border: 1.5px solid #f4f1ea; pointer-events: none; } .ds-day { display: block; width: 22px; height: 22px; line-height: 22px; text-align: center; } .ds-day-today { background: #f4f1ea; color: #0e1a3a; border-radius: 50%; } .ds-day-outside { color: #8f97ad; }"
     },
     {
       "name": "Event Block",
       "kind": "card",
       "refersTo": "event-block",
-      "description": "A timed event in the week and day views: the line and station on the left, on the Own Hue Fill (22% OKLab mix, at least 0.045 chroma in the line's hue). The CSS mix approximates the chroma floor.",
-      "html": "<div class=\"ds-grid\"><div class=\"ds-block\" style=\"--line:#3b82ff\"><span class=\"ds-block-line\"></span><div class=\"ds-block-text\"><div class=\"ds-block-title\">Review roadmapy</div><div class=\"ds-block-meta\">10:00 – 11:00</div><div class=\"ds-block-meta\">Zasedačka Vltava</div></div></div><div class=\"ds-block\" style=\"--line:#db660d\"><span class=\"ds-block-line\"></span><div class=\"ds-block-text\"><div class=\"ds-block-title\">All-hands</div><div class=\"ds-block-meta\">14:30 – 16:00</div></div></div></div>",
-      "css": ".ds-grid { display: flex; gap: 2px; background: #0e1a3a; padding: 8px; font-family: -apple-system, system-ui, sans-serif; } .ds-block { display: flex; width: 150px; height: 64px; border-radius: 4px; overflow: hidden; background: color-mix(in oklch, color-mix(in oklab, #0e1a3a, var(--line) 22%) 80%, var(--line) 20%); } .ds-block-line { position: relative; flex: none; width: 3px; margin-left: 2px; background: var(--line); } .ds-block-line::after { content: \"\"; position: absolute; left: 50%; top: 4px; width: 7px; height: 7px; margin-left: -5px; border-radius: 50%; background: #f4f1ea; border: 1.5px solid var(--line); } .ds-block-text { padding: 2px 3px 2px 5px; min-width: 0; } .ds-block-title { font-size: 12px; font-weight: 600; color: #f4f1ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-block-meta { font-size: 11px; color: rgba(244,241,234,0.8); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }"
+      "description": "A timed event in the week and day views: the line and station on the left, on the Own Hue Fill (22% OKLab mix, at least 0.045 chroma in the line's hue). The third block has passed: hollow station, title in block secondary ink, the 11% fill with a 0.0225 chroma floor, the left-edge line at full strength. The CSS mixes approximate the chroma floors.",
+      "html": "<div class=\"ds-grid\"><div class=\"ds-block\" style=\"--line:#3b82ff\"><span class=\"ds-block-line\"></span><div class=\"ds-block-text\"><div class=\"ds-block-title\">Review roadmapy</div><div class=\"ds-block-meta\">10:00–11:00</div><div class=\"ds-block-meta\">Zasedačka Vltava</div></div></div><div class=\"ds-block\" style=\"--line:#db660d\"><span class=\"ds-block-line\"></span><div class=\"ds-block-text\"><div class=\"ds-block-title\">All-hands</div><div class=\"ds-block-meta\">14:30–16:00</div></div></div><div class=\"ds-block ds-block-passed\" style=\"--line:#1f9959\"><span class=\"ds-block-line\"></span><div class=\"ds-block-text\"><div class=\"ds-block-title\">Standup</div><div class=\"ds-block-meta\">9:00–9:30</div></div></div></div>",
+      "css": ".ds-grid { display: flex; gap: 2px; background: #0e1a3a; padding: 8px; font-family: -apple-system, system-ui, sans-serif; } .ds-block { display: flex; width: 150px; height: 64px; border-radius: 4px; overflow: hidden; --fill: color-mix(in oklch, color-mix(in oklab, #0e1a3a, var(--line) 22%) 80%, var(--line) 20%); background: var(--fill); } .ds-block-line { position: relative; flex: none; width: 3px; margin-left: 2px; background: var(--line); } .ds-block-line::after { content: \"\"; position: absolute; left: 50%; top: 4px; width: 7px; height: 7px; margin-left: -5px; border-radius: 50%; background: #f4f1ea; border: 1.5px solid var(--line); } .ds-block-text { padding: 2px 3px 2px 5px; min-width: 0; } .ds-block-title { font-size: 12px; font-weight: 600; color: #f4f1ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-block-meta { font-size: 11px; color: rgba(244,241,234,0.8); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-block-passed { --fill: color-mix(in oklch, color-mix(in oklab, #0e1a3a, var(--line) 11%) 90%, var(--line) 10%); } .ds-block-passed .ds-block-line::after { background: var(--fill); } .ds-block-passed .ds-block-title { color: rgba(244,241,234,0.8); }"
     },
     {
       "name": "Now Line",
       "kind": "custom",
       "refersTo": "now-line",
-      "description": "The current time on today's column: an interchange circle and an ink line over the hour rules.",
+      "description": "The current time on today's column in the week and day views: an interchange circle and an ink line over the hour rules. The month has no now line.",
       "html": "<div class=\"ds-now-wrap\"><div class=\"ds-hour-rule\"></div><div class=\"ds-now\"><span class=\"ds-now-dot\"></span><span class=\"ds-now-rule\"></span></div><div class=\"ds-hour-rule\"></div></div>",
       "css": ".ds-now-wrap { background: #0e1a3a; width: 240px; padding: 16px 0; } .ds-hour-rule { height: 1px; background: rgba(244,241,234,0.16); margin: 14px 0; } .ds-now { display: flex; align-items: center; height: 11px; } .ds-now-dot { flex: none; width: 11px; height: 11px; box-sizing: border-box; border-radius: 50%; background: #f4f1ea; border: 2px solid #0e1a3a; } .ds-now-rule { flex: 1; height: 2px; background: #f4f1ea; }"
     },
@@ -564,6 +564,11 @@
         "section": "colors"
       },
       {
+        "name": "The Passed Station Rule",
+        "body": "An event has passed when its end is at or before now (a zero-length event when its start is), and an all-day event when its last day is before today; an event in progress has not passed. It is drawn by hollowing the station (the ring and the line stay at full strength, the centre shows the surface behind it) and stepping the title to secondary ink, never by a hue, a grey wash or a veil over the cell. Passed blocks take an 11% fill with a 0.0225 chroma floor; a wholly passed span line is mixed 50% into the ground. That span line is the one stated exception to The Three to One Rule, and only outside Increased Contrast, where it stays at full strength.",
+        "section": "colors"
+      },
+      {
         "name": "The Colour Plus Name Rule",
         "body": "A calendar is never identified by colour alone: rail rows, picker rows, the detail's calendar row, day-sheet and search rows, and VoiceOver labels carry its title beside its colour.",
         "section": "colors"
@@ -618,13 +623,15 @@
       "Do give new rail rows the shared trailing column, a 44 pt target and names that wrap between words.",
       "Do provide the agenda fallback for any new grid at accessibility sizes.",
       "Do give every adaptive colour an Increased Contrast value, and check text on a block against 4.5:1 and any new preset against 3:1 on both grounds.",
-      "Do build new metrics as scaled metrics tied to a text style."
+      "Do build new metrics as scaled metrics tied to a text style.",
+      "Do mark an event that has passed by hollowing its station and stepping its title to secondary ink."
     ],
     "donts": [
       "Don't hide events behind a count, a dot or a \"more\" link in any view.",
       "Don't give the interface a hue of its own; a blue control or highlight reads as a calendar line.",
       "Don't give categories colours; they are told apart by symbol.",
       "Don't fill with a calendar colour at full strength, by opacity, or by an sRGB mix.",
+      "Don't grey out, veil or recolour past days or events, and don't add a now line to the month.",
       "Don't add shadows, gradients or a third surface tone.",
       "Don't round the end of a span line where the event continues.",
       "Don't let text break inside a word, or condense text that would fit by wrapping.",
