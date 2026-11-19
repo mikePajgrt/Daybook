@@ -45,23 +45,23 @@ struct EventBlockView: View {
 
     var body: some View {
         let line = Theme.line(color)
+        let passed = model.hasPassed(placement.event)
         HStack(alignment: .top, spacing: 0) {
+            // The line keeps its full strength when the event has passed; only the station goes hollow.
             Rectangle()
                 .fill(line)
                 .frame(width: 3)
+                .stationHollow(passed, top: 4)
                 .overlay(alignment: .top) {
-                    Circle()
-                        .fill(Theme.station)
-                        .frame(width: 7, height: 7)
-                        .overlay { Circle().stroke(line, lineWidth: 1.5) }
+                    StationDot(color: line, passed: passed)
                         .padding(.top, 4)
                 }
                 // The dot is wider than the line: inset the line so the clip keeps the dot whole.
                 .padding(.leading, 2)
             ViewThatFits(in: .vertical) {
-                details(time: true, place: true)
-                details(time: true, place: false)
-                details(time: false, place: false)
+                details(time: true, place: true, passed: passed)
+                details(time: true, place: false, passed: passed)
+                details(time: false, place: false, passed: passed)
             }
             .padding(.leading, 5)
             .padding(.trailing, 3)
@@ -70,7 +70,7 @@ struct EventBlockView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { probes }
-        .background(Theme.blockFill(color))
+        .background(passed ? Theme.passedBlockFill(color) : Theme.blockFill(color))
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel([EventText.spoken(placement.event, calendar: model.calendar, calendarTitle: calendarTitle,
@@ -106,14 +106,14 @@ struct EventBlockView: View {
         .accessibilityHidden(true)
     }
 
-    @ViewBuilder private func details(time: Bool, place: Bool) -> some View {
+    @ViewBuilder private func details(time: Bool, place: Bool, passed: Bool) -> some View {
         VStack(alignment: .leading, spacing: 1) {
             Text(title)
                 .font(.caption.weight(.semibold))
                 // As many whole-word lines as the block's height holds; the last one ends in an ellipsis.
                 .lineLimit(titleWraps ? nil : 1)
                 .truncationMode(.tail)
-                .foregroundStyle(Theme.ink)
+                .foregroundStyle(passed ? Theme.blockSecondaryInk : Theme.ink)
             if time {
                 // The whole range on one line, else the start alone, else nothing. Category symbols
                 // follow the time where both fit; they never displace it.

@@ -80,6 +80,15 @@ enum Theme {
     static func blockFill(_ color: RGBA) -> ThemeColor {
         ThemeColor { p, increased in p.blockFill(color, increased: increased) }
     }
+    /// Fill of the block of an event that has passed: half the normal mix and chroma floor.
+    static func passedBlockFill(_ color: RGBA) -> ThemeColor {
+        ThemeColor { p, increased in p.passedBlockFill(color, increased: increased) }
+    }
+    /// A span line of an event that has wholly passed: the adjusted line mixed halfway into the ground,
+    /// opaque. Full strength under Increased Contrast.
+    static func passedSpanLine(_ color: RGBA) -> ThemeColor {
+        ThemeColor { p, increased in p.passedSpanLine(color, increased: increased) }
+    }
     /// Time and place inside an event block. Darker than `secondaryInk`, because the block's tint
     /// lowers contrast; holds 4.5:1 on a tinted block in every theme and appearance.
     static let blockSecondaryInk = ThemeColor { p, increased in p.blockSecondaryInk(increased: increased) }

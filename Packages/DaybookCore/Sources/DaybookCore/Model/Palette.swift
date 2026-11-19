@@ -34,12 +34,36 @@ public enum Palette {
     /// lets a blue ground cancel a warm colour (amber became grey on midnight); this keeps one rule
     /// for every calendar: lightness from the mix, hue from the line.
     public static func blockFill(_ color: RGBA, on ground: RGBA) -> RGBA {
-        let mixed = mix(ground, color, amount: blockFillAmount)
+        tintedFill(color, on: ground, amount: blockFillAmount, chromaFloor: blockFillChromaFloor)
+    }
+
+    /// How much of the calendar's colour the block of an event that has passed carries: half the normal fill.
+    public static let passedBlockFillAmount = blockFillAmount / 2
+    /// The chroma floor of a passed block's fill: half the normal floor.
+    public static let passedBlockFillChromaFloor = blockFillChromaFloor / 2
+
+    /// Fill of the block of an event that has passed: the same rule as `blockFill` at half the mix and
+    /// half the chroma floor, so the block steps back toward the ground but stays in its calendar's hue.
+    public static func passedBlockFill(_ color: RGBA, on ground: RGBA) -> RGBA {
+        tintedFill(color, on: ground, amount: passedBlockFillAmount, chromaFloor: passedBlockFillChromaFloor)
+    }
+
+    /// How far a span line that has wholly passed is mixed toward the ground.
+    public static let passedLineAmount = 0.5
+
+    /// A span line of an event that has wholly passed: the (adjusted) line mixed halfway into the ground
+    /// in OKLab. Opaque, so rules and weekend veils under it never show through.
+    public static func passedLine(_ color: RGBA, on ground: RGBA) -> RGBA {
+        mix(ground, color, amount: passedLineAmount)
+    }
+
+    private static func tintedFill(_ color: RGBA, on ground: RGBA, amount: Double, chromaFloor: Double) -> RGBA {
+        let mixed = mix(ground, color, amount: amount)
         let line = oklab(color)
         let lineChroma = hypot(line.1, line.2)
         guard lineChroma >= achromaticBelow else { return mixed }
         let lab = oklab(mixed)
-        let chroma = max(hypot(lab.1, lab.2), blockFillChromaFloor)
+        let chroma = max(hypot(lab.1, lab.2), chromaFloor)
         return rgb(fromOklab: (lab.0, line.1 / lineChroma * chroma, line.2 / lineChroma * chroma))
     }
 

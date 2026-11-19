@@ -102,6 +102,17 @@ public struct ThemePalette: Hashable, Sendable {
     public func blockFill(_ color: RGBA, increased: Bool = false) -> RGBA {
         Palette.blockFill(line(color, increased: increased), on: ground)
     }
+
+    /// The fill of the block of an event that has passed (see `Palette.passedBlockFill`).
+    public func passedBlockFill(_ color: RGBA, increased: Bool = false) -> RGBA {
+        Palette.passedBlockFill(line(color, increased: increased), on: ground)
+    }
+
+    /// A span line of an event that has wholly passed: the adjusted line mixed halfway into this ground.
+    /// Under Increased Contrast the line keeps its full strength; only its title steps back.
+    public func passedSpanLine(_ color: RGBA, increased: Bool = false) -> RGBA {
+        increased ? line(color, increased: true) : Palette.passedLine(line(color), on: ground)
+    }
 }
 
 extension RGBA {

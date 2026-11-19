@@ -18,14 +18,15 @@ struct DayListView: View {
             }
             ForEach(events) { event in
                 let info = model.calendarInfo(event.calendarID)
+                let passed = model.hasPassed(event)
                 HStack(spacing: 12) {
                     // The same mark as everywhere: a piece of the calendar's line with the event's station.
-                    StationMark(color: Theme.line(info?.color ?? Theme.fallbackLine))
+                    StationMark(color: Theme.line(info?.color ?? Theme.fallbackLine), passed: passed)
                         .padding(.vertical, 2)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(EventRowView.title(of: event))
                             .font(.body)
-                            .foregroundStyle(Theme.ink)
+                            .foregroundStyle(passed ? Theme.secondaryInk : Theme.ink)
                         Text([when(event), info?.title].compactMap { $0 }.joined(separator: " · "))
                             .font(.subheadline)
                             .foregroundStyle(Theme.secondaryInk)

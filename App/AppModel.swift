@@ -53,6 +53,9 @@ final class AppModel {
     let calendar: Calendar
     /// Today's local midnight. Rolls over at midnight and after a clock or time-zone change.
     private(set) var today: Date
+    /// The instant events are judged passed against (`EventInfo.hasPassed`). Follows the clock minute by
+    /// minute, but is only reassigned when some loaded event actually changes state, so views redraw only then.
+    private(set) var passageNow: Date
     /// Screens a debug demo launch asks to open straight away, for screenshots.
     let stagedScreens: Set<String>
     /// Bumped by "Dnes", so the month scrolls back to today even when it is already on screen.
@@ -66,6 +69,7 @@ final class AppModel {
     private var watcher: Task<Void, Never>?
     private var categoryWatcher: Task<Void, Never>?
     private var clockObservers: [NSObjectProtocol] = []
+    private var minuteTicker: Task<Void, Never>?
 
     private(set) var access: CalendarAccess
     private(set) var calendars: [CalendarInfo] = []
@@ -126,6 +130,7 @@ final class AppModel {
         self.defaults = defaults
         self.calendar = calendar
         self.today = calendar.startOfDay(for: now)
+        self.passageNow = now
         self.focusedDate = now
         self.windowCenter = now
         self.monthWindow = MonthLayout.window(around: now, radius: Self.monthRadius, calendar: calendar)
@@ -224,6 +229,7 @@ final class AppModel {
             self.cached = (interval, events)
             self.loading = nil
             self.loadingInterval = nil
+            self.advancePassage()
             self.layout()
         }
     }
@@ -292,10 +298,40 @@ final class AppModel {
                 MainActor.assumeIsolated { self?.clockChanged() }
             }
         }
+        // Events pass on the minute: wake just after each minute starts and see whether any did.
+        let calendar = calendar
+        minuteTicker = Task { [weak self] in
+            while !Task.isCancelled {
+                let now = Date()
+                let next = calendar.nextDate(after: now, matching: DateComponents(second: 0),
+                                             matchingPolicy: .nextTime) ?? now.addingTimeInterval(60)
+                try? await Task.sleep(for: .seconds(next.timeIntervalSince(now) + 0.05))
+                guard let self else { return }
+                self.advancePassage()
+            }
+        }
+    }
+
+    /// Moves `passageNow` to the clock, but only when a loaded event passed (or un-passed, after a clock
+    /// change) in between; otherwise nothing is assigned and nothing redraws.
+    private func advancePassage() {
+        guard fixedNow == nil else { return }
+        let now = Date()
+        let old = passageNow
+        guard let events = cached?.events,
+              events.contains(where: { $0.hasPassed(at: old, calendar: calendar) != $0.hasPassed(at: now, calendar: calendar) })
+        else { return }
+        passageNow = now
+    }
+
+    /// Whether `event` is over: drawn as a passed station.
+    func hasPassed(_ event: EventInfo) -> Bool {
+        event.hasPassed(at: passageNow, calendar: calendar)
     }
 
     func clockChanged() {
         guard fixedNow == nil else { return }
+        advancePassage()
         let newToday = calendar.startOfDay(for: Date())
         guard newToday != today else { return }
         today = newToday

@@ -52,6 +52,23 @@ struct WeekRowView: View {
         }
         .overlay(alignment: .topLeading) { spans }
         .overlay(alignment: .bottom) { Rectangle().fill(Theme.rule).frame(height: 1) }
+        .overlay(alignment: .topLeading) { todayOutline }
+    }
+
+    /// Today's whole cell is outlined in ink, square-cut like the grid it sits in. Drawn above the
+    /// rules and the span lines, so the square stays unbroken when a line runs through the day.
+    private var todayOutline: some View {
+        GeometryReader { proxy in
+            if let column = week.days.firstIndex(where: { $0.date == today }) {
+                let width = proxy.size.width / CGFloat(week.days.count)
+                Rectangle()
+                    .strokeBorder(Theme.ink, lineWidth: contrast == .increased ? 2 : 1.5)
+                    .frame(width: width, height: proxy.size.height)
+                    .padding(.leading, width * CGFloat(column))
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     private func dayCell(_ day: DayLayout, column: Int, isLast: Bool) -> some View {
@@ -127,7 +144,8 @@ struct WeekRowView: View {
                     .accessibilityHidden(true)
             }
         }
-        .padding(.leading, isToday ? (compact ? 1 : 3) : (compact ? 3 : 6))
+        // Today's circle keeps the same 3 pt from the cell's leading edge as from its top, clear of the outline.
+        .padding(.leading, isToday || compact ? 3 : 6)
         .frame(height: metrics.numberHeight, alignment: .leading)
         .animation(.default, value: inMonth)
     }
@@ -188,6 +206,9 @@ struct SpanView: View {
 
     var body: some View {
         let categories = categoryModel.categories(for: span.event.key)
+        let passed = model.hasPassed(span.event)
+        // Wholly passed: the line mixed halfway into the ground, opaque (full strength under Increased Contrast).
+        let line = passed ? Theme.passedSpanLine(model.color(of: span.event.calendarID)) : color
         let lead: CGFloat = span.continuesBefore ? 0 : 4
         let trail: CGFloat = span.continuesAfter ? 0 : 4
         let inset: CGFloat = compact ? 3 : 6
@@ -195,12 +216,13 @@ struct SpanView: View {
             // The line's start, lengthened by the label's slide so the line stays unbroken up to the label.
             UnevenRoundedRectangle(topLeadingRadius: lead, bottomLeadingRadius: lead,
                                    bottomTrailingRadius: 0, topTrailingRadius: 0)
-                .fill(color)
+                .fill(line)
                 .frame(width: (compact ? 6 : 10) + max(0, labelOffset), height: 8)
             Text(EventRowView.title(of: span.event))
                 .font(.caption2.weight(.semibold))
                 .fontWidth(compact ? .condensed : .standard)
                 .lineLimit(1)
+                .foregroundStyle(passed ? Theme.secondaryInk : Theme.ink)
                 .withCategorySymbols(categories, spacing: 3)
                 .font(.caption2)
                 .layoutPriority(1)
@@ -209,7 +231,7 @@ struct SpanView: View {
             } else {
                 UnevenRoundedRectangle(topLeadingRadius: 0, bottomLeadingRadius: 0,
                                        bottomTrailingRadius: trail, topTrailingRadius: trail)
-                    .fill(color)
+                    .fill(line)
                     .frame(height: 8)
                     .frame(maxWidth: .infinity)
             }

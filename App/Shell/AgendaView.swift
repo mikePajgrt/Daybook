@@ -64,12 +64,14 @@ struct AgendaView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(events) { event in
+                    let passed = model.hasPassed(event)
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        StationMark(color: color(event.calendarID))
+                        StationMark(color: color(event.calendarID), passed: passed)
                             .frame(height: 14)
                         VStack(alignment: .leading, spacing: 0) {
                             Text(EventRowView.title(of: event))
                                 .font(.body)
+                                .foregroundStyle(passed ? Theme.secondaryInk : Theme.ink)
                             Text(when(event, on: day))
                                 .font(.caption)
                                 .foregroundStyle(Theme.secondaryInk)

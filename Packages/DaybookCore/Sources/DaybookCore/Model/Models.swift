@@ -104,3 +104,16 @@ public struct EventInfo: Identifiable, Hashable, Sendable {
                   alert: alert, timeZoneID: timeZoneID, isEditable: isEditable)
     }
 }
+
+extension EventInfo {
+    /// Whether the event is over at `now`: a station the train has already passed. A timed event has
+    /// passed once its end is at or before `now` (a zero-length one once its start is); an all-day event
+    /// once its last day (see `MonthLayout.dayRange`) is before the day of `now`. An event in progress
+    /// has not passed.
+    public func hasPassed(at now: Date, calendar: Calendar) -> Bool {
+        if isAllDay {
+            return MonthLayout.dayRange(of: self, calendar: calendar).upperBound < calendar.startOfDay(for: now)
+        }
+        return max(start, end) <= now
+    }
+}

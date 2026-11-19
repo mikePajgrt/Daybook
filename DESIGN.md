@@ -211,6 +211,7 @@ Line colours are not tokens; they come from the system calendar store and the us
 - **Line fallback** (`line-fallback`): an event whose calendar cannot be resolved.
 - **Line adjustment.** Every calendar colour is drawn through `Theme.line`: if it holds less than 3:1 against the ground on screen (4.5:1 under Increased Contrast), its OKLab lightness moves toward black (light ground) or white (dark ground) just far enough; hue is kept, chroma drops only where sRGB runs out. A colour that already holds is drawn as chosen. Menu swatches use the same adjusted colour.
 - **Block fill.** The adjusted line mixed 22% into the ground in OKLab, then turned to the line's own hue with at least 0.045 OKLab chroma. Lightness comes from the mix, hue from the line, so a warm colour does not go grey on midnight and every chromatic calendar's fill is recognisably its own. Greys (chroma under 0.04) keep the plain mix. Opaque.
+- **Passed fills.** The block of an event that has passed uses the same rule at half strength: 11% mix, 0.0225 chroma floor. A span line that has wholly passed is the adjusted line mixed 50% into the ground in OKLab, opaque; under Increased Contrast it keeps the full line.
 
 ### Named Rules
 **The Line Is the Only Colour Rule.** Hue on a calendar surface means "this calendar" and nothing else. Selection, today, the current time, search matches, filter state and category identity are drawn in ink, weight or symbol. The only other hue is the platform's destructive and error red on delete actions and form errors.
@@ -218,6 +219,8 @@ Line colours are not tokens; they come from the system calendar store and the us
 **The Three to One Rule.** Every calendar line holds 3:1 against the ground in the appearance on screen, 4.5:1 under Increased Contrast, by lightness alone; hue never changes.
 
 **The Own Hue Fill Rule.** A calendar colour used as a fill is mixed 22% into the ground in OKLab and given at least 0.045 chroma in the line's hue. Never transparency, never an sRGB mix, never full strength.
+
+**The Passed Station Rule.** An event has passed when its end is at or before now (a zero-length event when its start is), and an all-day event when its last day is before today; an event in progress has not passed. It is drawn by hollowing the station (the ring and the line stay at full strength, the centre shows the surface behind it) and stepping the title to secondary ink, never by a hue, a grey wash or a veil over the cell. Passed blocks take an 11% fill with a 0.0225 chroma floor; a wholly passed span line is mixed 50% into the ground. That span line is the one stated exception to The Three to One Rule, and only outside Increased Contrast, where it stays at full strength.
 
 **The Colour Plus Name Rule.** A calendar is never identified by colour alone: rail rows, picker rows, the detail's calendar row, day-sheet and search rows, and VoiceOver labels carry its title beside its colour.
 
@@ -298,6 +301,7 @@ The geometry is a diagram's: straight segments, true circles, small radii only w
 - **Lines** are square-cut: 3 pt wide vertically, 8 pt tall horizontally. A span line's ends round (4 pt) only where the event really starts or ends.
 - **Stations** are 7 pt circles with a 1.5 pt ring in the line colour, overhanging the 3 pt line.
 - **The interchange** is a filled ink circle around today's number (22 pt month, 26 pt grid header, 32 pt navigator, 34 pt agenda) and, at 11 pt with a 2 pt ground ring, at the head of the now line.
+- **Today's cell** in the month is outlined in ink: a square-cut 1.5 pt line (2 pt under Increased Contrast) inside the cell's edges, drawn above the rules and the span lines, with the interchange circle 3 pt inside its top-leading corner. No tint, no hue.
 - **Selection** is an ink ring (1.5 pt in the navigator, 2 pt round a chosen swatch), or, in the symbol grid, an ink-filled 8 pt rounded cell with the symbol reversed out.
 - **Blocks** are rectangles with 4 pt corners.
 - **The interchange mark** sits on a midnight tile with the platform's continuous icon corner (17 pt at 76 pt) and a rule-coloured hairline.
@@ -306,7 +310,7 @@ The geometry is a diagram's: straight segments, true circles, small radii only w
 ## Components
 
 ### Station Mark
-The signature. A 3 pt piece of the calendar's line with a 7 pt station dot centred on it. It stands for an event in month rows, the agenda, the day sheet, search results, and the detail's calendar row (22 pt tall there); in a block the dot sits 4 pt from the top. Days outside the month draw it at 60% opacity.
+The signature. A 3 pt piece of the calendar's line with a 7 pt station dot centred on it. It stands for an event in month rows, the agenda, the day sheet, search results, and the detail's calendar row (22 pt tall there); in a block the dot sits 4 pt from the top. Days outside the month draw it at 60% opacity. A passed event's station is hollow (see Passed Stations).
 
 ### Event Row
 One 17 pt line: station mark, time in secondary ink (in the "00:00" slot), title in ink, then the event's category symbols when title and symbols fit together. Inset 8 pt, gaps 6 pt; under 130 pt columns inset 4 pt, gaps 4 pt, no time, condensed type. Outside-month rows use outside ink.
@@ -318,7 +322,16 @@ An all-day or multi-day event: a short stub (10 pt, 6 pt narrow), the title set 
 A timed event in week and day: the line down the left edge (inset 2 pt) with a station dot at the top, on the Own Hue Fill. Title semibold label in ink, wrapping between words as many lines as the block holds; time and place in micro type and block secondary ink, category symbols after the time where both fit. Condensed as a grid, not per block.
 
 ### Now Line
-On today's column: an 11 pt interchange circle and a 2 pt ink line, updated every minute.
+On today's column: an 11 pt interchange circle and a 2 pt ink line, updated every minute. The month has no now line: its rows take their height only from events, so today's cell splits into passed and upcoming rows by the passed treatment alone.
+
+### Passed Stations
+An event that is over (The Passed Station Rule) keeps its place and its line; only its station and title step back.
+- **Month row, agenda, day sheet:** hollow station, title in secondary ink, time and category symbols unchanged. On a day outside the month the row keeps its outside ink and 60% mark and only the station goes hollow, so the neighbouring month (whole day, day number included, in outside ink) and the past (events only, day numbers unchanged) stay distinct.
+- **Span line:** wholly passed, the line is the 50% passed mix and the title is in secondary ink; under Increased Contrast only the title changes. A span still in progress is unchanged.
+- **Event block:** hollow station, title in block secondary ink (still semibold), the passed 11% fill; the left-edge line stays at full strength. Text holds 4.5:1 on it.
+- **Clock:** demo mode judges against its fixed time; otherwise the app checks at each minute and on return to the app, and redraws only when an event actually changed state. No animation.
+- **Unchanged:** search (past days already sit under "Dříve"), the detail, the navigator, day numbers, VoiceOver labels.
+- **Light appearance:** station white on porcelain is close to the ground, so a hollow station reads more weakly than in dark; the secondary-ink title carries the difference.
 
 ### Rail Rows
 - **Calendar:** a large checkbox symbol (filled square with check when on, empty square when off) in the calendar's adjusted line colour, the name in ink (secondary ink when off), "sdílený" under it in caption, a lock in the trailing column for read-only calendars. One tap toggles; the context menu offers show only, show all and change colour.
@@ -369,12 +382,14 @@ Platform motion only. Switching a calendar or category re-lays out with the syst
 - **Do** provide the agenda fallback for any new grid at accessibility sizes.
 - **Do** give every adaptive colour an Increased Contrast value, and check text on a block against 4.5:1 and any new preset against 3:1 on both grounds.
 - **Do** build new metrics as scaled metrics tied to a text style.
+- **Do** mark an event that has passed by hollowing its station and stepping its title to secondary ink.
 
 ### Don't:
 - **Don't** hide events behind a count, a dot or a "more" link in any view.
 - **Don't** give the interface a hue of its own; a blue control or highlight reads as a calendar line.
 - **Don't** give categories colours; they are told apart by symbol.
 - **Don't** fill with a calendar colour at full strength, by opacity, or by an sRGB mix.
+- **Don't** grey out, veil or recolour past days or events, and don't add a now line to the month.
 - **Don't** add shadows, gradients or a third surface tone.
 - **Don't** round the end of a span line where the event continues.
 - **Don't** let text break inside a word, or condense text that would fit by wrapping.
