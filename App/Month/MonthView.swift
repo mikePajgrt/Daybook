@@ -3,7 +3,8 @@ import SwiftUI
 
 /// The month: a weekday header over one continuous column of weeks of unequal height that never hide
 /// an event. The column holds the focused month and three months either side; scrolling carries on
-/// into them, and the title and the dimming follow the month that owns most of the viewport.
+/// into them, and the title and the dimmed day numbers follow the month that owns most of the viewport.
+/// Events are never dimmed for their month; only a passed event steps back.
 /// Back, Today and forward re-centre the window.
 struct MonthView: View {
     @Environment(AppModel.self) private var model
@@ -18,7 +19,8 @@ struct MonthView: View {
     @State private var visibleWeeks: [Date] = []
     @State private var viewport: CGFloat = 0
     /// Opened on today's week (launch, "Dnes", back from the week or day): until the user scrolls, the
-    /// title stays on today's month and the next month, which fills the rest of the screen, is in full ink.
+    /// title stays on today's month and the next month, which fills the rest of the screen, has its day
+    /// numbers in full ink.
     @State private var anchoredOnToday = false
     /// The week the view opened on, kept apart from `topWeek` (which the scroll view rewrites as rows above
     /// change height): until the user scrolls, every later layout change scrolls back to it.
@@ -37,7 +39,7 @@ struct MonthView: View {
         return Array(symbols[first...] + symbols[..<first])
     }
 
-    /// The days drawn in full ink: the month on screen; while anchored on today, also the month after it,
+    /// The days whose numbers are drawn in full ink: the month on screen; while anchored on today, also the month after it,
     /// since the weeks ahead are what the view opened to show.
     private var shownMonth: DateInterval? {
         guard let month = model.calendar.dateInterval(of: .month, for: model.focusedDate) else { return nil }
@@ -237,7 +239,7 @@ struct MonthView: View {
 
     #if DEBUG
     /// Debug staging: scrolls down across the month's end, as a user would, so the capture shows the
-    /// title and the dimming following the month that now owns the screen.
+    /// title and the dimmed day numbers following the month that now owns the screen.
     private func stageScroll() async {
         // After the events have filled in, so the rows have their real heights.
         try? await Task.sleep(for: .milliseconds(1500))

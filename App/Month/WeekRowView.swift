@@ -22,7 +22,8 @@ struct WeekRowView: View {
     let metrics: WeekMetrics
     let compact: Bool
     let color: (String) -> ThemeColor
-    /// The month on screen: its days are in full ink, the others in outside ink.
+    /// The month on screen: its day numbers are in full ink, the others in outside ink. Events are drawn
+    /// alike in both; only a passed event steps back.
     let month: DateInterval?
     /// Called when a day is tapped. `nil` where tapping a day does nothing.
     let onSelectDay: ((Date) -> Void)?
@@ -77,8 +78,7 @@ struct WeekRowView: View {
             dayNumber(day, inMonth: inMonth)
             Color.clear.frame(height: CGFloat(week.laneCount) * metrics.rowHeight)
             ForEach(day.timed) { event in
-                EventRowView(event: event, color: color(event.calendarID),
-                             compact: compact, dimmed: !inMonth)
+                EventRowView(event: event, color: color(event.calendarID), compact: compact)
                     .frame(height: metrics.rowHeight)
                     .opensEventDetail(event, when: eventsOpenDetail)
             }

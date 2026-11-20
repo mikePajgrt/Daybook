@@ -199,7 +199,7 @@ A two-colour world: midnight and porcelain carry every surface and every word, a
 - **Station White** (`station-light`): the station dot in the light appearance, where porcelain on porcelain would vanish.
 - **Secondary Ink** (`secondary-ink-*`): ink at 62%, 80% under Increased Contrast. Times, weekday names, hour labels, account headers, supporting lines, switched-off rail rows, row menu buttons, category symbols after titles.
 - **Block Secondary Ink** (`block-secondary-ink-*`): ink at 80%, 90% under Increased Contrast. Time, place and category symbols inside an event block.
-- **Outside Ink** (`outside-ink-*`): day numbers and event text of the neighbouring month; opaque, 4.5:1 on the ground. Under Increased Contrast, ink at 85%.
+- **Outside Ink** (`outside-ink-*`): day numbers of the neighbouring month (never its events); opaque, 4.5:1 on the ground. Under Increased Contrast, ink at 85%.
 - **Rule** (`rule-*`): ink at 16%, 32% under Increased Contrast, 1 pt.
 - **Weekend Tint** (`weekend-*`): a veil over Saturday and Sunday in the month, the time grid and the agenda.
 - **Switch On** (`switch-on-*`): the "on" track of every switch. Ink in light; in dark an opaque grey (ink thinned to 55% over midnight), because a porcelain track would leave the white knob at 1.13:1. Holds the knob at 3.2:1.
@@ -268,7 +268,7 @@ One time format per locale, from `TimeText`: the locale's hours and minutes ("8:
 
 **Rail.** A list: the day view's month navigator first when the day has no room for it beside itself, then calendars grouped by account, "+ Nový kalendář", then the categories section ending in "+ Nová kategorie" and the storage line. Rows share one trailing column: calendar locks and category menu buttons centre on one line (the menu symbol drawn 32 pt wide, 10 pt into the trailing inset; 44 pt target).
 
-**Month.** A weekday header over seven equal columns with no gutters. A week row is the day number (28 pt) plus one 17 pt row per lane of its fullest day plus a 6 pt foot. Spare height is shared in proportion to need. Spans sit in shared lanes under the day numbers; timed events stack below. The month is one continuous scroll of the focused month and three either side; the title and the dimming follow the month owning most of the viewport. iPhone opens on today's week.
+**Month.** A weekday header over seven equal columns with no gutters. A week row is the day number (28 pt) plus one 17 pt row per lane of its fullest day plus a 6 pt foot. Spare height is shared in proportion to need. Spans sit in shared lanes under the day numbers; timed events stack below. The month is one continuous scroll of the focused month and three either side; the title and the outside ink of day numbers follow the month owning most of the viewport. Events are drawn alike in every month: grey on an event means only that it has passed. iPhone opens on today's week.
 
 **Time grid (week and day).** A 46 pt hour gutter, 52 pt per hour, day columns never under 110 pt; week shows seven (three on iPhone) and pages a day at a time when fewer fit, the gutter staying. Blocks are never shorter than half an hour; overlaps share the column with 2 pt gaps. All-day lanes 20 pt above the grid, growing with their lanes; in paged columns each label slides to the visible edge. The grid opens one hour before now on today's period, 7:00 otherwise. Regular width: a 300 pt month navigator on the rail colour beside the day when the day keeps 400 pt.
 
@@ -310,10 +310,10 @@ The geometry is a diagram's: straight segments, true circles, small radii only w
 ## Components
 
 ### Station Mark
-The signature. A 3 pt piece of the calendar's line with a 7 pt station dot centred on it. It stands for an event in month rows, the agenda, the day sheet, search results, and the detail's calendar row (22 pt tall there); in a block the dot sits 4 pt from the top. Days outside the month draw it at 60% opacity. A passed event's station is hollow (see Passed Stations).
+The signature. A 3 pt piece of the calendar's line with a 7 pt station dot centred on it. It stands for an event in month rows, the agenda, the day sheet, search results, and the detail's calendar row (22 pt tall there); in a block the dot sits 4 pt from the top. A passed event's station is hollow (see Passed Stations).
 
 ### Event Row
-One 17 pt line: station mark, time in secondary ink (in the "00:00" slot), title in ink, then the event's category symbols when title and symbols fit together. Inset 8 pt, gaps 6 pt; under 130 pt columns inset 4 pt, gaps 4 pt, no time, condensed type. Outside-month rows use outside ink.
+One 17 pt line: station mark, time in secondary ink (in the "00:00" slot), title in ink, then the event's category symbols when title and symbols fit together. Inset 8 pt, gaps 6 pt; under 130 pt columns inset 4 pt, gaps 4 pt, no time, condensed type. Rows on days of the neighbouring month are drawn the same; only a passed event steps back.
 
 ### Span Line
 An all-day or multi-day event: a short stub (10 pt, 6 pt narrow), the title set into it in semibold micro type with category symbols when they fit, then the line runs on to the event's end. A one-day event is the stub and title alone.
@@ -326,7 +326,7 @@ On today's column: an 11 pt interchange circle and a 2 pt ink line, updated ever
 
 ### Passed Stations
 An event that is over (The Passed Station Rule) keeps its place and its line; only its station and title step back.
-- **Month row, agenda, day sheet:** hollow station, title in secondary ink, time and category symbols unchanged. On a day outside the month the row keeps its outside ink and 60% mark and only the station goes hollow, so the neighbouring month (whole day, day number included, in outside ink) and the past (events only, day numbers unchanged) stay distinct.
+- **Month row, agenda, day sheet:** hollow station, title in secondary ink, time and category symbols unchanged. The same on a day of the neighbouring month, whose events are otherwise in full ink: there only the day number takes outside ink, so the neighbouring month (day numbers) and the past (events) stay distinct.
 - **Span line:** wholly passed, the line is the 50% passed mix and the title is in secondary ink; under Increased Contrast only the title changes. A span still in progress is unchanged.
 - **Event block:** hollow station, title in block secondary ink (still semibold), the passed 11% fill; the left-edge line stays at full strength. Text holds 4.5:1 on it.
 - **Clock:** demo mode judges against its fixed time; otherwise the app checks at each minute and on return to the app, and redraws only when an event actually changed state. No animation.

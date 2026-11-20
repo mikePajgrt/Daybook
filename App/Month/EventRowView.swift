@@ -7,10 +7,7 @@ struct EventRowView: View {
     let color: ThemeColor
     /// Narrow columns (iPhone, iPad beside the sidebar): no time, condensed type.
     let compact: Bool
-    /// The event's day belongs to the neighbouring month.
-    var dimmed = false
 
-    @Environment(\.colorSchemeContrast) private var contrast
     @Environment(CategoryModel.self) private var categoryModel
     @Environment(AppModel.self) private var model
 
@@ -30,15 +27,16 @@ struct EventRowView: View {
         let categories = categoryModel.categories(for: event.key)
         let passed = model.hasPassed(event)
         return HStack(spacing: compact ? 4 : 6) {
+            // Grey on an event means only that it has passed: a day of the neighbouring month dims its
+            // number, never its events.
             StationMark(color: color, passed: passed)
-                .opacity(dimmed ? 0.6 : 1)
             if !compact {
                 // As wide as the widest time in this font, right-aligned, so titles share one left edge.
                 Text(verbatim: "00:00")
                     .hidden()
                     .overlay(alignment: .trailing) {
                         Text(TimeText.time(event.start))
-                            .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : Theme.secondaryInk)
+                            .foregroundStyle(Theme.secondaryInk)
                             .fixedSize()
                     }
                     .monospacedDigit()
@@ -46,8 +44,8 @@ struct EventRowView: View {
                     .accessibilityHidden(true)
             }
             Text(Self.title(of: event))
-                // A passed event steps its title back; the neighbouring month keeps its outside ink.
-                .foregroundStyle(dimmed ? Theme.outsideInk(contrast) : passed ? Theme.secondaryInk : Theme.ink)
+                // A passed event steps its title back.
+                .foregroundStyle(passed ? Theme.secondaryInk : Theme.ink)
                 .lineLimit(1)
                 .withCategorySymbols(categories, spacing: compact ? 2 : 4)
             Spacer(minLength: 0)
