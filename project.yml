@@ -66,7 +66,7 @@ targets:
         # build-local-mac.sh put in the UTC date and time of the build (scripts/build-number.sh) and the
         # short commit hash, and a Release build from Xcode still at 1 gets them from the build phase
         # "Stamp build number", so every archive has a new build number for App Store Connect.
-        MARKETING_VERSION: "0.2.0"
+        MARKETING_VERSION: "0.2.1"
         CURRENT_PROJECT_VERSION: "1"
         DAYBOOK_COMMIT: ""
         SWIFT_VERSION: "5.0"
