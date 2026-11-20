@@ -78,6 +78,7 @@ struct SidebarView: View {
         // Shown from the sidebar, so on iPhone it rises over the calendars sheet it was opened from.
         .sheet(item: Binding(get: { model.calendarEditor }, set: { model.calendarEditor = $0 })) { editor in
             CalendarEditorView(editor: editor) { model.calendarEditor = nil }
+                .environment(model)
                 .presentationBackground(Theme.rail)
         }
         .sheet(item: $categories.editor) { editor in

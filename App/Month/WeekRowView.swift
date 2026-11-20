@@ -31,6 +31,8 @@ struct WeekRowView: View {
     var onOpenDay: ((Date) -> Void)? = nil
     /// Called when empty space in a day is double-clicked (Mac, iPad: creates an event). `nil` disables it.
     var onCreateEvent: ((Date) -> Void)? = nil
+    /// Offered with `onCreateEvent` in the empty space's context menu (Mac, iPad). `nil` leaves it out.
+    var onCreateAllDayEvent: ((Date) -> Void)? = nil
     /// Clicking an event opens its detail (Mac, iPad). On iPhone a tap opens the day instead.
     var eventsOpenDetail = false
 
@@ -90,7 +92,8 @@ struct WeekRowView: View {
         .overlay(alignment: .trailing) {
             if !isLast { Rectangle().fill(Theme.rule).frame(width: 1) }
         }
-        .modifier(DayCellTaps(day: day.date, onSelect: onSelectDay, onCreate: onCreateEvent))
+        .modifier(DayCellTaps(day: day.date, onSelect: onSelectDay, onCreate: onCreateEvent,
+                              onCreateAllDay: onCreateAllDayEvent))
         // A day is one group: its date and how many events it has, then the events themselves.
         .accessibilityElement(children: .contain)
         .accessibilityLabel(DayText.spoken(day.date, isToday: day.date == today, count: eventCount(column: column)))
@@ -171,11 +174,13 @@ struct WeekRowView: View {
 }
 
 /// Taps on a day cell: one tap selects the day (iPhone), a double click on empty space creates
-/// an event there (Mac, iPad). Events inside the cell take their own clicks first.
+/// an event there (Mac, iPad), and its context menu offers a timed or an all-day event that day.
+/// Events inside the cell take their own clicks and context menus first.
 private struct DayCellTaps: ViewModifier {
     let day: Date
     let onSelect: ((Date) -> Void)?
     let onCreate: ((Date) -> Void)?
+    let onCreateAllDay: ((Date) -> Void)?
 
     func body(content: Content) -> some View {
         if let onSelect {
@@ -183,6 +188,12 @@ private struct DayCellTaps: ViewModifier {
         } else if let onCreate {
             content.contentShape(Rectangle())
                 .onTapGesture(count: 2) { onCreate(day) }
+                .contextMenu {
+                    Button("Nová událost", systemImage: "plus") { onCreate(day) }
+                    if let onCreateAllDay {
+                        Button("Nová celodenní událost", systemImage: "calendar.badge.plus") { onCreateAllDay(day) }
+                    }
+                }
                 .accessibilityAction(named: Text("Nová událost v tento den")) { onCreate(day) }
         } else {
             content

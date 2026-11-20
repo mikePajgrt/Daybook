@@ -31,6 +31,10 @@ struct RootView: View {
                 .sheet(item: Binding(get: { model.editorInDaySheet ? nil : model.editor },
                                      set: { model.editor = $0 })) { editor in
                     EventEditorView(editor: editor) { model.editor = nil }
+                        // Passed on by hand, as the detail popover does: the iPad app on a Mac stopped here
+                        // with "No Observable object of type AppModel found" when the sheet came up without it.
+                        .environment(model)
+                        .environment(model.categoryModel)
                         .presentationBackground(Theme.rail)
                         // iPad: a page-sized sheet shows more of the form without scrolling.
                         .presentationSizing(.page)
@@ -48,6 +52,8 @@ struct RootView: View {
                                             }
                                         })
                     }
+                    .environment(model)
+                    .environment(model.categoryModel)
                     .presentationDetents([.medium, .large])
                     .presentationBackground(Theme.ground)
                 }
@@ -121,6 +127,8 @@ struct RootView: View {
                         }
                         #endif
                 }
+                .environment(model)
+                .environment(model.categoryModel)
                 .presentationDetents([.medium, .large], selection: $calendarsDetent)
                 .presentationBackground(Theme.rail)
             }

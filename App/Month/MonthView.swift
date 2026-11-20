@@ -66,6 +66,8 @@ struct MonthView: View {
         .foregroundStyle(Theme.ink)
         .sheet(item: $selectedDay) { day in
             NavigationStack { DayListView(day: day.date) }
+                .environment(model)
+                .environment(model.categoryModel)
                 .presentationDetents([.medium, .large])
                 .presentationBackground(Theme.rail)
         }
@@ -117,8 +119,10 @@ struct MonthView: View {
                                 // iPhone: a tap on a day opens the day sheet. Mac and iPad: the day number opens the day view.
                                 onSelectDay: compact ? { selectedDay = SelectedDay(date: $0) } : nil,
                                 onOpenDay: compact ? nil : { model.show(day: $0) },
-                                // Mac and iPad: double-click on empty space creates an event that day.
+                                // Mac and iPad: double-click on empty space creates an event that day; its
+                                // context menu offers a timed or an all-day one.
                                 onCreateEvent: compact ? nil : { model.beginNewEvent(onDay: $0) },
+                                onCreateAllDayEvent: compact ? nil : { model.beginNewAllDayEvent(onDay: $0) },
                                 eventsOpenDetail: !compact)
                         .frame(height: height)
                         .id(week.id)

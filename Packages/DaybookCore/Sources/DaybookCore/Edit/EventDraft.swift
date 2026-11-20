@@ -164,6 +164,13 @@ public struct EventDraft: Hashable, Sendable {
         return newEvent(at: start, calendarID: calendarID, calendar: calendar)
     }
 
+    /// A new all-day event on `day` alone.
+    public static func newAllDayEvent(on day: Date, calendarID: String, calendar: Calendar) -> EventDraft {
+        var draft = newEvent(at: calendar.startOfDay(for: day), calendarID: calendarID, calendar: calendar)
+        draft.setAllDay(true, calendar: calendar)
+        return draft
+    }
+
     /// A new one-hour event starting at `start`.
     public static func newEvent(at start: Date, calendarID: String, calendar: Calendar) -> EventDraft {
         EventDraft(calendarID: calendarID, start: start, end: start.addingTimeInterval(3600),

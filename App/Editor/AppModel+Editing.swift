@@ -48,6 +48,14 @@ extension AppModel {
         editor = EventEditorModel(draft: draft, original: nil, calendar: calendar)
     }
 
+    /// A new all-day event on `day` (the month's context menu).
+    func beginNewAllDayEvent(onDay day: Date) {
+        guard let calendarID = preferredCalendarID else { return explainNoWritableCalendar() }
+        editorInDaySheet = false
+        editor = EventEditorModel(draft: EventDraft.newAllDayEvent(on: day, calendarID: calendarID, calendar: calendar),
+                                  original: nil, calendar: calendar)
+    }
+
     /// A new one-hour event at `start` (a time-grid slot).
     func beginNewEvent(at start: Date) {
         guard let calendarID = preferredCalendarID else { return explainNoWritableCalendar() }

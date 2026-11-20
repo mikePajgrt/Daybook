@@ -1449,6 +1449,16 @@
         }
       }
     },
+    "Nová celodenní událost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New all-day event"
+          }
+        }
+      }
+    },
     "Nová kategorie": {
       "localizations": {
         "en": {

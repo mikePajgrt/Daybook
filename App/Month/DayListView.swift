@@ -48,6 +48,8 @@ struct DayListView: View {
         .sheet(item: Binding(get: { model.editorInDaySheet ? model.editor : nil },
                              set: { model.editor = $0 })) { editor in
             EventEditorView(editor: editor) { model.editor = nil }
+                .environment(model)
+                .environment(model.categoryModel)
                 .presentationBackground(Theme.rail)
                 // iPad: a page-sized sheet shows more of the form without scrolling.
                 .presentationSizing(.page)

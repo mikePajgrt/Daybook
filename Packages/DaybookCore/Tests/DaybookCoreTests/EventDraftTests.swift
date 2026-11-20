@@ -187,6 +187,19 @@ import Testing
         #expect(draft.start == d(2026, 11, 17, 14, 30) && draft.end == d(2026, 11, 17, 15, 30))
     }
 
+    @Test func newAllDayEventCoversThatDayAlone() {
+        // Any time of the clicked day gives the same draft: the whole day, no time zone.
+        let draft = EventDraft.newAllDayEvent(on: d(2026, 11, 21, 15, 40), calendarID: "home", calendar: cal)
+        #expect(draft.isAllDay && draft.start == d(2026, 11, 21) && draft.end == d(2026, 11, 21))
+        #expect(draft.timeZoneID == nil && draft.title.isEmpty && draft.calendarID == "home")
+        #expect(draft.problems(calendar: cal).isEmpty)
+    }
+
+    @Test func newAllDayEventOnTheAutumnClockChangeStaysOnItsDay() {
+        let draft = EventDraft.newAllDayEvent(on: d(2026, 10, 25), calendarID: "home", calendar: cal)
+        #expect(draft.start == d(2026, 10, 25) && draft.end == d(2026, 10, 25))
+    }
+
     @Test func preferredCalendarFallsBackInOrder() {
         func c(_ id: String, readOnly: Bool = false) -> CalendarInfo {
             CalendarInfo(id: id, title: id, color: RGBA(r: 0, g: 0, b: 0), sourceTitle: "", sourceKind: .icloud,
